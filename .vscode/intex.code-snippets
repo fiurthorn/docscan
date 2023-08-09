@@ -1,0 +1,149 @@
+{
+	// Place your preform workspace snippets here. Each snippet is defined under a snippet name and has a scope, prefix, body and
+	// description. Add comma separated ids of the languages where the snippet is applicable in the scope field. If scope
+	// is left empty or omitted, the snippet gets applied to all languages. The prefix is what is
+	// used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
+	// $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders.
+	// Placeholders with the same ids are connected.
+	// Example:
+	// "Print to console": {
+	// 	"scope": "javascript,typescript",
+	// 	"prefix": "log",
+	// 	"body": [
+	// 		"console.log('$1');",
+	// 		"$2"
+	// 	],
+	// 	"description": "Log output to console"
+	// }
+	"ok": {
+		"scope": "markdown,dart,go,js",
+		"prefix": "ok",
+		"body": [
+			"[✓] "
+		]
+	},
+	"nok": {
+		"scope": "markdown",
+		"prefix": "nok",
+		"body": [
+			"[🗙] "
+		]
+	},
+	"work": {
+		"scope": "markdown",
+		"prefix": "work",
+		"body": [
+			"[-] "
+		]
+	},
+	"maybe": {
+		"scope": "markdown",
+		"prefix": "maybe",
+		"body": [
+			"[~] "
+		]
+	},
+	"arb_entry": {
+		"scope": "json",
+		"prefix": "arb_entry",
+		"body": [
+			"\"${name}\": \"${translation}\",",
+			"\"@${name}\": {",
+			"  \"description\": \"${description}\"",
+			"},"
+		],
+	},
+	"arb_entry_with_placeholders": {
+		"scope": "json",
+		"prefix": "arb_entry_with_placeholders",
+		"body": [
+			"\"${1:name}\": \"${2:translation}\",",
+			"\"@${name}\": {",
+			"  \"description\": \"${3:description}\",",
+			"  \"placeholders\": {",
+			"    \"${4:placeholder}\": {",
+			"      \"type\": \"${5:int}\",",
+			"      \"example\": \"${6:3}\"",
+			"    }",
+			"  }",
+			"},"
+		],
+	},
+	"arb_entry_placeholders": {
+		"scope": "json",
+		"prefix": "arb_entry_placeholders",
+		"body": [
+			"\"${4:placeholder}\": {",
+			"  \"type\": \"${5:int}\",",
+			"  \"example\": \"${6:3}\"",
+			"}",
+		],
+	},
+	"screen": {
+		"scope": "dart",
+		"prefix": "screen",
+		"body": [
+			"import 'package:flutter/material.dart';",
+			"import 'package:flutter_gen/gen_l10n/app_localizations.dart';",
+			"import 'package:preform/preform/presentation/screens/base.dart';",
+			"",
+			"// TODO bloc+state",
+			"class ${Widget}Screen extends BaseScreen {",
+			"  const ${Widget}Screen({Key? key}) : super(key: key);",
+			"",
+			"  @override",
+			"  State<${Widget}Screen> createState() => _${Widget}ScreenState();",
+			"",
+			"  @override",
+			"  static String get route => '/${route}';",
+			"}",
+			"",
+			"class _${Widget}ScreenState$0 extends BaseScreenState<${Widget}Screen> {",
+			"",
+			"  @override",
+			"  String title(BuildContext context) => AppLocalizations.of(context)!.${page_title};",
+			"",
+			"  @override",
+			"  Widget buildScreen(BuildContext context) => Container();",
+			"",
+			"  @override",
+			"  PreferredSizeWidget? buildAppBar(BuildContext context) => null;",
+			"",
+			"  @override",
+			"  Widget? buildBottomNavigationBar(BuildContext context) => null;",
+			"",
+			"  @override",
+			"  Drawer? buildDrawer(BuildContext context) => null;",
+			"",
+			"  @override",
+			"  Drawer? buildEndDrawer(BuildContext context) => null;",
+			"",
+			"  @override",
+			"  Widget? buildFloatingActionButton(BuildContext context) => null;",
+			"}",
+		]
+	},
+	"usecase": {
+		"prefix": "usecase",
+		"body": [
+			"import 'package:preform/core/lib/optional.dart';",
+			"import 'package:preform/core/lib/tuple.dart';",
+			"import 'package:preform/preform/domain/usecases/usecase.dart';",
+			"",
+			"class ${1:UseCase}Param extends Tuple<String>{",
+			"  ${4:String} get ${3:param} => a;",
+			"",
+			"  const ${1:UseCase}Param({",
+			"    required ${4:String} ${3:param},",
+			"  }) : super(${3:param});",
+			"}",
+			"",
+			"class ${1:UseCase}UseCase implements UseCase<${2:String}, ${1:UseCase}Param> {",
+			"  @override",
+			"  Future<Optional<${2:String}>> call(${1:UseCase}Param param) async {",
+			"    return Optional.newValue($5\"value\");",
+			"  }",
+			"}",
+		]
+	}
+}

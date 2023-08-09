@@ -1,0 +1,116 @@
+{
+  "baseScreen_about_label": "About {applicationName}",
+  "@baseScreen_about_label": {
+    "description": "About label",
+    "placeholders": {
+      "applicationName": {
+        "type": "String",
+        "example": "My App"
+      }
+    }
+  },
+  "baseScreen_about_system_label_browser": "Runs in {browser} on {device}/{os}",
+  "@baseScreen_about_system_label_browser": {
+    "description": "small description on which device the app is running",
+    "placeholders": {
+      "browser": {
+        "type": "String",
+        "example": "Chrome, Edge, Firefox, etc."
+      },
+      "device": {
+        "type": "String",
+        "example": "Mobile"
+      },
+      "os": {
+        "type": "String",
+        "example": "e.g. linux, windows, etc."
+      }
+    }
+  },
+  "baseScreen_about_system_label_desktop": "Runs on {device}/{os}",
+  "@baseScreen_about_system_label_desktop": {
+    "description": "small description on which device the app is running",
+    "placeholders": {
+      "device": {
+        "type": "String",
+        "example": "Mobile"
+      },
+      "os": {
+        "type": "String",
+        "example": "e.g. linux, windows, etc."
+      }
+    }
+  },
+  "baseScreen_signOut_label": "Sign out",
+  "@baseScreen_signOut_label": {
+    "description": "logout label"
+  },
+  "example_plural_title": "{n,plural, =1{1st} =2{2nd} few{{n}rd} other{{n}th}} Item",
+  "@example_plural_title": {
+    "description": "",
+    "placeholders": {
+      "n": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "message_failure_genericError": "Failure while submit the form: {serverMessage}",
+  "@message_failure_genericError": {
+    "description": "generic error message on submit a form",
+    "placeholders": {
+      "serverMessage": {
+        "type": "String",
+        "example": "db error, server error, etc."
+      }
+    }
+  },
+  "validate_email_errorHint": "a valid email <name@example.com> need",
+  "@validate_email_errorHint": {
+    "description": "validation error on regex match error"
+  },
+  "validate_maxLength_errorHint": "need less than {n} characters",
+  "@validate_maxLength_errorHint": {
+    "description": "validation error on max length error",
+    "placeholders": {
+      "n": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "validate_minLength_errorHint": "need more than {n} characters",
+  "@validate_minLength_errorHint": {
+    "description": "validation error on min length error",
+    "placeholders": {
+      "n": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "validate_notADate_errorHint": "is not a date",
+  "@validate_notADate_errorHint": {
+    "description": "validation error if the text is not a date"
+  },
+  "validate_notANumber_errorHint": "is not a number",
+  "@validate_notANumber_errorHint": {
+    "description": "validation error if the text is not a number"
+  },
+  "validate_notEmpty_errorHint": "required",
+  "@validate_notEmpty_errorHint": {
+    "description": "validation error for empty values"
+  },
+  "validate_passwordEquals_errorHint": "The old ant the new password are not allowed to match",
+  "@validate_passwordEquals_errorHint": {
+    "description": "old password and new password must not match"
+  },
+  "validate_passwordNotEquals_errorHint": "The passwords must match.",
+  "@validate_passwordNotEquals_errorHint": {
+    "description": "check password and new password have to match"
+  },
+  "validate_regexMatch_errorHint": "the value does not match the pattern",
+  "@validate_regexMatch_errorHint": {
+    "description": "validation error on regex match error"
+  }
+}

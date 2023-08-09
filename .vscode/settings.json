@@ -1,0 +1,51 @@
+{
+  "files.associations": {
+    "*.arb": "json",
+    "*.schema": "json"
+  },
+  "files.exclude": {
+    ".azure": true,
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    ".vscode": true,
+    "*.key": true,
+    ".dart_tool": true,
+    ".flutter*": true,
+    ".idea": true,
+    ".metadata": true,
+    ".packages": true,
+    "analysis_options.yaml": true,
+    "pubspec.lock": true,
+    "*.iml": true,
+    "build": true,
+    "android": false,
+    "linux": true,
+    "windows": true,
+    "ios": true,
+    "lib/generated_plugin_registrant.dart": true,
+  },
+  "vscode-janus-debug.categories": true,
+  "vscode-janus-debug.uploadOnSave": [
+    "preform",
+    "itxPurchaseRequest.script.filetype.Gentable.json",
+    "toolbox8.preform.startWorkflows",
+    "toolbox8.preform.api",
+    "toolbox8.intexforms.startWorkflows",
+    "itxPurchaseRequest.script.filetype.externalPreformShop",
+    "toolbox8.intexforms.api",
+    "simple.intexforms.api",
+    "qrcode"
+  ],
+  "cSpell.words": [
+    "docscanner",
+    "nord"
+  ],
+  "commentTranslate.targetLanguage": "de",
+  "cSpell.language": "de,en,de-DE",
+  "cSpell.useGitignore": false,
+  "java.configuration.updateBuildConfiguration": "interactive"
+}

@@ -1,0 +1,23 @@
+permittedLicenses:
+  - MIT
+  - BSD-2-Clause
+  - BSD-3-Clause
+  - Apache-2.0
+  - ECL-2.0
+  - JSON
+  - Zlib
+
+rejectedLicenses:
+  - GPL
+  - AGPL
+  - LGPL
+
+approvedPackages:
+  "unknown-license":
+    - rxdart
+    - dependency_validator
+  "no-file":
+    - flutter_test
+    - flutter_gen
+    - flutter_localizations
+    - flutter_web_plugins

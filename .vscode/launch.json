@@ -1,0 +1,34 @@
+{
+	// Use IntelliSense to learn about possible configuration attributes.
+	// Hover to view descriptions of existing attributes.
+	"version": "v1.6.0",
+	"configurations": [
+		{
+			"name": "android",
+			"type": "dart",
+			"request": "launch",
+			"args": [
+				"-d",
+				"Pixel 6 Pro",
+			],
+			"program": "lib/main.dart",
+		},
+		{
+			"name": "android-emulator",
+			"type": "dart",
+			"request": "launch",
+			"args": [
+				"-d",
+				"emulator-5554",
+			],
+			"program": "lib/main.dart",
+		},
+		{
+			"name": "test.dart",
+			"type": "dart",
+			"request": "launch",
+			// "deviceId": "linux",
+			"program": "lib/test.dart"
+		},
+	]
+}
