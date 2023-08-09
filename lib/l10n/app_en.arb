@@ -45,6 +45,16 @@
   "@baseScreen_signOut_label": {
     "description": "logout label"
   },
+  "dropdown_empty_hint": "choose {label}",
+  "@dropdown_empty_hint": {
+    "placeholders": {
+      "label": {
+        "type": "String",
+        "example": "text description"
+      }
+    },
+    "description": ""
+  },
   "example_plural_title": "{n,plural, =1{1st} =2{2nd} few{{n}rd} other{{n}th}} Item",
   "@example_plural_title": {
     "description": "",

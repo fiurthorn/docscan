@@ -1,6 +1,6 @@
 // ignore: depend_on_referenced_packages
 import 'package:document_scanner/scanner/application.dart';
-import 'package:document_scanner/scanner/presentation/screens/scanner.dart';
+import 'package:document_scanner/scanner/presentation/screens/scanner/page.dart';
 import 'package:flutter/material.dart';
 
 class DocumentScanner extends Application {

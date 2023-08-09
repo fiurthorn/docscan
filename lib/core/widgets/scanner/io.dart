@@ -16,6 +16,7 @@ Future<Tuple2<String, Uint8List?>> scan() async {
   final pdf = pw.Document();
   for (final imagePath in imagePaths) {
     await (img.Command()
+          // TODO make this configurable
           ..decodeJpgFile(imagePath)
           ..grayscale()
           //..monochrome(color: img.ColorInt16.rgb(0, 0, 0))

@@ -6,7 +6,11 @@ class ThemeIcons {
         "icons/transparent/xxxhdpi.png",
         color: Colors.white,
       );
-  static Image get logo2 => Image.asset('icons/transparent/xxxhdpi.png', height: 20);
+  static Image logo2({double? height, Color? color}) => Image.asset(
+        'icons/transparent/xxxhdpi.png',
+        height: height,
+        color: color,
+      );
 
   static IconData get attach => FontAwesomeIcons.fileArrowUp;
 

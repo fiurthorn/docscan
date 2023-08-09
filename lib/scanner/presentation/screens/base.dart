@@ -1,5 +1,6 @@
 import 'package:document_scanner/core/lib/optional.dart';
 import 'package:document_scanner/core/lib/transition_page_fade.dart';
+import 'package:document_scanner/core/platform/platform.dart';
 import 'package:document_scanner/core/widgets/loading_widget/loading_widget.dart';
 import 'package:document_scanner/scanner/presentation/screens/error/error.dart';
 import 'package:flutter/material.dart';
@@ -96,9 +97,7 @@ abstract class BaseScreenState<T extends StatefulWidget> extends State<T> {
   Widget _scaffold(BuildContext context) => _theme(
       context,
       WillPopScope(
-        onWillPop: () async {
-          return true;
-        },
+        onWillPop: () => _onWillPop(context),
         child: Scaffold(
           extendBodyBehindAppBar: extendBodyBehindAppBar,
           appBar: buildAppBar(context),
@@ -127,6 +126,33 @@ abstract class BaseScreenState<T extends StatefulWidget> extends State<T> {
     return Theme(
       data: theme,
       child: screen,
+    );
+  }
+
+  Future<bool> _onWillPop(BuildContext context) async {
+    if (!isMobile || isWeb) return true;
+
+    bool? exitResult = await showDialog(
+      context: context,
+      builder: (context) => _buildExitDialog(context),
+    );
+    return exitResult ?? false;
+  }
+
+  AlertDialog _buildExitDialog(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Please confirm'),
+      content: const Text('Do you want to exit the app?'),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: const Text('No'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          child: const Text('Yes'),
+        ),
+      ],
     );
   }
 }

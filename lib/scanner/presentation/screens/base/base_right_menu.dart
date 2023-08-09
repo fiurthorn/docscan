@@ -1,5 +1,7 @@
 import 'package:document_scanner/core/design/theme_icons.dart';
 import 'package:document_scanner/core/lib/language_name.dart';
+import 'package:document_scanner/core/systempanel/systempanel.dart';
+import 'package:document_scanner/core/version.g.dart';
 import 'package:document_scanner/l10n/app_lang.dart';
 import 'package:flutter/material.dart';
 
@@ -40,6 +42,22 @@ Drawer baseRightMenu(
                 reloader();
               },
             ),
+          ),
+          const Divider(thickness: 1, height: 2),
+          ListTile(
+            leading: Icon(ThemeIcons.info),
+            title: Text(AppLang.i18n.baseScreen_about_label('intex Forms')),
+            onTap: () {
+              showAboutDialog(
+                  context: context,
+                  applicationIcon: ThemeIcons.logo2(height: 100),
+                  applicationName: 'intex Forms',
+                  applicationVersion: buildVersion,
+                  applicationLegalese: copyright,
+                  children: [const RuntimeWidget()]);
+
+              scaffold.currentState!.closeEndDrawer();
+            },
           ),
           const Divider(thickness: 1, height: 2),
         ],
