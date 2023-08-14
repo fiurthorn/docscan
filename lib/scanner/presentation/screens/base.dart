@@ -35,6 +35,17 @@ abstract class BaseScreen extends StatefulWidget {
 abstract class BaseScreenState<T extends StatefulWidget> extends State<T> {
   final GlobalKey<ScaffoldState> scaffold = GlobalKey();
 
+  void go(String route) {
+    GoRouter.of(context).go(route);
+  }
+
+  void push(String route) {
+    if (isWeb)
+      GoRouter.of(context).go(route);
+    else
+      GoRouter.of(context).push(route);
+  }
+
   VoidCallback refresher(VoidCallback fn) => () => setState(fn);
   void refresh(VoidCallback fn) => setState(fn);
   void update() => refresh(() {});

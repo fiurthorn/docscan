@@ -1,10 +1,9 @@
 enum KeyValueNames {
-  serverUrl,
-  username,
-  session,
-  refresh,
   locale,
-  loggedIn,
+  //
+  supplierNames,
+  documentTypes,
+  areas,
 }
 
 extension KeyValueNamesExtension on KeyValueNames {
@@ -24,8 +23,15 @@ abstract class KeyValues {
   bool notEmpty(KeyValueNames key);
   bool has(KeyValueNames key);
 
-  String signOut();
-  void signIn(String username, String session, String refresh);
-
   void close();
+
+  Future<List<String>> supplierNames();
+  Future<void> setSupplierNames(List<String> list);
+  Future<void> addSupplierNames(String supplierName);
+
+  Future<List<String>> documentTypeItems();
+  Future<void> setDocumentTypeItems(List<String> list);
+
+  Future<List<String>> areaItems();
+  Future<void> setAreaItems(List<String> list);
 }

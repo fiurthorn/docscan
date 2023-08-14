@@ -1,7 +1,12 @@
 import 'package:document_scanner/core/design/theme_colors.dart';
 import 'package:document_scanner/core/design/theme_icons.dart';
+import 'package:document_scanner/scanner/presentation/screens/areas/page.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/base_right_menu.dart';
+import 'package:document_scanner/scanner/presentation/screens/documentsTypes/page.dart';
+import 'package:document_scanner/scanner/presentation/screens/scanner/page.dart';
+import 'package:document_scanner/scanner/presentation/screens/supplier/page.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 Drawer rightMenu(
   BuildContext context,
@@ -28,13 +33,39 @@ Drawer rightMenu(
     ),
     const SizedBox(height: 10),
     const Divider(thickness: 1, height: 2),
-    // ListTile(
-    //   title: Text(AppLang.i18n.preAttach_page_title),
-    //   leading: Icon(ThemeIcons.attach),
-    //   onTap: () {
-    //     scaffold.currentState!.closeEndDrawer();
-    //     context.go(AttachScreen.path);
-    //   },
-    // ),
+    const SizedBox(height: 10),
+    ListTile(
+      title: const Text("Scan"),
+      leading: const Icon(Icons.scanner),
+      onTap: () {
+        scaffold.currentState!.closeEndDrawer();
+        context.go(ScannerScreen.path);
+      },
+    ),
+    const Divider(thickness: 1, height: 2),
+    ListTile(
+      title: const Text("Areas"),
+      leading: Icon(ThemeIcons.area),
+      onTap: () {
+        scaffold.currentState!.closeEndDrawer();
+        context.go(AreasScreen.path);
+      },
+    ),
+    ListTile(
+      title: const Text("Document types"),
+      leading: Icon(ThemeIcons.docType),
+      onTap: () {
+        scaffold.currentState!.closeEndDrawer();
+        context.go(DocumentTypesScreen.path);
+      },
+    ),
+    ListTile(
+      title: const Text("Suppliers"),
+      leading: Icon(ThemeIcons.supplier),
+      onTap: () {
+        scaffold.currentState!.closeEndDrawer();
+        context.go(SuppliersScreen.path);
+      },
+    ),
   ], accountItems: []);
 }

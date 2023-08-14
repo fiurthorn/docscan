@@ -2,8 +2,6 @@ import 'package:document_scanner/core/design/theme_colors.dart';
 import 'package:document_scanner/core/design/theme_data.dart';
 import 'package:document_scanner/core/design/theme_icons.dart';
 import 'package:document_scanner/core/lib/logger.dart';
-import 'package:document_scanner/core/service_locator/service_locator.dart';
-import 'package:document_scanner/scanner/domain/repositories/key_values.dart';
 import 'package:flutter/material.dart';
 
 class ErrorApp extends StatelessWidget {
@@ -60,10 +58,7 @@ class ErrorScaffold extends StatelessWidget {
           appBar: AppBar(title: Text(title ?? ""), actions: [
             IconButton(
               icon: Icon(ThemeIcons.clearCache),
-              onPressed: () {
-                keyValues().remove(KeyValueNames.serverUrl);
-                reload();
-              },
+              onPressed: () => reload(),
             )
           ]),
           body: ErrorWidget(

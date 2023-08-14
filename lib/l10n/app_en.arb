@@ -75,6 +75,10 @@
       }
     }
   },
+  "needOnePosition_errorHint": "At least one Position required",
+  "@needOnePosition_errorHint": {
+    "description": "error hint, if lesser than one position to create"
+  },
   "validate_email_errorHint": "a valid email <name@example.com> need",
   "@validate_email_errorHint": {
     "description": "validation error on regex match error"

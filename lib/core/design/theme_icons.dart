@@ -13,6 +13,7 @@ class ThemeIcons {
       );
 
   static IconData get attach => FontAwesomeIcons.fileArrowUp;
+  static IconData get area => FontAwesomeIcons.fileShield;
 
   static IconData get back => const IconDataSolid(0xf060);
 
@@ -29,14 +30,16 @@ class ThemeIcons {
   static IconData get defaultUser => const IconDataRegular(0xf007);
   static IconData get deletePosition => FontAwesomeIcons.trashCan;
   static IconData get dissatisfied => FontAwesomeIcons.disease;
+  static IconData get docType => FontAwesomeIcons.fileInvoice;
 
   static IconData get email => FontAwesomeIcons.share;
   static IconData get exit => FontAwesomeIcons.rightFromBracket;
 
   static IconData get firebase => const IconDataRegular(0xf0e0);
   static IconData get file => FontAwesomeIcons.file;
-  static IconData get fileDownload => FontAwesomeIcons.fileArrowDown;
   static IconData get fileAdd => FontAwesomeIcons.fileCirclePlus;
+  static IconData get fileDownload => FontAwesomeIcons.fileArrowDown;
+  static IconData get filePDF => FontAwesomeIcons.filePdf;
 
   static IconData get hitlist => const IconDataSolid(0xf03a);
   static IconData get home => FontAwesomeIcons.houseChimney;
@@ -75,6 +78,7 @@ class ThemeIcons {
   static IconData get searchFilter => FontAwesomeIcons.filter;
   static IconData get smallSearch => FontAwesomeIcons.magnifyingGlass;
   static IconData get settings => FontAwesomeIcons.sliders;
+  static IconData get supplier => FontAwesomeIcons.vanShuttle;
 
   static IconData get send => Icons.send;
   static IconData get sendAlt => const IconDataSolid(0xe20a);

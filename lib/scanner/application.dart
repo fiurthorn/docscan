@@ -5,9 +5,11 @@ import 'dart:math';
 import 'package:document_scanner/core/design/theme_data.dart';
 import 'package:document_scanner/core/goroute/auth_route.dart';
 import 'package:document_scanner/core/lib/simple_bloc_observer.dart';
+import 'package:document_scanner/core/lib/trace.dart';
 import 'package:document_scanner/core/lib/tuple.dart';
 import 'package:document_scanner/core/platform/platform.dart';
 import 'package:document_scanner/core/service_locator/service_locator.dart';
+import 'package:document_scanner/core/widgets/loading_widget/loading_widget.dart';
 import 'package:document_scanner/l10n/app_lang.dart';
 import 'package:document_scanner/l10n/translations/translations.dart';
 import 'package:document_scanner/scanner/domain/repositories/key_values.dart';
@@ -51,7 +53,7 @@ abstract class ApplicationState<T extends Application> extends State<T> {
 
   Future<bool> setLanguage() async {
     final systemLocale = await findSystemLocale();
-    AppLang.lang = keyValues().get(KeyValueNames.locale, systemLocale);
+    AppLang.lang = trace(keyValues().get(KeyValueNames.locale, systemLocale));
     return true;
   }
 
@@ -59,11 +61,19 @@ abstract class ApplicationState<T extends Application> extends State<T> {
   Widget build(BuildContext context) {
     return KeyedSubtree(
       key: key,
-      child: app,
+      child: FutureBuilder(
+          future: setLanguage(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return error(snapshot);
+            }
+            if (!snapshot.hasData) {
+              return const LoadingWidget();
+            }
+            return app;
+          }),
     );
   }
-
-  bool get hasServerUrl => isWeb || keyValues().notEmpty(KeyValueNames.serverUrl);
 
   Widget get app {
     final router = goRouter();

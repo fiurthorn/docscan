@@ -28,22 +28,39 @@ class KeyValuesImpl implements KeyValues {
   Future<void> remove(KeyValueNames key) async => _box.delete(key.name);
 
   @override
+  Future<List<String>> documentTypeItems() async =>
+      (await _box.get(KeyValueNames.documentTypes.name, defaultValue: const []) as List).map((e) => '$e').toList();
+
+  @override
+  Future<void> setAreaItems(List<String> list) async => _box.put(KeyValueNames.areas.name, list);
+
+  @override
+  Future<List<String>> areaItems() async =>
+      (await _box.get(KeyValueNames.areas.name, defaultValue: const []) as List).map((e) => '$e').toList();
+
+  @override
+  Future<void> setDocumentTypeItems(List<String> list) async => _box.put(KeyValueNames.documentTypes.name, list);
+
+  @override
+  Future<List<String>> supplierNames() async =>
+      (await _box.get(KeyValueNames.supplierNames.name, defaultValue: const []) as List).map((e) => '$e').toList();
+
+  @override
+  Future<void> setSupplierNames(List<String> list) async => _box.put(KeyValueNames.supplierNames.name, list);
+
+  @override
+  Future<void> addSupplierNames(String supplierName) async {
+    if (!_box.containsKey(KeyValueNames.supplierNames.name)) {
+      _box.put(KeyValueNames.supplierNames.name, [supplierName]);
+      return;
+    }
+
+    supplierNames()
+        .then((value) => value.contains(supplierName) ? null : value)
+        .then((value) => value?..add(supplierName))
+        .then((value) => value == null ? null : _box.put(KeyValueNames.supplierNames.name, value));
+  }
+
+  @override
   close() => _box.close();
-
-  @override
-  String signOut() {
-    final token = get(KeyValueNames.session);
-    set(KeyValueNames.session, "");
-    set(KeyValueNames.refresh, "");
-    set(KeyValueNames.loggedIn, "false");
-    return token;
-  }
-
-  @override
-  void signIn(String username, String session, String refresh) {
-    set(KeyValueNames.username, username);
-    set(KeyValueNames.session, session);
-    set(KeyValueNames.refresh, refresh);
-    set(KeyValueNames.loggedIn, "true");
-  }
 }

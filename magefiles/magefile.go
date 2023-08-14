@@ -40,6 +40,15 @@ func AdbWlan(ip, port, pairCode, pairPort string) (err error) {
 	return
 }
 
+func AdbQrcode(port string) (err error) {
+	err = mage.NewTask("adb-wifi", port).Run()
+	if err != nil {
+		fmt.Println("maybe install 'npm i adb-wifi -g'")
+		return
+	}
+	return
+}
+
 func OptimizePng() (err error) {
 	err = mage.NewTask("find", "-name", "'*.png'", "-exec", "zopflipng", "-m", "-y", "'{}'", "'{}'", "';'").WorkingDir(".").Result(&bytes.Buffer{}, &bytes.Buffer{})
 	return

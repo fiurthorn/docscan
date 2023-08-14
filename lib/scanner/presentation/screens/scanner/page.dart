@@ -19,6 +19,7 @@ import 'package:document_scanner/scanner/presentation/screens/base/right_menu.da
 import 'package:document_scanner/scanner/presentation/screens/base/top_nav.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
+import 'package:pdfx/pdfx.dart';
 
 class ScannerScreen extends BaseScreen {
   const ScannerScreen({super.key});
@@ -75,63 +76,164 @@ class _ScannerScreenState extends FormBlocBaseScreenState<ScannerScreen, Scanner
               stackTrace: state.failureResponse!.stackTrace);
         },
         child: Builder(builder: (context) {
-          return SingleChildScrollView(
-            physics: const ClampingScrollPhysics(),
-            primary: true,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 15),
-              child: Column(
-                children: [
-                  DropDownBlocBuilder(
-                    bloc: formBloc.main.area,
-                    label: "Area",
-                    hint: "Area",
-                  ),
-                  DropDownBlocBuilder(
-                    bloc: formBloc.main.documentType,
-                    label: "Document Type",
-                    hint: "Document Type",
-                  ),
-                  TextBlocBuilder(
-                    bloc: formBloc.main.supplierName,
-                    label: "Supplier Name",
-                    hint: "Supplier Name",
-                  ),
-                  DateTimeBlocBuilder(
-                    bloc: formBloc.main.documentDate,
-                    label: "Document Date",
-                    hint: "Document Date",
-                  ),
-                  const SizedBox(height: 20),
-                  BlocBuilder(
-                      bloc: formBloc.main.attachments,
-                      builder: (context, state) {
-                        return ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: formBloc.attachmentCount(),
-                          itemBuilder: attachmentItemBuilder(formBloc),
-                        );
-                      }),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      scannerButton(formBloc),
-                      sendPurchaseButton(context, formBloc),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          );
+          if (formBloc.scannedImages.value.isNotEmpty) {
+            return buildImageEnhancementViewer(context, formBloc);
+          }
+
+          return buildInputForm(context, formBloc);
         }),
       ),
     );
   }
 
-  void dirty(BuildContext context) => BlocProvider.of<ScannerBloc>(context).validate();
+  Widget buildImageEnhancementViewer(BuildContext context, ScannerBloc formBloc) {
+    return Column(
+      children: [
+        DropDownBlocBuilder(
+          bloc: formBloc.converter,
+          hint: "Select Converter",
+          requestFocus: true,
+          onChanged: (_) => formBloc.clearImageCache(),
+        ),
+        Visibility(
+          visible: formBloc.converter.value?.technical == monochrome,
+          child: BlocBuilder(
+              bloc: formBloc.amount,
+              builder: (context, state) {
+                return Slider(
+                    value: formBloc.amount.value,
+                    divisions: 20,
+                    onChanged: (value) {
+                      formBloc.amountChanged(value);
+                      update();
+                    });
+              }),
+        ),
+        Visibility(
+          visible: formBloc.converter.value?.technical == luminance,
+          child: BlocBuilder(
+              bloc: formBloc.threshold,
+              builder: (context, state) {
+                return Slider(
+                    value: formBloc.threshold.value,
+                    divisions: 20,
+                    onChanged: (value) {
+                      formBloc.thresholdChanged(value);
+                      update();
+                    });
+              }),
+        ),
+        SizedBox(
+          height: 400,
+          width: 400,
+          child: PhotoViewGallery.builder(
+            scrollPhysics: const BouncingScrollPhysics(),
+            builder: (BuildContext context, int index) {
+              return PhotoViewGalleryPageOptions(
+                imageProvider: MemoryImage(formBloc.convertedImage(index)),
+                initialScale: PhotoViewComputedScale.contained * 0.8,
+                heroAttributes: PhotoViewHeroAttributes(tag: index),
+              );
+            },
+            itemCount: formBloc.scannedImages.value.length,
+            loadingBuilder: (context, event) => Center(
+              child: SizedBox(
+                width: 20.0,
+                height: 20.0,
+                child: CircularProgressIndicator(
+                  value: event == null
+                      ? 0
+                      : event.cumulativeBytesLoaded / (event.expectedTotalBytes ?? event.cumulativeBytesLoaded),
+                ),
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              RoundIconButton(
+                backgroundColor: themeGrey2Color,
+                onPressed: () => formBloc.createPDF().then((value) => update()),
+                icon: ThemeIcons.filePDF,
+                tooltip: '',
+              ),
+            ],
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget buildInputForm(BuildContext context, ScannerBloc formBloc) => SingleChildScrollView(
+        physics: const ClampingScrollPhysics(),
+        primary: true,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 15),
+          child: Column(
+            children: [
+              DropDownBlocBuilder(
+                bloc: formBloc.main.area,
+                label: "Area",
+                hint: "Area",
+              ),
+              TextBlocBuilder(
+                bloc: formBloc.main.supplierName,
+                label: "Supplier Name",
+                hint: "Supplier Name",
+              ),
+              DropDownBlocBuilder(
+                bloc: formBloc.main.documentType,
+                label: "Document Type",
+                hint: "Document Type",
+              ),
+              DateTimeBlocBuilder(
+                bloc: formBloc.main.documentDate,
+                label: "Document Date",
+                hint: "Document Date",
+                firstDateTime: DateTime(1900),
+                lastDateDuration: const Duration(days: 3653 * 20),
+              ),
+              const SizedBox(height: 20),
+              BlocBuilder(
+                  bloc: formBloc.main.attachments,
+                  builder: (context, state) {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: formBloc.attachmentCount(),
+                      itemBuilder: attachmentItemBuilder(formBloc),
+                    );
+                  }),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  scannerButton(formBloc),
+                  sendPurchaseButton(context, formBloc),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+
+  void dirty(BuildContext context) {
+    final formBloc = BlocProvider.of<ScannerBloc>(context);
+
+    if (formBloc.attachments.isEmpty) {
+      showSnackBarFailure(context, "create pre send (dirty)", AppLang.i18n.needOnePosition_errorHint, "no positions");
+      // } else {
+      // showSnackBarFailure(context, "create pre send (dirty)", "missing required values");
+    }
+
+    formBloc.validate();
+  }
+
   void submit(BuildContext context) => context.read<ScannerBloc>().submit();
 
   Widget sendPurchaseButton(BuildContext context, ScannerBloc bloc) {
@@ -151,11 +253,9 @@ class _ScannerScreenState extends FormBlocBaseScreenState<ScannerScreen, Scanner
       backgroundColor: Theme.of(context).primaryColor,
       onPressed: () async {
         LoadingDialog.show(context);
-        // TODO move converting to bloc
-        // TODO clean up
         scan().then((value) {
-          if (value.b != null) {
-            formBloc.uploadAttachment(value.a, value.b!, ready: () => update());
+          if (value != null) {
+            formBloc.storeScanResult(value, ready: () => update());
           }
         }).whenComplete(() => LoadingDialog.hide(context));
       },

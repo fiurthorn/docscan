@@ -11,6 +11,7 @@ class DropDownBlocBuilder extends DropdownFieldBlocBuilder<I18nLabel> {
     bool requestFocus = false,
     bool isEnabled = true,
     String? label,
+    super.onChanged,
     super.key,
   }) : super(
           isEnabled: isEnabled,

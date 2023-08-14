@@ -1,15 +1,11 @@
 part of "bloc.dart";
 
-class FileAttachment extends Tuple3<String, String, int> {
+class FileAttachment extends Tuple3<String, Uint8List, int> {
   String get name => a;
-  String get id => b;
+  Uint8List get data => b;
   int get size => c;
 
-  const FileAttachment(String name, String id, int size) : super(name, id, size);
-
-  FileAttachment copyWith({required String id}) {
-    return FileAttachment(name, id, size);
-  }
+  const FileAttachment(String name, Uint8List data, int size) : super(name, data, size);
 }
 
 typedef AttachmentState
@@ -31,47 +27,64 @@ class AttachState extends GroupFieldBloc<FieldBloc, dynamic> {
   AttachState()
       : super(name: "main", fieldBlocs: [
           ListFieldBloc<AttachmentState, String>(name: "attachments"),
-          SelectFieldBloc<I18nLabel, dynamic>(name: "area", validators: [notEmptyObject()], items: areaItems()),
           SelectFieldBloc<I18nLabel, dynamic>(
-              name: "documentType", validators: [notEmptyObject()], items: documentTypeItems()),
-          TextFieldBloc<String>(name: "supplierName", validators: [notEmpty()], suggestions: supplierNames),
+            name: "area",
+            validators: [notEmptyObject()],
+          ),
+          SelectFieldBloc<I18nLabel, dynamic>(
+            name: "documentType",
+            validators: [notEmptyObject()],
+          ),
+          TextFieldBloc<String>(
+            name: "supplierName",
+            validators: [notEmpty()],
+            suggestions: supplierNames,
+          ),
           DateTimeBloc.create(name: "documentDate", validators: [notEmpty()]),
         ]) {
     attachments.emit(attachments.state.copyWith(isValidating: false));
+
+    documentTypeItems().then((value) => documentType.updateItems(value));
+    areaItems().then((value) => area.updateItems(value));
   }
 
-  void uploadAttachment(String filename, Uint8List bytes, {required Function ready}) {
-    final value = FileAttachment(filename, "", bytes.length);
+  void uploadAttachment(String filename, Uint8List bytes) {
+    final value = FileAttachment(filename, bytes, bytes.length);
     final attachment = InputFieldBloc<FileAttachment, dynamic>(initialValue: value);
     attachments.addFieldBloc(attachment);
-    // sl<UploadAttachmentUseCase>()
-    //     .call(UploadAttachmentParam(filename: filename, bytes: bytes))
-    //     .then((id) => attachment.updateValue(value.copyWith(id: id.eval())))
-    //     .then((_) => ready());
   }
 
   void removeAttachment(int index) {
-    final id = attachments.state.fieldBlocs[index].value.id;
     attachments.removeFieldBlocAt(index);
-    // sl<RemoveAttachmentUseCase>().call(RemoveAttachmentParam(id: id));
   }
 
   static Future<List<String>> supplierNames(String pattern) async {
-    // TODO store in db; load from db
-    return ["Axa", "Allianz", "Helsana", "Mobiliar", "Zurich", "Generali", "Helvetia", "Swisslife"];
+    return keyValues().supplierNames().then(
+          (value) => value
+              .where(
+                (element) => element.toLowerCase().contains(pattern.toLowerCase()),
+              )
+              .toList(),
+        );
   }
 
-  static List<I18nLabel> documentTypeItems() {
-    return [
-      I18nLabel.build(label: "invoice;de:Rechnung;en:Invoice"),
-      I18nLabel.build(label: "receipt;de:Quittung;en:Receipt"),
-      I18nLabel.build(label: "other;de:Andere;en:Other"),
-    ];
+  static Future<List<I18nLabel>> documentTypeItems() async {
+    return keyValues().documentTypeItems().then(
+          (value) => value
+              .map(
+                (element) => I18nLabel.build(label: element),
+              )
+              .toList(),
+        );
   }
 
-  static List<I18nLabel> areaItems() {
-    return [
-      I18nLabel.build(label: "insurance;de:Versicherung;en:Insurance"),
-    ];
+  static Future<List<I18nLabel>> areaItems() async {
+    return keyValues().areaItems().then(
+          (value) => value
+              .map(
+                (element) => I18nLabel.build(label: element),
+              )
+              .toList(),
+        );
   }
 }
