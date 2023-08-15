@@ -69,7 +69,7 @@ class ScannerBloc extends FormBloc<String, ErrorValue> {
         final downloadsDirectory = (await DownloadsPath.downloadsDirectory())!;
 
         final filepath =
-            Directory("${downloadsDirectory.path}/export/${main.area.value!.technical}/${main.supplierName.value}");
+            Directory("${downloadsDirectory.path}/Archive/${main.area.value!.technical}/${main.supplierName.value}");
 
         if (!filepath.existsSync()) {
           filepath.createSync(recursive: true);

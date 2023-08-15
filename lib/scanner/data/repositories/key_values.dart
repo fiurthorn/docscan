@@ -57,7 +57,9 @@ class KeyValuesImpl implements KeyValues {
 
     supplierNames()
         .then((value) => value.contains(supplierName) ? null : value)
-        .then((value) => value?..add(supplierName))
+        .then((value) => value
+          ?..add(supplierName)
+          ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase())))
         .then((value) => value == null ? null : _box.put(KeyValueNames.supplierNames.name, value));
   }
 

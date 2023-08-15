@@ -26,7 +26,7 @@ class ItemBloc extends FormBloc<String, ErrorValue> {
   FutureOr<void> onSubmitting() async {
     try {
       keyValues().setAreaItems(
-          main.areas.value.map((e) => e.value).toList()..sort(((a, b) => a.toLowerCase().compareTo(b.toLowerCase()))));
+          main.areas.value.map((e) => e.value).toList()..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase())));
       emitSuccess(successResponse: "Saved");
     } on Exception catch (err, stack) {
       emitFailure(failureResponse: ErrorValue(err, stack));
