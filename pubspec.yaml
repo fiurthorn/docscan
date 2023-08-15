@@ -39,6 +39,7 @@ dependencies:
   lecle_downloads_path_provider: ^0.0.2+8
   mime: ^1.0.4
   mobile_scanner: ^3.3.0
+  once: ^1.5.3
   path_provider: ^2.0.15
   pdf: ^3.10.4
   pdfx: ^2.4.0

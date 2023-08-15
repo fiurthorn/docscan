@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:document_scanner/l10n/app_lang.dart';
-import 'package:path_provider/path_provider.dart';
 
 final isDesktop = isLinux || isMacOs || isWindows;
 const isWeb = false;
@@ -22,7 +21,6 @@ final isLinux = Platform.isLinux;
 final isWindows = Platform.isWindows;
 final isMacOs = Platform.isMacOS;
 
-Future<String> appDocumentsDir() async => (await getApplicationDocumentsDirectory()).absolute.path;
 Future<String> findSystemLocale() => Future.value(Platform.localeName);
 void loaded() => {};
 

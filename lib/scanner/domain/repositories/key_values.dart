@@ -23,7 +23,7 @@ abstract class KeyValues {
   bool notEmpty(KeyValueNames key);
   bool has(KeyValueNames key);
 
-  void close();
+  Future<void> close();
 
   Future<List<String>> supplierNames();
   Future<void> setSupplierNames(List<String> list);
@@ -34,4 +34,6 @@ abstract class KeyValues {
 
   Future<List<String>> areaItems();
   Future<void> setAreaItems(List<String> list);
+
+  Future<void> init();
 }

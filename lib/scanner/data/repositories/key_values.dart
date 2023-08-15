@@ -64,5 +64,52 @@ class KeyValuesImpl implements KeyValues {
   }
 
   @override
-  close() => _box.close();
+  Future<void> close() => _box.close();
+
+  @override
+  Future<void> init() async {
+    await setAreaItems([
+      "archived;de:Archiv;en:Archive",
+      "cards;de:Karten;en:Cards",
+      "commercial;de:Handel;en:Commercial",
+      "common;de:Allgemein;en:Common",
+      "financial;de:Finanzen;en:Financial",
+      "insurance;de:Versicherung;en:Insurance",
+      "private;de:Privat;en:Private",
+      "tax;de:Steuer;en:Tax",
+      "traveling;de:Reisen;en:Traveling",
+    ]);
+
+    await setDocumentTypeItems([
+      "bankDocument;de:Bankunterlagen;en:Bank document",
+      "birthCertificate;de:Geburtsurkunde;en:Birth certificate",
+      "business;de:Geschäftliche;en:Business",
+      "children;de:Kinder;en:Children",
+      "contract;de:Vertrag;en:Contract",
+      "correspondence;de:Korrespondenz;en:Correspondence",
+      "craftInstruction;de:Bastelanleitung;en:Craft instruction",
+      "deathCertificate;de:Sterbeurkunde;en:Death certificate",
+      "deliveryNote;de:Lieferschein;en:Delivery note",
+      "gardenPlan;de:Gartenplan;en:Garden plan",
+      "hobbies;de:Hobby;en:Hobbies",
+      "identificationDocument;de:Ausweisdokument;en:Identification document",
+      "insurance;de:Versicherung;en:Insurance",
+      "invoice;de:Rechnung;en:Invoice",
+      "statementOfAccount;de:Kontoauszug;en:Statement of account",
+      "marriageCertificate;de:Heiratsurkunde;en:Marriage certificate",
+      "music;de:Musik;en:Music",
+      "orderConfirmation;de:Auftragsbestätigung;en:Order confirmation",
+      "other;de:Sonstiges;en:Other",
+      "personal;de:Persönliche;en:Personal",
+      "pets;de:Haustier;en:Pets",
+      "photo;de:Foto;en:Photo",
+      "presentation;de:Präsentation;en:Presentation",
+      "recipes;de:Rezepte;en:Recipes",
+      "reports;de:Berichte;en:Reports",
+      "sportsResult;de:Sportergebnis;en:Sports result",
+      "taxDocument;de:Steuerunterlagen;en:Tax document",
+      "travelDocument;de:Reiseunterlagen;en:Travel document",
+      "video;de:Video;en:Video",
+    ]);
+  }
 }
