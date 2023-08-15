@@ -204,7 +204,10 @@ func DevelopDeps() {
 		PubGet,
 		PubGlobalUpgrade,
 		CreateI18nSynthetic,
-		Deps,
+		CreateVersion,
+		CreateI18n,
+		Icons,
+		BuildRunner,
 	)
 }
 

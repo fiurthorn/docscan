@@ -24,8 +24,17 @@ jobs:
       - name: Build dependencies
         run: dart run build_runner build
 
+      - name: Build dependencies
+        run: flutter gen-l10n --arb-dir=lib/l10n --template-arb-file=app_en.arb --output-dir=lib/l10n/translations --output-class=S --output-localization-file=S.dart
+
+      - name: Build dependencies
+        run: "flutter gen-l10n --arb-dir=lib/l10n --template-arb-file=app_en.arb --output-dir=lib/l10n/translations --output-class=S --no-nullable-getter --output-localization-file=translations.dart"
+
+      - name: format generated files
+        run: dart format --line-length=120 lib/core/lib/hive_store/value.g.dart lib/l10n/translations/translations*.dart
+
       - name: Verify formatting
-        run: dart format  --line-length=120 --output=none --set-exit-if-changed .
+        run: dart format --line-length=120 --output=none --set-exit-if-changed .
 
       - name: Analyze project source
         run: dart analyze --fatal-infos
