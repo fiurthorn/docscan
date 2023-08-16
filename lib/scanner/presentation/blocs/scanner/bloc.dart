@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:document_scanner/core/lib/logger.dart';
 import 'package:document_scanner/core/lib/optional.dart';
 import 'package:document_scanner/core/lib/tuple.dart';
+import 'package:document_scanner/core/platform/native.dart';
 import 'package:document_scanner/core/service_locator/service_locator.dart';
 import 'package:document_scanner/core/states/validators.dart';
 import 'package:document_scanner/core/widgets/bloc_builder/dropdown.dart';
@@ -11,7 +12,6 @@ import 'package:document_scanner/core/widgets/blocs/datetime.dart';
 import 'package:document_scanner/scanner/domain/usecases/read_scanned_files.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
-import 'package:lecle_downloads_path_provider/lecle_downloads_path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:permission_handler/permission_handler.dart';
 
@@ -66,7 +66,7 @@ class ScannerBloc extends FormBloc<String, ErrorValue> {
     try {
       if (await Permission.manageExternalStorage.request().isGranted) {
         final df = DateFormat("yyyyMMdd");
-        final downloadsDirectory = (await DownloadsPath.downloadsDirectory())!;
+        final downloadsDirectory = (await Helper.getDownloadsDirectory())!;
 
         final filepath =
             Directory("${downloadsDirectory.path}/Archive/${main.area.value!.technical}/${main.supplierName.value}");

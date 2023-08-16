@@ -3,7 +3,7 @@ description: fiurthorn document scanner
 
 publish_to: "none"
 
-version: 0.0.4
+version: 0.0.4+4
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -36,11 +36,9 @@ dependencies:
   image: ^4.0.17
   image_picker: ">=0.8.9 <2.0.0"
   intl: any
-  lecle_downloads_path_provider: ^0.0.2+8
   mime: ^1.0.4
   mobile_scanner: ^3.3.0
   once: ^1.5.3
-  path_provider: ^2.0.15
   pdf: ^3.10.4
   pdfx: ^2.4.0
   permission_handler: ^10.4.3

@@ -446,11 +446,30 @@ func replaceVersionYamlKeyValue(path, version string) (err error) {
 		fmt.Println(err)
 		return
 	}
-	replacer, err := regexp.Compile("version: .*")
+	versionCodeMatcher, err := regexp.Compile(`version: \d+\.\d+\.\d+(?:\+(\d+))?`)
 	if err != nil {
 		return
 	}
-	result := replacer.ReplaceAllString(string(data), fmt.Sprintf("version: %s", version))
+
+	var versionCode int
+
+	match := versionCodeMatcher.FindStringSubmatch(string(data))
+	if len(match) < 2 {
+		versionCode = 0
+	} else {
+		versionCode, err = strconv.Atoi(match[1])
+		if err != nil {
+			return
+		}
+	}
+	versionCode++
+
+	replacer, err := regexp.Compile(`version: .*`)
+	if err != nil {
+		return
+	}
+
+	result := replacer.ReplaceAllString(string(data), fmt.Sprintf("version: %s+%d", version, versionCode))
 	err = os.WriteFile(path, []byte(result), 0666)
 
 	return

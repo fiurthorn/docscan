@@ -4,16 +4,16 @@ import 'package:flutter/services.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 
 class DateTimeSuffixButton extends StatelessWidget {
-  final DateTime? firstDateTime;
-  final Duration? lastDateDuration;
+  final DateTime firstDateTime;
+  final Duration lastDateDuration;
   final void Function(DateTime?) onSubmit;
   final DateTime? Function() initialDateTime;
 
   const DateTimeSuffixButton({
     required this.onSubmit,
     required this.initialDateTime,
-    this.firstDateTime,
-    this.lastDateDuration,
+    required this.firstDateTime,
+    required this.lastDateDuration,
     super.key,
   });
 
@@ -24,8 +24,8 @@ class DateTimeSuffixButton extends StatelessWidget {
           showDatePicker(
             context: context,
             initialDate: initialDateTime() ?? DateTime.now(),
-            firstDate: firstDateTime ?? DateTime.now(),
-            lastDate: firstDateTime ?? DateTime.now().add(lastDateDuration ?? const Duration(days: 3653)),
+            firstDate: firstDateTime,
+            lastDate: DateTime.now().add(lastDateDuration),
           ).then(onSubmit);
         },
       );
@@ -38,8 +38,8 @@ class DateTimeBlocBuilder extends TextFieldBlocBuilder {
     bool isEnabled = true,
     String? label,
     String? hint,
-    DateTime? firstDateTime,
-    Duration? lastDateDuration,
+    required DateTime firstDateTime,
+    required Duration lastDateDuration,
     required DateTimeBloc<dynamic> bloc,
   }) : super(
           textFieldBloc: bloc,
