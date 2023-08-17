@@ -1,6 +1,6 @@
 import 'package:document_scanner/core/lib/hive_store/value.dart';
 import 'package:document_scanner/core/lib/trace.dart';
-import 'package:document_scanner/core/platform/native.dart';
+import 'package:document_scanner/core/platform/helper.dart';
 import 'package:document_scanner/core/platform/platform.dart';
 import 'package:hive/hive.dart';
 

@@ -340,7 +340,7 @@ func complete(line string, stop int, hasLine bool) (err error) {
 }
 
 // auto complete helper (recompile if needed)
-func Check() {
+func Check() (err error) {
 	changed, err := target.Glob(
 		"mage",
 		"magefiles/*",
@@ -353,16 +353,18 @@ func Check() {
 	if changed {
 		fmt.Fprintln(os.Stderr, "compiling...")
 		sh.Rm("mage")
-		mage.NewTask(
+		err = mage.NewTask(
 			"go",
 			"run",
-			"cmd/mage/mage.go",
+			"magefiles/cmd/mage.go",
 			"-compile",
 			executableName("../mage"),
-		).WorkingDir("server").
+		).WorkingDir(".").
 			Run()
-		os.Exit(66)
+
+		//os.Exit(66)
 	}
+	return
 }
 
 func Version() (err error) {

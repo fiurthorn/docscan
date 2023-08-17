@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:document_scanner/core/design/theme_colors.dart';
 import 'package:document_scanner/core/design/theme_icons.dart';
 import 'package:document_scanner/core/goroute/auth_route.dart';
@@ -17,8 +19,10 @@ import 'package:document_scanner/scanner/presentation/blocs/scanner/bloc.dart';
 import 'package:document_scanner/scanner/presentation/screens/base.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/right_menu.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/top_nav.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
+import 'package:path/path.dart' as p;
 import 'package:pdfx/pdfx.dart';
 
 class ScannerScreen extends BaseScreen {
@@ -213,7 +217,15 @@ class _ScannerScreenState extends FormBlocBaseScreenState<ScannerScreen, Scanner
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  scannerButton(formBloc),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      scannerButton(formBloc),
+                      const SizedBox(width: 8),
+                      filePickerButton(formBloc),
+                    ],
+                  ),
                   sendPurchaseButton(context, formBloc),
                 ],
               ),
@@ -261,6 +273,23 @@ class _ScannerScreenState extends FormBlocBaseScreenState<ScannerScreen, Scanner
       },
       tooltip: "Scan Document",
       icon: Icons.scanner,
+    );
+  }
+
+  Widget filePickerButton(ScannerBloc formBloc) {
+    return RoundIconButton(
+      backgroundColor: Theme.of(context).primaryColor,
+      onPressed: () async {
+        LoadingDialog.show(context);
+
+        FilePicker.platform
+            .pickFiles() //
+            .then((result) => result!.files.single.path!)
+            .then((path) => formBloc.uploadAttachment(p.basename(path), File(path).readAsBytesSync()))
+            .whenComplete(() => LoadingDialog.hide(context));
+      },
+      tooltip: "Pick Document",
+      icon: ThemeIcons.file,
     );
   }
 

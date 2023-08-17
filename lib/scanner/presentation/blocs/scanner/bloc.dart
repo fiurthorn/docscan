@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:document_scanner/core/lib/logger.dart';
 import 'package:document_scanner/core/lib/optional.dart';
 import 'package:document_scanner/core/lib/tuple.dart';
-import 'package:document_scanner/core/platform/native.dart';
+import 'package:document_scanner/core/platform/helper.dart';
 import 'package:document_scanner/core/service_locator/service_locator.dart';
 import 'package:document_scanner/core/states/validators.dart';
 import 'package:document_scanner/core/widgets/bloc_builder/dropdown.dart';
@@ -13,7 +13,6 @@ import 'package:document_scanner/scanner/domain/usecases/read_scanned_files.dart
 import 'package:flutter/foundation.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 import 'package:path/path.dart' as p;
-import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../core/widgets/scanner/scanner.dart';
 
@@ -64,37 +63,30 @@ class ScannerBloc extends FormBloc<String, ErrorValue> {
   @override
   FutureOr<void> onSubmitting() async {
     try {
-      if (await Permission.manageExternalStorage.request().isGranted) {
-        final df = DateFormat("yyyyMMdd");
-        final downloadsDirectory = (await Helper.getDownloadsDirectory())!;
+      //if (await Permission.manageExternalStorage.request().isGranted) {
+      final df = DateFormat("yyyy-MM-dd");
+      final downloadsDirectory = await Helper.getTempDir();
 
-        final filepath =
-            Directory("${downloadsDirectory.path}/Archive/${main.area.value!.technical}/${main.supplierName.value}");
+      for (var element in main.attachments.value) {
+        final extension = p.extension(element.value.name);
 
-        if (!filepath.existsSync()) {
-          filepath.createSync(recursive: true);
-        }
+        final file = File("$downloadsDirectory/tmpfile");
+        file.writeAsBytesSync(element.value.data);
 
-        int i = 0;
-        for (var element in main.attachments.value) {
-          final basename =
-              "${filepath.path}/${main.documentType.value!.technical}_${df.format(main.documentDate.dateTime!)}";
-          final extension = p.extension(p.basename(element.value.name));
-          File file;
-          do {
-            file = File("$basename${i == 0 ? '' : '-'}${i == 0 ? '' : i}$extension");
-            ++i;
-          } while (file.existsSync());
+        final structure =
+            "docscan/${main.area.value!.technical}/${main.supplierName.value}/${main.documentType.value!.technical}";
+        final fileName = "${main.documentType.value!.technical}_${df.format(main.documentDate.dateTime!)}.$extension";
 
-          Log.high("filepath: ${file.path}");
-          file.writeAsBytesSync(element.value.data);
-        }
+        await Helper.saveFileInMediaStore(file.path, structure, fileName);
+        Log.high("filepath: $fileName");
 
-        keyValues().addSupplierNames(main.supplierName.value);
-        clearScannedImage();
-        main.attachments.value.clear();
-        emitSuccess(successResponse: "files created", canSubmitAgain: true);
+        file.deleteSync();
       }
+
+      keyValues().addSupplierNames(main.supplierName.value);
+      main.attachments.value.clear();
+      emitSuccess(successResponse: "files created", canSubmitAgain: true);
+      //   }
     } on Exception catch (err, stack) {
       emitFailure(failureResponse: ErrorValue(err, stack));
     }

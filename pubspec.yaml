@@ -18,6 +18,7 @@ dependencies:
   async: ^2.9.0
   crop_your_image: ^0.7.5
   cunning_document_scanner: ^1.1.2
+  cupertino_icons: ^1.0.5
   equatable: ^2.0.0
   file_picker: ^5.2.5
   file_saver: ^0.2.7
