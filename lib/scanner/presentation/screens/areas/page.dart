@@ -1,9 +1,9 @@
 import 'package:document_scanner/core/design/theme_colors.dart';
 import 'package:document_scanner/core/design/theme_icons.dart';
-import 'package:document_scanner/core/goroute/auth_route.dart';
 import 'package:document_scanner/core/lib/optional.dart';
 import 'package:document_scanner/core/toaster/error.dart';
 import 'package:document_scanner/core/toaster/success.dart';
+import 'package:document_scanner/core/widgets/goroute/route.dart';
 import 'package:document_scanner/core/widgets/loading_dialog/loading_dialog.dart';
 import 'package:document_scanner/core/widgets/responsive.dart';
 import 'package:document_scanner/core/widgets/style/round_icon_button.dart';
@@ -12,8 +12,10 @@ import 'package:document_scanner/scanner/presentation/blocs/areas/bloc.dart';
 import 'package:document_scanner/scanner/presentation/screens/base.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/right_menu.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/top_nav.dart';
+import 'package:document_scanner/scanner/presentation/screens/scanner/page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class AreasScreen extends BaseScreen {
   const AreasScreen({super.key});
@@ -34,7 +36,7 @@ class _AreasScreenState extends FormBlocBaseScreenState<AreasScreen, ItemBloc> {
   ItemBloc createBloc(BuildContext context) => ItemBloc();
 
   @override
-  String title(BuildContext context) => "Areas";
+  String title(BuildContext context) => AppLang.i18n.areas_page_title;
 
   @override
   PreferredSizeWidget? buildAppBar(BuildContext context) => fullTopNavBar(context, title(context), scaffold, update);
@@ -56,7 +58,7 @@ class _AreasScreenState extends FormBlocBaseScreenState<AreasScreen, ItemBloc> {
         onSuccess: (context, state) {
           LoadingDialog.hide(context);
           showSnackBarSuccess(context, "attach", "${state.successResponse}");
-          // context.go(PurchaseListRequestsScreen.path);
+          context.go(ScannerScreen.path);
         },
         onLoaded: (context, state) => update(),
         onLoadFailed: (context, state) {
@@ -92,8 +94,8 @@ class _AreasScreenState extends FormBlocBaseScreenState<AreasScreen, ItemBloc> {
                 itemBuilder: (context, index) => TextFieldBlocBuilder(
                   textFieldBloc: formBloc.main.areas.value[index],
                   decoration: InputDecoration(
-                    labelText: "Area",
-                    hintText: "tech;de:Übersetzung;;en:translation",
+                    labelText: AppLang.i18n.areas_areaField_label,
+                    hintText: AppLang.i18n.i18n_field_hint,
                     suffixIcon: IconButton(
                       icon: Icon(ThemeIcons.deletePosition),
                       onPressed: () {
@@ -121,7 +123,7 @@ class _AreasScreenState extends FormBlocBaseScreenState<AreasScreen, ItemBloc> {
 
                     return RoundIconButton(
                       icon: ThemeIcons.send,
-                      tooltip: "add",
+                      tooltip: "send",
                       backgroundColor: valid ? themeSignalColor : themeGrey2Color,
                       onPressed: () => valid ? formBloc.submit() : formBloc.validate(),
                     );

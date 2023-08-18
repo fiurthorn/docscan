@@ -3,14 +3,17 @@ part of "bloc.dart";
 typedef ItemStateBloc = TextFieldBloc<dynamic>;
 
 class ItemState extends GroupFieldBloc<FieldBloc, dynamic> {
-  ListFieldBloc<ItemStateBloc, dynamic> get suppliers =>
-      state.fieldBlocs["suppliers"] as ListFieldBloc<ItemStateBloc, dynamic>;
+  ListFieldBloc<ItemStateBloc, dynamic> get senders =>
+      state.fieldBlocs["senders"] as ListFieldBloc<ItemStateBloc, dynamic>;
 
   ItemState()
       : super(name: "main", fieldBlocs: [
-          ListFieldBloc<ItemStateBloc, String>(name: "suppliers"),
+          ListFieldBloc<ItemStateBloc, String>(name: "senders"),
         ]) {
-    keyValues().supplierNames().then((value) {
+    sl<LoadListItemsUseCase>()
+        .call(LoadListItemsParam(KeyValueNames.senderNames))
+        .then((value) => value.eval())
+        .then((value) {
       for (var element in value) {
         createItem(initialValue: element);
       }
@@ -18,7 +21,7 @@ class ItemState extends GroupFieldBloc<FieldBloc, dynamic> {
   }
 
   void createItem({String? initialValue}) {
-    suppliers.addFieldBloc(
+    senders.addFieldBloc(
       TextFieldBloc(
         initialValue: initialValue ?? "",
         validators: [
@@ -29,6 +32,6 @@ class ItemState extends GroupFieldBloc<FieldBloc, dynamic> {
   }
 
   void removeItem(int index) {
-    suppliers.removeFieldBlocAt(index);
+    senders.removeFieldBlocAt(index);
   }
 }

@@ -1,9 +1,9 @@
 import 'package:document_scanner/core/design/theme_colors.dart';
 import 'package:document_scanner/core/design/theme_icons.dart';
-import 'package:document_scanner/core/goroute/auth_route.dart';
 import 'package:document_scanner/core/lib/optional.dart';
 import 'package:document_scanner/core/toaster/error.dart';
 import 'package:document_scanner/core/toaster/success.dart';
+import 'package:document_scanner/core/widgets/goroute/route.dart';
 import 'package:document_scanner/core/widgets/loading_dialog/loading_dialog.dart';
 import 'package:document_scanner/core/widgets/responsive.dart';
 import 'package:document_scanner/core/widgets/style/round_icon_button.dart';
@@ -12,8 +12,10 @@ import 'package:document_scanner/scanner/presentation/blocs/documenttypes/bloc.d
 import 'package:document_scanner/scanner/presentation/screens/base.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/right_menu.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/top_nav.dart';
+import 'package:document_scanner/scanner/presentation/screens/scanner/page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class DocumentTypesScreen extends BaseScreen {
   const DocumentTypesScreen({super.key});
@@ -34,7 +36,7 @@ class _DocumentTypesState extends FormBlocBaseScreenState<DocumentTypesScreen, I
   ItemBloc createBloc(BuildContext context) => ItemBloc();
 
   @override
-  String title(BuildContext context) => "Document types";
+  String title(BuildContext context) => AppLang.i18n.docTypes_page_title;
 
   @override
   PreferredSizeWidget? buildAppBar(BuildContext context) => fullTopNavBar(context, title(context), scaffold, update);
@@ -56,7 +58,7 @@ class _DocumentTypesState extends FormBlocBaseScreenState<DocumentTypesScreen, I
         onSuccess: (context, state) {
           LoadingDialog.hide(context);
           showSnackBarSuccess(context, "attach", "${state.successResponse}");
-          // context.go(PurchaseListRequestsScreen.path);
+          context.go(ScannerScreen.path);
         },
         onLoaded: (context, state) => update(),
         onLoadFailed: (context, state) {
@@ -92,8 +94,8 @@ class _DocumentTypesState extends FormBlocBaseScreenState<DocumentTypesScreen, I
                 itemBuilder: (context, index) => TextFieldBlocBuilder(
                   textFieldBloc: formBloc.main.documentTypes.value[index],
                   decoration: InputDecoration(
-                    labelText: "Area",
-                    hintText: "tech;de:Übersetzung;;en:translation",
+                    labelText: AppLang.i18n.docTypes_docTypeField_label,
+                    hintText: AppLang.i18n.i18n_field_hint,
                     suffixIcon: IconButton(
                       icon: Icon(ThemeIcons.deletePosition),
                       onPressed: () {

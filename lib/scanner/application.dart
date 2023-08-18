@@ -3,12 +3,12 @@
 import 'dart:math';
 
 import 'package:document_scanner/core/design/theme_data.dart';
-import 'package:document_scanner/core/goroute/auth_route.dart';
+import 'package:document_scanner/core/lib/platform/platform.dart';
 import 'package:document_scanner/core/lib/simple_bloc_observer.dart';
 import 'package:document_scanner/core/lib/trace.dart';
 import 'package:document_scanner/core/lib/tuple.dart';
-import 'package:document_scanner/core/platform/platform.dart';
 import 'package:document_scanner/core/service_locator/service_locator.dart';
+import 'package:document_scanner/core/widgets/goroute/route.dart';
 import 'package:document_scanner/core/widgets/loading_widget/loading_widget.dart';
 import 'package:document_scanner/l10n/app_lang.dart';
 import 'package:document_scanner/l10n/translations/translations.dart';
@@ -56,7 +56,7 @@ abstract class ApplicationState<T extends Application> extends State<T> {
 
   Future<bool> setLanguage() async {
     final systemLocale = await findSystemLocale();
-    AppLang.lang = trace(keyValues().get(KeyValueNames.locale, systemLocale));
+    AppLang.lang = trace(sl<KeyValues>().get(KeyValueNames.locale, systemLocale));
     return true;
   }
 
@@ -124,7 +124,7 @@ abstract class ApplicationState<T extends Application> extends State<T> {
         return err.ErrorScaffold(reload: restartApp);
       },
       initialLocation: initialRoute,
-      restorationScopeId: 'docscanner',
+      restorationScopeId: 'docscan',
       redirect: (context, state) {
         return null;
       },

@@ -11,9 +11,11 @@ class ReadFilesParam {
   ReadFilesParam(this.path);
 }
 
-class ReadFilesUseCase implements UseCase<List<Tuple2<String, Uint8List>>, ReadFilesParam> {
+typedef Result = List<Tuple2<String, Uint8List>>;
+
+class ReadFilesUseCase implements UseCase<Result, ReadFilesParam> {
   @override
-  Future<Optional<List<Tuple2<String, Uint8List>>>> call(ReadFilesParam param) async {
+  Future<Optional<Result>> call(ReadFilesParam param) async {
     try {
       return Optional.newValue(sl<DiskSource>().readFiles(param.path));
     } on Exception catch (e, st) {

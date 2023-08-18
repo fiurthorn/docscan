@@ -1,4 +1,4 @@
-// docscanner project
+// docscan project
 package main
 
 import (
@@ -490,12 +490,12 @@ func writeChangelog(path, changelog, version string) (err error) {
 }
 
 func GitChangelog() (err error) {
-	fmt.Println("get last Version")
 	lastVersionBytes, err := exec.Command("git", "describe", "--tags", "--abbrev=0").Output()
 	if err != nil {
 		return err
 	}
 	lastVersion := strings.TrimSpace(string(lastVersionBytes))
+	fmt.Println("get last Version", lastVersion)
 
 	changeLogBytes, err := exec.Command("git", "log", string(lastVersion)+"..HEAD", "--oneline").Output()
 	if err != nil {

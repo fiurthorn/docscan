@@ -1,40 +1,42 @@
 import 'package:document_scanner/core/design/theme_colors.dart';
 import 'package:document_scanner/core/design/theme_icons.dart';
-import 'package:document_scanner/core/goroute/auth_route.dart';
 import 'package:document_scanner/core/lib/optional.dart';
 import 'package:document_scanner/core/toaster/error.dart';
 import 'package:document_scanner/core/toaster/success.dart';
+import 'package:document_scanner/core/widgets/goroute/route.dart';
 import 'package:document_scanner/core/widgets/loading_dialog/loading_dialog.dart';
 import 'package:document_scanner/core/widgets/responsive.dart';
 import 'package:document_scanner/core/widgets/style/round_icon_button.dart';
 import 'package:document_scanner/l10n/app_lang.dart';
-import 'package:document_scanner/scanner/presentation/blocs/supplier/bloc.dart';
+import 'package:document_scanner/scanner/presentation/blocs/sender/bloc.dart';
 import 'package:document_scanner/scanner/presentation/screens/base.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/right_menu.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/top_nav.dart';
+import 'package:document_scanner/scanner/presentation/screens/scanner/page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
+import 'package:go_router/go_router.dart';
 
-class SuppliersScreen extends BaseScreen {
-  const SuppliersScreen({super.key});
+class SendersScreen extends BaseScreen {
+  const SendersScreen({super.key});
 
   @override
-  State<SuppliersScreen> createState() => _SuppliersState();
+  State<SendersScreen> createState() => _SendersState();
 
-  static const String path = '/suppliers';
+  static const String path = '/senders';
 
   static AuthGoRoute get route => AuthGoRoute.unauthorized(
         path: path,
-        child: (context, state) => const SuppliersScreen(),
+        child: (context, state) => const SendersScreen(),
       );
 }
 
-class _SuppliersState extends FormBlocBaseScreenState<SuppliersScreen, ItemBloc> {
+class _SendersState extends FormBlocBaseScreenState<SendersScreen, ItemBloc> {
   @override
   ItemBloc createBloc(BuildContext context) => ItemBloc();
 
   @override
-  String title(BuildContext context) => "Document types";
+  String title(BuildContext context) => AppLang.i18n.senders_page_title;
 
   @override
   PreferredSizeWidget? buildAppBar(BuildContext context) => fullTopNavBar(context, title(context), scaffold, update);
@@ -56,7 +58,7 @@ class _SuppliersState extends FormBlocBaseScreenState<SuppliersScreen, ItemBloc>
         onSuccess: (context, state) {
           LoadingDialog.hide(context);
           showSnackBarSuccess(context, "attach", "${state.successResponse}");
-          // context.go(PurchaseListRequestsScreen.path);
+          context.go(ScannerScreen.path);
         },
         onLoaded: (context, state) => update(),
         onLoadFailed: (context, state) {
@@ -88,12 +90,12 @@ class _SuppliersState extends FormBlocBaseScreenState<SuppliersScreen, ItemBloc>
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: formBloc.main.suppliers.value.length,
+                itemCount: formBloc.main.senders.value.length,
                 itemBuilder: (context, index) => TextFieldBlocBuilder(
-                  textFieldBloc: formBloc.main.suppliers.value[index],
+                  textFieldBloc: formBloc.main.senders.value[index],
                   decoration: InputDecoration(
-                    labelText: "Area",
-                    hintText: "Name",
+                    labelText: AppLang.i18n.senders_senderField_label,
+                    hintText: AppLang.i18n.senders_senderField_label,
                     suffixIcon: IconButton(
                       icon: Icon(ThemeIcons.deletePosition),
                       onPressed: () {

@@ -28,39 +28,28 @@ class KeyValuesImpl implements KeyValues {
   Future<void> remove(KeyValueNames key) async => _box.delete(key.name);
 
   @override
-  Future<List<String>> documentTypeItems() async =>
-      (await _box.get(KeyValueNames.documentTypes.name, defaultValue: const []) as List).map((e) => '$e').toList();
-
-  @override
-  Future<void> setAreaItems(List<String> list) async => _box.put(KeyValueNames.areas.name, list);
-
-  @override
-  Future<List<String>> areaItems() async =>
-      (await _box.get(KeyValueNames.areas.name, defaultValue: const []) as List).map((e) => '$e').toList();
-
-  @override
-  Future<void> setDocumentTypeItems(List<String> list) async => _box.put(KeyValueNames.documentTypes.name, list);
-
-  @override
-  Future<List<String>> supplierNames() async =>
-      (await _box.get(KeyValueNames.supplierNames.name, defaultValue: const []) as List).map((e) => '$e').toList();
-
-  @override
-  Future<void> setSupplierNames(List<String> list) async => _box.put(KeyValueNames.supplierNames.name, list);
-
-  @override
-  Future<void> addSupplierNames(String supplierName) async {
-    if (!_box.containsKey(KeyValueNames.supplierNames.name)) {
-      _box.put(KeyValueNames.supplierNames.name, [supplierName]);
+  Future<void> addSenderName(String senderName) async {
+    if (!_box.containsKey(KeyValueNames.senderNames.name)) {
+      _box.put(KeyValueNames.senderNames.name, [senderName]);
       return;
     }
 
-    supplierNames()
-        .then((value) => value.contains(supplierName) ? null : value)
+    getItems(KeyValueNames.senderNames)
+        .then((value) => value.contains(senderName) ? null : value)
         .then((value) => value
-          ?..add(supplierName)
+          ?..add(senderName)
           ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase())))
-        .then((value) => value == null ? null : _box.put(KeyValueNames.supplierNames.name, value));
+        .then((value) => value == null ? null : _box.put(KeyValueNames.senderNames.name, value));
+  }
+
+  @override
+  Future<List<String>> getItems(KeyValueNames key) async =>
+      (await _box.get(key.name, defaultValue: const []) as List).map((e) => '$e').toList();
+
+  @override
+  Future<void> setItems(KeyValueNames key, List<String> list) {
+    list.sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    return _box.put(key.name, list);
   }
 
   @override
@@ -68,7 +57,7 @@ class KeyValuesImpl implements KeyValues {
 
   @override
   Future<void> init() async {
-    await setAreaItems([
+    await setItems(KeyValueNames.areas, [
       "archived;de:Archiv;en:Archive",
       "cards;de:Karten;en:Cards",
       "commercial;de:Handel;en:Commercial",
@@ -80,7 +69,7 @@ class KeyValuesImpl implements KeyValues {
       "traveling;de:Reisen;en:Traveling",
     ]);
 
-    await setDocumentTypeItems([
+    await setItems(KeyValueNames.documentTypes, [
       "bankDocument;de:Bankunterlagen;en:Bank document",
       "birthCertificate;de:Geburtsurkunde;en:Birth certificate",
       "business;de:Geschäftliche;en:Business",
@@ -103,8 +92,9 @@ class KeyValuesImpl implements KeyValues {
       "personal;de:Persönliche;en:Personal",
       "pets;de:Haustier;en:Pets",
       "photo;de:Foto;en:Photo",
+      "prescription;de:Rezept;en:Prescription",
       "presentation;de:Präsentation;en:Presentation",
-      "recipes;de:Rezepte;en:Recipes",
+      "recipe;de:Quittung;en:Recipe",
       "reports;de:Berichte;en:Reports",
       "sportsResult;de:Sportergebnis;en:Sports result",
       "taxDocument;de:Steuerunterlagen;en:Tax document",

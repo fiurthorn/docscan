@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:document_scanner/core/lib/optional.dart';
 import 'package:document_scanner/core/service_locator/service_locator.dart';
+import 'package:document_scanner/scanner/domain/repositories/key_values.dart';
+import 'package:document_scanner/scanner/domain/usecases/load_list_items.dart';
+import 'package:document_scanner/scanner/domain/usecases/store_list_items.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 
 part 'state.dart';
@@ -25,8 +28,12 @@ class ItemBloc extends FormBloc<String, ErrorValue> {
   @override
   FutureOr<void> onSubmitting() async {
     try {
-      keyValues().setSupplierNames(main.suppliers.value.map((e) => e.value).toList()
-        ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase())));
+      await sl<StoreListItemsUseCase>().call(
+        StoreListItemsParam(
+          KeyValueNames.senderNames,
+          main.senders.value.map((e) => e.value).toList(),
+        ),
+      );
       emitSuccess(successResponse: "Saved");
     } on Exception catch (err, stack) {
       emitFailure(failureResponse: ErrorValue(err, stack));

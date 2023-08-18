@@ -20,6 +20,7 @@ class ThemeIcons {
   static IconData get camera => FontAwesomeIcons.camera;
   static IconData get cancel => FontAwesomeIcons.ban;
   static IconData get cartPlus => FontAwesomeIcons.cartShopping;
+  static IconData get check => FontAwesomeIcons.check;
   static IconData get checkToSlot => const IconDataSolid(0xf772);
   static IconData get checkSquare => const IconDataSolid(0xf14a);
   static IconData get close => FontAwesomeIcons.xmark;
@@ -33,6 +34,7 @@ class ThemeIcons {
   static IconData get docType => FontAwesomeIcons.fileInvoice;
 
   static IconData get email => FontAwesomeIcons.share;
+  static IconData get envelopeOpenText => FontAwesomeIcons.envelopeOpenText;
   static IconData get exit => FontAwesomeIcons.rightFromBracket;
 
   static IconData get firebase => const IconDataRegular(0xf0e0);
@@ -61,7 +63,6 @@ class ThemeIcons {
   static IconData get multiLinePlus => FontAwesomeIcons.circlePlus;
 
   static IconData get newPosition => FontAwesomeIcons.plus;
-  static IconData get newPurchase => FontAwesomeIcons.plus;
   static IconData get noObscure => FontAwesomeIcons.eye;
   static IconData get notifications => FontAwesomeIcons.bell;
 
@@ -78,7 +79,6 @@ class ThemeIcons {
   static IconData get searchFilter => FontAwesomeIcons.filter;
   static IconData get smallSearch => FontAwesomeIcons.magnifyingGlass;
   static IconData get settings => FontAwesomeIcons.sliders;
-  static IconData get supplier => FontAwesomeIcons.vanShuttle;
 
   static IconData get send => Icons.send;
   static IconData get sendAlt => const IconDataSolid(0xe20a);
@@ -88,6 +88,7 @@ class ThemeIcons {
   static IconData get toggleOff => FontAwesomeIcons.toggleOff;
   static IconData get toggleOn => FontAwesomeIcons.toggleOn;
 
+  static IconData get scanner => const IconData(0xe554, fontFamily: 'MaterialIcons');
   static IconData get swfCreation => const IconDataSolid(0xf07a);
   static IconData get swfError => const IconDataSolid(0xf06a);
   static IconData get swfExport => const IconDataSolid(0xf56e);

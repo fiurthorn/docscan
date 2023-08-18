@@ -1,8 +1,8 @@
 import 'dart:io';
 
+import 'package:cunning_document_scanner/cunning_document_scanner.dart';
 import 'package:document_scanner/core/design/theme_colors.dart';
 import 'package:document_scanner/core/design/theme_icons.dart';
-import 'package:document_scanner/core/goroute/auth_route.dart';
 import 'package:document_scanner/core/lib/optional.dart';
 import 'package:document_scanner/core/lib/size.dart';
 import 'package:document_scanner/core/toaster/error.dart';
@@ -10,11 +10,13 @@ import 'package:document_scanner/core/toaster/success.dart';
 import 'package:document_scanner/core/widgets/bloc_builder/datetime.dart';
 import 'package:document_scanner/core/widgets/bloc_builder/dropdown.dart';
 import 'package:document_scanner/core/widgets/bloc_builder/text.dart';
+import 'package:document_scanner/core/widgets/cropper/widget.dart';
+import 'package:document_scanner/core/widgets/goroute/route.dart';
 import 'package:document_scanner/core/widgets/loading_dialog/loading_dialog.dart';
 import 'package:document_scanner/core/widgets/responsive.dart';
-import 'package:document_scanner/core/widgets/scanner/scanner.dart';
 import 'package:document_scanner/core/widgets/style/round_icon_button.dart';
 import 'package:document_scanner/l10n/app_lang.dart';
+import 'package:document_scanner/scanner/domain/repositories/convert.dart';
 import 'package:document_scanner/scanner/presentation/blocs/scanner/bloc.dart';
 import 'package:document_scanner/scanner/presentation/screens/base.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/right_menu.dart';
@@ -22,7 +24,7 @@ import 'package:document_scanner/scanner/presentation/screens/base/top_nav.dart'
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
-import 'package:path/path.dart' as p;
+import 'package:image_picker/image_picker.dart';
 import 'package:pdfx/pdfx.dart';
 
 class ScannerScreen extends BaseScreen {
@@ -47,10 +49,46 @@ class _ScannerScreenState extends FormBlocBaseScreenState<ScannerScreen, Scanner
   String title(BuildContext context) => "Scanner";
 
   @override
-  PreferredSizeWidget? buildAppBar(BuildContext context) => fullTopNavBar(context, title(context), scaffold, update);
+  PreferredSizeWidget? buildAppBar(BuildContext context) {
+    final formBloc = BlocProvider.of<ScannerBloc>(context);
+
+    if (formBloc.displayCropper.value) {
+      return cropTopNavBar(formBloc);
+    }
+
+    return fullTopNavBar(context, title(context), scaffold, update);
+  }
+
+  AppBar cropTopNavBar(ScannerBloc formBloc) => customButtonTopNavBar(
+      context,
+      title(context),
+      Row(
+        children: [
+          InkWell(
+            onTap: () {
+              formBloc.displayCropper.changeValue(false);
+              update();
+            },
+            child: Center(
+              child: Icon(
+                ThemeIcons.close,
+                color: themeGrey4Color,
+              ),
+            ),
+          ),
+        ],
+      ),
+      update);
 
   @override
-  Drawer? buildEndDrawer(BuildContext context) => rightMenu(context, scaffold, update);
+  Drawer? buildEndDrawer(BuildContext context) {
+    final formBloc = BlocProvider.of<ScannerBloc>(context);
+    if (formBloc.displayCropper.value) {
+      return null;
+    }
+
+    return rightMenu(context, scaffold, update);
+  }
 
   @override
   Widget buildScreen(BuildContext context) => buildScannerForm(context);
@@ -66,7 +104,7 @@ class _ScannerScreenState extends FormBlocBaseScreenState<ScannerScreen, Scanner
         onSuccess: (context, state) {
           LoadingDialog.hide(context);
           showSnackBarSuccess(context, "attach", "${state.successResponse}");
-          // context.go(PurchaseListRequestsScreen.path);
+          // context.go(ScannerScreen.path);
         },
         onLoadFailed: (context, state) {
           final message = AppLang.i18n.message_failure_genericError(state.failureResponse?.exception.toString() ?? "");
@@ -82,6 +120,8 @@ class _ScannerScreenState extends FormBlocBaseScreenState<ScannerScreen, Scanner
         child: Builder(builder: (context) {
           if (formBloc.scannedImages.value.isNotEmpty) {
             return buildImageEnhancementViewer(context, formBloc);
+          } else if (formBloc.displayCropper.value) {
+            return cropper(context);
           }
 
           return buildInputForm(context, formBloc);
@@ -90,12 +130,29 @@ class _ScannerScreenState extends FormBlocBaseScreenState<ScannerScreen, Scanner
     );
   }
 
+  Widget cropper(BuildContext context) {
+    final formBloc = BlocProvider.of<ScannerBloc>(context);
+    final image = formBloc.cropperImage;
+
+    return Cropper(
+      image: image!,
+      onCropped: (image) {
+        LoadingDialog.show(context);
+        final formBloc = BlocProvider.of<ScannerBloc>(context);
+        formBloc.displayCropper.changeValue(false);
+        formBloc.uploadAttachment(formBloc.cropperFilename!, image);
+        update();
+        LoadingDialog.hide(context);
+      },
+    );
+  }
+
   Widget buildImageEnhancementViewer(BuildContext context, ScannerBloc formBloc) {
     return Column(
       children: [
         DropDownBlocBuilder(
           bloc: formBloc.converter,
-          hint: "Select Converter",
+          hint: AppLang.i18n.scanner_converterSelect_hint,
           requestFocus: true,
           onChanged: (_) => formBloc.clearImageCache(),
         ),
@@ -181,23 +238,23 @@ class _ScannerScreenState extends FormBlocBaseScreenState<ScannerScreen, Scanner
             children: [
               DropDownBlocBuilder(
                 bloc: formBloc.main.area,
-                label: "Area",
-                hint: "Area",
+                label: AppLang.i18n.scanner_areaSelect_label,
+                hint: AppLang.i18n.scanner_areaSelect_hint,
               ),
               TextBlocBuilder(
-                bloc: formBloc.main.supplierName,
-                label: "Supplier Name",
-                hint: "Supplier Name",
+                bloc: formBloc.main.senderName,
+                label: AppLang.i18n.scanner_senderField_label,
+                hint: AppLang.i18n.scanner_senderField_hint,
               ),
               DropDownBlocBuilder(
                 bloc: formBloc.main.documentType,
-                label: "Document Type",
-                hint: "Document Type",
+                label: AppLang.i18n.scanner_docTypeSelect_label,
+                hint: AppLang.i18n.scanner_docTypeSelect_hint,
               ),
               DateTimeBlocBuilder(
                 bloc: formBloc.main.documentDate,
-                label: "Document Date",
-                hint: "Document Date",
+                label: AppLang.i18n.scanner_docDateField_label,
+                hint: AppLang.i18n.scanner_docDateField_hint,
                 firstDateTime: DateTime(1900),
                 lastDateDuration: const Duration(days: 3653 * 20),
               ),
@@ -224,9 +281,11 @@ class _ScannerScreenState extends FormBlocBaseScreenState<ScannerScreen, Scanner
                       scannerButton(formBloc),
                       const SizedBox(width: 8),
                       filePickerButton(formBloc),
+                      const SizedBox(width: 8),
+                      cameraButton(formBloc),
                     ],
                   ),
-                  sendPurchaseButton(context, formBloc),
+                  sendButton(context, formBloc),
                 ],
               ),
             ],
@@ -238,7 +297,8 @@ class _ScannerScreenState extends FormBlocBaseScreenState<ScannerScreen, Scanner
     final formBloc = BlocProvider.of<ScannerBloc>(context);
 
     if (formBloc.attachments.isEmpty) {
-      showSnackBarFailure(context, "create pre send (dirty)", AppLang.i18n.needOnePosition_errorHint, "no positions");
+      showSnackBarFailure(context, "create pre send (dirty)", AppLang.i18n.needOnePosition_errorHint,
+          AppLang.i18n.scanner_noAttachment_hint);
       // } else {
       // showSnackBarFailure(context, "create pre send (dirty)", "missing required values");
     }
@@ -248,7 +308,7 @@ class _ScannerScreenState extends FormBlocBaseScreenState<ScannerScreen, Scanner
 
   void submit(BuildContext context) => context.read<ScannerBloc>().submit();
 
-  Widget sendPurchaseButton(BuildContext context, ScannerBloc bloc) {
+  Widget sendButton(BuildContext context, ScannerBloc bloc) {
     final empty = bloc.main.attachments.value.isEmpty;
     final valid = bloc.state.isValid();
 
@@ -265,15 +325,49 @@ class _ScannerScreenState extends FormBlocBaseScreenState<ScannerScreen, Scanner
       backgroundColor: Theme.of(context).primaryColor,
       onPressed: () async {
         LoadingDialog.show(context);
-        scan().then((value) {
+        CunningDocumentScanner.getPictures().then((value) {
           if (value != null) {
             formBloc.storeScanResult(value, ready: () => update());
           }
         }).whenComplete(() => LoadingDialog.hide(context));
       },
       tooltip: "Scan Document",
-      icon: Icons.scanner,
+      icon: ThemeIcons.scanner,
     );
+  }
+
+  Widget cameraButton(ScannerBloc formBloc) {
+    return RoundIconButton(
+      backgroundColor: Theme.of(context).primaryColor,
+      onPressed: () => camera(
+        formBloc,
+        source: ImageSource.camera,
+        maxHeight: 2048,
+        maxWidth: 2048,
+        imageQuality: 66,
+      ),
+      tooltip: "Picture",
+      icon: ThemeIcons.camera,
+    );
+  }
+
+  void camera(
+    ScannerBloc formBloc, {
+    ImageSource source = ImageSource.gallery,
+    double? maxWidth,
+    double? maxHeight,
+    int? imageQuality,
+  }) {
+    ImagePicker()
+        .pickImage(
+          source: source,
+          maxWidth: maxWidth,
+          maxHeight: maxHeight,
+          imageQuality: imageQuality,
+          requestFullMetadata: false,
+        )
+        .then((file) => formBloc.loadCropperImage(file))
+        .then((_) => update()); //.whenComplete(() => LoadingDialog.hide(context));
   }
 
   Widget filePickerButton(ScannerBloc formBloc) {
@@ -284,9 +378,14 @@ class _ScannerScreenState extends FormBlocBaseScreenState<ScannerScreen, Scanner
 
         FilePicker.platform
             .pickFiles() //
-            .then((result) => result!.files.single.path!)
-            .then((path) => formBloc.uploadAttachment(p.basename(path), File(path).readAsBytesSync()))
-            .whenComplete(() => LoadingDialog.hide(context));
+            .then((result) => result?.files.single.path)
+            .then(
+          (path) {
+            if (path != null) {
+              formBloc.uploadAttachment(path, File(path).readAsBytesSync());
+            }
+          },
+        ).whenComplete(() => LoadingDialog.hide(context));
       },
       tooltip: "Pick Document",
       icon: ThemeIcons.file,

@@ -1,36 +1,36 @@
 import 'dart:async';
-import 'dart:io';
 
-import 'package:document_scanner/core/lib/logger.dart';
 import 'package:document_scanner/core/lib/optional.dart';
+import 'package:document_scanner/core/lib/states/validators.dart';
 import 'package:document_scanner/core/lib/tuple.dart';
-import 'package:document_scanner/core/platform/helper.dart';
 import 'package:document_scanner/core/service_locator/service_locator.dart';
-import 'package:document_scanner/core/states/validators.dart';
 import 'package:document_scanner/core/widgets/bloc_builder/dropdown.dart';
 import 'package:document_scanner/core/widgets/blocs/datetime.dart';
-import 'package:document_scanner/scanner/domain/usecases/read_scanned_files.dart';
+import 'package:document_scanner/scanner/domain/repositories/convert.dart';
+import 'package:document_scanner/scanner/domain/repositories/key_values.dart';
+import 'package:document_scanner/scanner/domain/usecases/create_pdf_file.dart';
+import 'package:document_scanner/scanner/domain/usecases/export_attachment.dart';
+import 'package:document_scanner/scanner/domain/usecases/load_list_items.dart';
+import 'package:document_scanner/scanner/domain/usecases/read_files.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
-
-import '../../../../core/widgets/scanner/scanner.dart';
 
 part 'state.dart';
 
-const original = "Original";
-const grayscale = "GrayScale";
-const monochrome = "Monochrome";
-const luminance = "Luminance";
-
 class ScannerBloc extends FormBloc<String, ErrorValue> {
+  final displayCropper = InputFieldBloc<bool, String>(initialValue: false);
+  String? cropperFilename;
+  Uint8List? cropperImage;
+
   final scannedImages = InputFieldBloc<List<Tuple2<String, Uint8List>>, dynamic>(initialValue: []);
   List<Uint8List?> cachedImages = [];
 
   final amount = InputFieldBloc<double, dynamic>(initialValue: 1.0);
   final threshold = InputFieldBloc<double, dynamic>(initialValue: 0.5);
 
-  void uploadAttachment(String filename, Uint8List bytes) => main.uploadAttachment(filename, bytes);
+  void uploadAttachment(String filename, Uint8List bytes) => main.uploadAttachment(p.basename(filename), bytes);
   void removeAttachment(int index) => main.removeAttachment(index);
 
   int attachmentCount() => main.attachments.value.length;
@@ -63,30 +63,18 @@ class ScannerBloc extends FormBloc<String, ErrorValue> {
   @override
   FutureOr<void> onSubmitting() async {
     try {
-      //if (await Permission.manageExternalStorage.request().isGranted) {
-      final df = DateFormat("yyyy-MM-dd");
-      final downloadsDirectory = await Helper.getTempDir();
-
-      for (var element in main.attachments.value) {
-        final extension = p.extension(element.value.name);
-
-        final file = File("$downloadsDirectory/tmpfile");
-        file.writeAsBytesSync(element.value.data);
-
-        final structure =
-            "docscan/${main.area.value!.technical}/${main.supplierName.value}/${main.documentType.value!.technical}";
-        final fileName = "${main.documentType.value!.technical}_${df.format(main.documentDate.dateTime!)}.$extension";
-
-        await Helper.saveFileInMediaStore(file.path, structure, fileName);
-        Log.high("filepath: $fileName");
-
-        file.deleteSync();
-      }
-
-      keyValues().addSupplierNames(main.supplierName.value);
-      main.attachments.value.clear();
-      emitSuccess(successResponse: "files created", canSubmitAgain: true);
-      //   }
+      sl<ExportAttachmentUseCase>()
+          .call(ExportAttachmentsParam(
+            main.area.value!.technical!,
+            main.senderName.value,
+            main.documentType.value!.technical!,
+            main.documentDate.dateTime!,
+            main.attachments.value.map((e) => ExportAttachmentParam(e.value.name, e.value.data)).toList(),
+          ))
+          .then((_) => main.attachments.value.clear())
+          .whenComplete(
+            () => emitSuccess(successResponse: "files created", canSubmitAgain: true),
+          );
     } on Exception catch (err, stack) {
       emitFailure(failureResponse: ErrorValue(err, stack));
     }
@@ -112,28 +100,13 @@ class ScannerBloc extends FormBloc<String, ErrorValue> {
   Uint8List convertedImage(int index) {
     if (cachedImages[index] == null) {
       emitLoading();
-      final item = scannedImages.value[index];
-      final path = item.a;
-      final image = item.b;
 
-      switch (converter.value?.technical) {
-        case original:
-          cachedImages[index] = convertToResize(image);
-          break;
-        case grayscale:
-          cachedImages[index] = convertToGreyScale(image);
-          break;
-        case monochrome:
-          cachedImages[index] = convertToMonochrome(image, amount: amount.value);
-          break;
-        case luminance:
-          cachedImages[index] = convertToLuminance(image, threshold: threshold.value);
-          break;
-        default:
-          cachedImages[index] = convertToResize(image);
-      }
-
-      File(path).writeAsBytesSync(cachedImages[index]!);
+      cachedImages[index] = sl<ImageConverter>().convertImage(
+        converter.value!.technical,
+        scannedImages.value[index],
+        amount: amount.value,
+        threshold: threshold.value,
+      );
 
       emitLoaded();
     }
@@ -150,10 +123,16 @@ class ScannerBloc extends FormBloc<String, ErrorValue> {
       pdfImageData.add(Tuple2(scannedImages.value[i].a, image));
     }
 
-    final pdfData = await createPdf(pdfImageData);
-    uploadAttachment("scan.pdf", pdfData!);
+    final pdfData = await sl<CreatePdfFileUseCase>().call(
+      CreatePdfFileParam(
+        pdfImageData.map((e) => AttachmentParam.fromTuple(e)).toList(),
+      ),
+    );
+    uploadAttachment("scan.pdf", pdfData.eval());
+
     scannedImages.updateValue([]);
     clearImageCache();
+
     emitLoaded();
   }
 
@@ -174,5 +153,16 @@ class ScannerBloc extends FormBloc<String, ErrorValue> {
   void amountChanged(double value) {
     amount.updateValue(value);
     clearImageCache();
+  }
+
+  // TODO! move to usecase->repos->usecase->datasource?
+  Future<void> loadCropperImage(XFile? file) async {
+    if (file == null) {
+      return;
+    }
+
+    cropperFilename = file.name;
+    cropperImage = await file.readAsBytes();
+    displayCropper.changeValue(true);
   }
 }

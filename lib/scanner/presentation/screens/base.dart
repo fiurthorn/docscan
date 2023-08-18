@@ -1,6 +1,6 @@
 import 'package:document_scanner/core/lib/optional.dart';
+import 'package:document_scanner/core/lib/platform/platform.dart';
 import 'package:document_scanner/core/lib/transition_page_fade.dart';
-import 'package:document_scanner/core/platform/platform.dart';
 import 'package:document_scanner/core/widgets/loading_widget/loading_widget.dart';
 import 'package:document_scanner/scanner/presentation/screens/error/error.dart';
 import 'package:flutter/material.dart';
@@ -40,10 +40,11 @@ abstract class BaseScreenState<T extends StatefulWidget> extends State<T> {
   }
 
   void push(String route) {
-    if (isWeb)
+    if (isWeb) {
       GoRouter.of(context).go(route);
-    else
+    } else {
       GoRouter.of(context).push(route);
+    }
   }
 
   VoidCallback refresher(VoidCallback fn) => () => setState(fn);

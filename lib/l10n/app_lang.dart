@@ -22,7 +22,7 @@ class AppLang {
   static set lang(String lang) {
     if (lang.length == 2) {
       _lang = lang;
-      keyValues().set(KeyValueNames.locale, lang);
+      sl<KeyValues>().set(KeyValueNames.locale, lang);
       localeByLang(lang);
     }
   }

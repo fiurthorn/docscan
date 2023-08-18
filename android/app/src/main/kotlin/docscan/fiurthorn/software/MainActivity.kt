@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.webkit.MimeTypeMap
-import io.flutter.Log
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodCall
@@ -39,7 +38,6 @@ class MainActivity : FlutterActivity() {
     private fun handleMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "saveFileInMediaStore" -> {
-                Log.d("argument", "${call.arguments}")
                 result.success(
                         saveFileInMediaStore(
                                 call.argument<String>("input")!!,
@@ -76,11 +74,7 @@ class MainActivity : FlutterActivity() {
         return type
     }
 
-    private fun saveFileInMediaStore(
-            inputUrl: String,
-            folder: String,
-            fileName: String,
-    ): Boolean {
+    private fun saveFileInMediaStore(inputUrl: String, folder: String, fileName: String): Boolean {
         val contentValues =
                 ContentValues().apply {
                     put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
@@ -92,9 +86,6 @@ class MainActivity : FlutterActivity() {
                 }
         val resolver = getContext().contentResolver
         val outputUrl = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
-
-        Log.d("input", "${inputUrl}")
-        Log.d("output", "${outputUrl}")
 
         if (outputUrl != null) {
             URL("file://${inputUrl}").openStream().use { input ->

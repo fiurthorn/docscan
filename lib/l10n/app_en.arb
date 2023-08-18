@@ -1,4 +1,12 @@
 {
+  "areas_areaField_label": "Area",
+  "@areas_areaField_label": {
+    "description": ""
+  },
+  "areas_page_title": "Areas",
+  "@areas_page_title": {
+    "description": ""
+  },
   "baseScreen_about_label": "About {applicationName}",
   "@baseScreen_about_label": {
     "description": "About label",
@@ -45,6 +53,14 @@
   "@baseScreen_signOut_label": {
     "description": "logout label"
   },
+  "docTypes_docTypeField_label": "Document type",
+  "@docTypes_docTypeField_label": {
+    "description": ""
+  },
+  "docTypes_page_title": "Document types",
+  "@docTypes_page_title": {
+    "description": ""
+  },
   "dropdown_empty_hint": "choose {label}",
   "@dropdown_empty_hint": {
     "placeholders": {
@@ -65,6 +81,10 @@
       }
     }
   },
+  "i18n_field_hint": "tech;en:Name;de:Translation",
+  "@i18n_field_hint": {
+    "description": ""
+  },
   "message_failure_genericError": "Failure while submit the form: {serverMessage}",
   "@message_failure_genericError": {
     "description": "generic error message on submit a form",
@@ -78,6 +98,58 @@
   "needOnePosition_errorHint": "At least one Position required",
   "@needOnePosition_errorHint": {
     "description": "error hint, if lesser than one position to create"
+  },
+  "scanner_areaSelect_hint": "Area",
+  "@scanner_areaSelect_hint": {
+    "description": ""
+  },
+  "scanner_areaSelect_label": "Area",
+  "@scanner_areaSelect_label": {
+    "description": ""
+  },
+  "scanner_converterSelect_hint": "Select converter",
+  "@scanner_converterSelect_hint": {
+    "description": ""
+  },
+  "scanner_docDateField_hint": "Document date",
+  "@scanner_docDateField_hint": {
+    "description": ""
+  },
+  "scanner_docDateField_label": "Document date",
+  "@scanner_docDateField_label": {
+    "description": ""
+  },
+  "scanner_docTypeSelect_hint": "Document type",
+  "@scanner_docTypeSelect_hint": {
+    "description": ""
+  },
+  "scanner_docTypeSelect_label": "Document type",
+  "@scanner_docTypeSelect_label": {
+    "description": ""
+  },
+  "scanner_noAttachment_hint": "At least one Attachment required",
+  "@scanner_noAttachment_hint": {
+    "description": ""
+  },
+  "scanner_page_title": "Scanner",
+  "@scanner_page_title": {
+    "description": ""
+  },
+  "scanner_senderField_hint": "Sender",
+  "@scanner_senderField_hint": {
+    "description": ""
+  },
+  "scanner_senderField_label": "Sender",
+  "@scanner_senderField_label": {
+    "description": ""
+  },
+  "senders_page_title": "Senders",
+  "@senders_page_title": {
+    "description": ""
+  },
+  "senders_senderField_label": "Sender",
+  "@senders_senderField_label": {
+    "description": ""
   },
   "validate_email_errorHint": "a valid email <name@example.com> need",
   "@validate_email_errorHint": {

@@ -1,6 +1,6 @@
 import 'package:document_scanner/core/design/theme_colors.dart';
 import 'package:document_scanner/core/design/theme_icons.dart';
-import 'package:document_scanner/core/platform/platform.dart';
+import 'package:document_scanner/core/lib/platform/platform.dart';
 import 'package:document_scanner/core/version.g.dart';
 import 'package:document_scanner/core/widgets/hover_icon_button/widget.dart';
 import 'package:document_scanner/scanner/application.dart';

@@ -1,24 +1,24 @@
 import 'package:crop_your_image/crop_your_image.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:document_scanner/core/design/theme_colors.dart';
 import 'package:document_scanner/core/design/theme_icons.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
-class DocScanner extends StatefulWidget {
+class DocumentScanner extends StatefulWidget {
   final Uint8List image;
   final ValueChanged<Uint8List> onCropped;
 
-  const DocScanner({
+  const DocumentScanner({
     super.key,
     required this.image,
     required this.onCropped,
   });
 
   @override
-  State<StatefulWidget> createState() => DocScannerState();
+  State<StatefulWidget> createState() => DocumentScannerState();
 }
 
-class DocScannerState extends State<DocScanner> {
+class DocumentScannerState extends State<DocumentScanner> {
   final CropController cropController = CropController();
   bool preview = false;
 

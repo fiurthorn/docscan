@@ -1,7 +1,7 @@
 enum KeyValueNames {
   locale,
   //
-  supplierNames,
+  senderNames,
   documentTypes,
   areas,
 }
@@ -25,15 +25,9 @@ abstract class KeyValues {
 
   Future<void> close();
 
-  Future<List<String>> supplierNames();
-  Future<void> setSupplierNames(List<String> list);
-  Future<void> addSupplierNames(String supplierName);
-
-  Future<List<String>> documentTypeItems();
-  Future<void> setDocumentTypeItems(List<String> list);
-
-  Future<List<String>> areaItems();
-  Future<void> setAreaItems(List<String> list);
+  Future<void> setItems(KeyValueNames key, List<String> list);
+  Future<List<String>> getItems(KeyValueNames key);
+  Future<void> addSenderName(String senderName);
 
   Future<void> init();
 }

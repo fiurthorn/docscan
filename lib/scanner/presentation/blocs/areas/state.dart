@@ -9,7 +9,10 @@ class ItemState extends GroupFieldBloc<FieldBloc, dynamic> {
       : super(name: "main", fieldBlocs: [
           ListFieldBloc<ItemStateBloc, String>(name: "areas"),
         ]) {
-    keyValues().areaItems().then((value) {
+    sl<LoadListItemsUseCase>()
+        .call(LoadListItemsParam(KeyValueNames.areas))
+        .then((value) => value.eval())
+        .then((value) {
       for (var element in value) {
         createItem(initialValue: element);
       }

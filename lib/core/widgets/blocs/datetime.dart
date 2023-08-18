@@ -1,4 +1,4 @@
-import 'package:document_scanner/core/states/validators.dart';
+import 'package:document_scanner/core/lib/states/validators.dart';
 import 'package:document_scanner/l10n/app_lang.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 
