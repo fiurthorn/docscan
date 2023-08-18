@@ -25,7 +25,7 @@ class Native {
   Future<dynamic> saveFileInMediaStore(String input, String folder, String fileName) async {
     return platform.invokeMethod('saveFileInMediaStore', {
       "input": input,
-      "folder": folder,
+      "folder": "docscan/$folder",
       "fileName": fileName,
     });
   }

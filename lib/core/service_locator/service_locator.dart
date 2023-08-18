@@ -15,6 +15,7 @@ import 'package:document_scanner/scanner/domain/repositories/media_store.dart';
 import 'package:document_scanner/scanner/domain/repositories/pdf.dart';
 import 'package:document_scanner/scanner/domain/usecases/create_pdf_file.dart';
 import 'package:document_scanner/scanner/domain/usecases/export_attachment.dart';
+import 'package:document_scanner/scanner/domain/usecases/export_database.dart';
 import 'package:document_scanner/scanner/domain/usecases/load_list_items.dart';
 import 'package:document_scanner/scanner/domain/usecases/read_files.dart';
 import 'package:document_scanner/scanner/domain/usecases/store_list_items.dart';
@@ -41,6 +42,7 @@ Future<GetIt> initServiceLocator() async {
     sl.registerLazySingleton(() => ReadFilesUseCase());
     sl.registerLazySingleton(() => CreatePdfFileUseCase());
     sl.registerLazySingleton(() => LoadListItemsUseCase());
+    sl.registerLazySingleton(() => ExportDatabaseUseCase());
     sl.registerLazySingleton(() => StoreListItemsUseCase());
     sl.registerLazySingleton(() => ExportAttachmentUseCase());
 

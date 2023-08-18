@@ -28,6 +28,7 @@ class ThemeIcons {
   static IconData get copyPosition => const IconDataRegular(0xf0c5);
   static IconData get crop => const IconDataSolid(0xf565);
 
+  static IconData get database => const IconDataSolid(0xf1c0);
   static IconData get defaultUser => const IconDataRegular(0xf007);
   static IconData get deletePosition => FontAwesomeIcons.trashCan;
   static IconData get dissatisfied => FontAwesomeIcons.disease;

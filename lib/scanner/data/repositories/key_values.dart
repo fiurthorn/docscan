@@ -1,3 +1,9 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:document_scanner/core/lib/trace.dart';
+import 'package:document_scanner/core/service_locator/service_locator.dart';
+import 'package:document_scanner/scanner/data/datasources/native.dart';
 import 'package:document_scanner/scanner/domain/repositories/key_values.dart';
 import 'package:hive/hive.dart';
 
@@ -54,6 +60,29 @@ class KeyValuesImpl implements KeyValues {
 
   @override
   Future<void> close() => _box.close();
+
+  @override
+  Future<void> importDatabase(Map<dynamic, dynamic> map) {
+    return Future.wait(
+        map.entries.map((e) => _box.put(KeyValueNames.values.firstWhere((key) => key.name == e.key).name, e.value)));
+  }
+
+  @override
+  Future<void> exportDatabase() async {
+    final tmpDir = await sl<Native>().getTempDir();
+    final file = File("$tmpDir/database.json");
+
+    return file
+        .writeAsString(trace(json.encode(_box.toMap()), "database"))
+        .then(
+          (value) => sl<Native>().saveFileInMediaStore(
+            file.absolute.path,
+            "database",
+            "content.json",
+          ),
+        )
+        .then((value) => file.delete());
+  }
 
   @override
   Future<void> init() async {

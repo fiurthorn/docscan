@@ -10,8 +10,8 @@ Drawer baseRightMenu(
   BuildContext context,
   GlobalKey<ScaffoldState> scaffold,
   Function reloader, {
-  List<Widget> menuItems = const <Widget>[],
-  List<Widget> accountItems = const <Widget>[],
+  List<Widget> topItems = const <Widget>[],
+  List<Widget> bottomItems = const <Widget>[],
 }) {
   return Drawer(
     child: SafeArea(
@@ -19,10 +19,10 @@ Drawer baseRightMenu(
         children: [
           const Padding(padding: EdgeInsets.only(top: 10)),
           Expanded(
-            child: Column(children: menuItems),
+            child: Column(children: topItems),
           ),
-          if (accountItems.isNotEmpty) const Divider(thickness: 1, height: 2),
-          Column(children: accountItems),
+          if (bottomItems.isNotEmpty) const Divider(thickness: 1, height: 2),
+          Column(children: bottomItems),
           const Divider(thickness: 1, height: 2),
           ListTile(
             leading: Icon(ThemeIcons.lang, color: themeGrey4Color),

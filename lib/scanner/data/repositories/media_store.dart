@@ -26,7 +26,7 @@ class MediaStoreImpl implements MediaStore {
       final file = File("$downloadsDirectory/tmpfile");
       file.writeAsBytesSync(element.image);
 
-      final structure = "docscan/$area/$senderName/$documentType";
+      final structure = "$area/$senderName/$documentType";
       final fileName = "${documentType}_${df.format(documentDate)}.$extension";
 
       await sl<Native>().saveFileInMediaStore(file.path, structure, fileName);

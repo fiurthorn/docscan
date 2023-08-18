@@ -30,4 +30,8 @@ abstract class KeyValues {
   Future<void> addSenderName(String senderName);
 
   Future<void> init();
+
+  Future<void> exportDatabase();
+
+  Future<void> importDatabase(Map<dynamic, dynamic> map);
 }
