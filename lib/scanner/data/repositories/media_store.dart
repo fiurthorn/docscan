@@ -14,6 +14,7 @@ class MediaStoreImpl implements MediaStore {
   Future<void> upload(
     String area,
     String senderName,
+    String receiverName,
     String documentType,
     DateTime documentDate,
     List<ExportAttachmentModel> attachments,
@@ -26,7 +27,7 @@ class MediaStoreImpl implements MediaStore {
       final file = File("$downloadsDirectory/tmpfile");
       file.writeAsBytesSync(element.image);
 
-      final structure = "$area/$senderName/$documentType";
+      final structure = "$area/$senderName/$receiverName/$documentType";
       final fileName = "${documentType}_${df.format(documentDate)}.$extension";
 
       await sl<Native>().saveFileInMediaStore(file.path, structure, fileName);

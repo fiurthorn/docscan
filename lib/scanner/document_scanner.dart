@@ -2,6 +2,7 @@
 import 'package:document_scanner/scanner/application.dart';
 import 'package:document_scanner/scanner/presentation/screens/areas/page.dart';
 import 'package:document_scanner/scanner/presentation/screens/documentsTypes/page.dart';
+import 'package:document_scanner/scanner/presentation/screens/receiver/page.dart';
 import 'package:document_scanner/scanner/presentation/screens/scanner/page.dart';
 import 'package:document_scanner/scanner/presentation/screens/sender/page.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ class _DocumentScannerState extends ApplicationState<DocumentScanner> {
     AreasScreen.route,
     DocumentTypesScreen.route,
     SendersScreen.route,
+    ReceiversScreen.route,
   };
 
   @override

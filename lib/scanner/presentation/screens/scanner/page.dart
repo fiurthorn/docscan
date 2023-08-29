@@ -247,6 +247,11 @@ class _ScannerScreenState extends FormBlocBaseScreenState<ScannerScreen, Scanner
                 hint: AppLang.i18n.scanner_senderField_hint,
               ),
               DropDownBlocBuilder(
+                bloc: formBloc.main.receiverName,
+                label: AppLang.i18n.scanner_receiverField_label,
+                hint: AppLang.i18n.scanner_receiverField_hint,
+              ),
+              DropDownBlocBuilder(
                 bloc: formBloc.main.documentType,
                 label: AppLang.i18n.scanner_docTypeSelect_label,
                 hint: AppLang.i18n.scanner_docTypeSelect_hint,

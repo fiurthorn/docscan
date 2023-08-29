@@ -13,9 +13,10 @@ class ExportAttachmentModel extends Tuple2<String, Uint8List> {
 abstract class MediaStore {
   Future<void> upload(
     String area,
-    String supllier,
+    String sender,
+    String receiver,
     String docType,
-    DateTime datetime,
+    DateTime dateTime,
     List<ExportAttachmentModel> attachments,
   );
 }

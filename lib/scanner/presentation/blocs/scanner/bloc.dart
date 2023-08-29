@@ -67,6 +67,7 @@ class ScannerBloc extends FormBloc<String, ErrorValue> {
           .call(ExportAttachmentsParam(
             main.area.value!.technical!,
             main.senderName.value,
+            main.receiverName.value!.technical!,
             main.documentType.value!.technical!,
             main.documentDate.dateTime!,
             main.attachments.value.map((e) => ExportAttachmentParam(e.value.name, e.value.data)).toList(),

@@ -18,6 +18,7 @@ class ExportAttachmentParam extends Tuple2<String, Uint8List> {
 class ExportAttachmentsParam {
   final String area;
   final String sender;
+  final String receiver;
   final String docType;
   final DateTime dateTime;
   final List<ExportAttachmentParam> attachments;
@@ -25,6 +26,7 @@ class ExportAttachmentsParam {
   ExportAttachmentsParam(
     this.area,
     this.sender,
+    this.receiver,
     this.docType,
     this.dateTime,
     this.attachments,
@@ -41,6 +43,7 @@ class ExportAttachmentUseCase implements UseCase<Result, ExportAttachmentsParam>
         sl<MediaStore>().upload(
           param.area,
           param.sender,
+          param.receiver,
           param.docType,
           param.dateTime,
           param.attachments.map((e) => ExportAttachmentModel.fromTuple(e)).toList(),

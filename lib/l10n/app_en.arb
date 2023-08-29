@@ -99,6 +99,14 @@
   "@needOnePosition_errorHint": {
     "description": "error hint, if lesser than one position to create"
   },
+  "receivers_page_title": "Receivers",
+  "@receivers_page_title": {
+    "description": ""
+  },
+  "receivers_receiverField_label": "Receiver",
+  "@receivers_receiverField_label": {
+    "description": ""
+  },
   "scanner_areaSelect_hint": "Area",
   "@scanner_areaSelect_hint": {
     "description": ""
@@ -133,6 +141,14 @@
   },
   "scanner_page_title": "Scanner",
   "@scanner_page_title": {
+    "description": ""
+  },
+  "scanner_receiverField_hint": "Receiver",
+  "@scanner_receiverField_hint": {
+    "description": ""
+  },
+  "scanner_receiverField_label": "Receiver",
+  "@scanner_receiverField_label": {
     "description": ""
   },
   "scanner_senderField_hint": "Sender",

@@ -22,6 +22,9 @@ class AttachState extends GroupFieldBloc<FieldBloc, dynamic> {
 
   TextFieldBloc<String> get senderName => state.fieldBlocs["senderName"] as TextFieldBloc<String>;
 
+  SelectFieldBloc<I18nLabel, dynamic> get receiverName =>
+      state.fieldBlocs["receiverName"] as SelectFieldBloc<I18nLabel, dynamic>;
+
   DateTimeBloc get documentDate => state.fieldBlocs["documentDate"] as DateTimeBloc;
 
   AttachState()
@@ -40,10 +43,15 @@ class AttachState extends GroupFieldBloc<FieldBloc, dynamic> {
             validators: [notEmpty()],
             suggestions: senderNames,
           ),
+          SelectFieldBloc<I18nLabel, dynamic>(
+            name: "receiverName",
+            validators: [notEmptyObject()],
+          ),
           DateTimeBloc.create(name: "documentDate", validators: [notEmpty()]),
         ]) {
     attachments.emit(attachments.state.copyWith(isValidating: false));
 
+    receiverNameItems().then((value) => receiverName.updateItems(value));
     documentTypeItems().then((value) => documentType.updateItems(value));
     areaItems().then((value) => area.updateItems(value));
   }
@@ -69,6 +77,20 @@ class AttachState extends GroupFieldBloc<FieldBloc, dynamic> {
               )
               .toList()
             ..sort((a, b) => a.compareTo(b)),
+        );
+  }
+
+  static Future<List<I18nLabel>> receiverNameItems() async {
+    return sl<LoadListItemsUseCase>()
+        .call(LoadListItemsParam(KeyValueNames.receiverNames))
+        .then((value) => value.eval())
+        .then(
+          (value) => value
+              .map(
+                (element) => I18nLabel.build(label: element),
+              )
+              .toList()
+            ..sort((a, b) => a.label.compareTo(b.label)),
         );
   }
 

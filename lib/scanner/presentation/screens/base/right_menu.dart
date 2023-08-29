@@ -63,6 +63,14 @@ Drawer rightMenu(
         context.go(SendersScreen.path);
       },
     ),
+    ListTile(
+      title: Text(AppLang.i18n.receivers_page_title),
+      leading: Icon(ThemeIcons.envelopeOpenText, color: themeGrey4Color),
+      onTap: () {
+        scaffold.currentState!.closeEndDrawer();
+        context.go(SendersScreen.path);
+      },
+    ),
   ], bottomItems: [
     ListTile(
       title: const Text("Export database"),

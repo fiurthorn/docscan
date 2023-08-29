@@ -2,6 +2,7 @@ enum KeyValueNames {
   locale,
   //
   senderNames,
+  receiverNames,
   documentTypes,
   areas,
 }
