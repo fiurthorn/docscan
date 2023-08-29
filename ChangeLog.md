@@ -1,3 +1,9 @@
+## Version 0.0.7
+
+fdcf6f1 feat: receiver name
+8b5a7c4 feat: export / import database
+cb6b143 refactor: clean arch refactoring
+
 # Version 0.0.6
 
 ab1875f refactor!: removed old file behavior, use media store api
