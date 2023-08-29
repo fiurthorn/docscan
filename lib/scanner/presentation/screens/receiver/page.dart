@@ -95,7 +95,7 @@ class _ReceiversState extends FormBlocBaseScreenState<ReceiversScreen, ItemBloc>
                   textFieldBloc: formBloc.main.receivers.value[index],
                   decoration: InputDecoration(
                     labelText: AppLang.i18n.receivers_receiverField_label,
-                    hintText: AppLang.i18n.i18n_field_hint,
+                    hintText: AppLang.i18n.technical_field_hint,
                     suffixIcon: IconButton(
                       icon: Icon(ThemeIcons.deletePosition),
                       onPressed: () {

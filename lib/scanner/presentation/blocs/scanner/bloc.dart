@@ -5,6 +5,7 @@ import 'package:document_scanner/core/lib/states/validators.dart';
 import 'package:document_scanner/core/lib/tuple.dart';
 import 'package:document_scanner/core/service_locator/service_locator.dart';
 import 'package:document_scanner/core/widgets/bloc_builder/dropdown.dart';
+import 'package:document_scanner/core/widgets/bloc_builder/i18n_dropdown.dart';
 import 'package:document_scanner/core/widgets/blocs/datetime.dart';
 import 'package:document_scanner/scanner/domain/repositories/convert.dart';
 import 'package:document_scanner/scanner/domain/repositories/key_values.dart';
@@ -67,7 +68,7 @@ class ScannerBloc extends FormBloc<String, ErrorValue> {
           .call(ExportAttachmentsParam(
             main.area.value!.technical!,
             main.senderName.value,
-            main.receiverName.value!.technical!,
+            main.receiverName.value!.technical,
             main.documentType.value!.technical!,
             main.documentDate.dateTime!,
             main.attachments.value.map((e) => ExportAttachmentParam(e.value.name, e.value.data)).toList(),

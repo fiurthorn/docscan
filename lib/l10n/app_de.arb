@@ -29,6 +29,7 @@
   "scanner_senderField_label": "Absender",
   "senders_page_title": "Absender",
   "senders_senderField_label": "Absender",
+  "technical_field_hint": "tech;Name",
   "validate_email_errorHint": "Keine valide Email Adresse",
   "validate_maxLength_errorHint": "Maximal {n} Zeichen",
   "validate_minLength_errorHint": "Mindestlänge von {n}",

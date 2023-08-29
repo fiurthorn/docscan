@@ -9,6 +9,7 @@ import 'package:document_scanner/core/toaster/error.dart';
 import 'package:document_scanner/core/toaster/success.dart';
 import 'package:document_scanner/core/widgets/bloc_builder/datetime.dart';
 import 'package:document_scanner/core/widgets/bloc_builder/dropdown.dart';
+import 'package:document_scanner/core/widgets/bloc_builder/i18n_dropdown.dart';
 import 'package:document_scanner/core/widgets/bloc_builder/text.dart';
 import 'package:document_scanner/core/widgets/cropper/widget.dart';
 import 'package:document_scanner/core/widgets/goroute/route.dart';
@@ -150,7 +151,7 @@ class _ScannerScreenState extends FormBlocBaseScreenState<ScannerScreen, Scanner
   Widget buildImageEnhancementViewer(BuildContext context, ScannerBloc formBloc) {
     return Column(
       children: [
-        DropDownBlocBuilder(
+        I18nDropDownBlocBuilder(
           bloc: formBloc.converter,
           hint: AppLang.i18n.scanner_converterSelect_hint,
           requestFocus: true,
@@ -236,7 +237,7 @@ class _ScannerScreenState extends FormBlocBaseScreenState<ScannerScreen, Scanner
           padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 15),
           child: Column(
             children: [
-              DropDownBlocBuilder(
+              I18nDropDownBlocBuilder(
                 bloc: formBloc.main.area,
                 label: AppLang.i18n.scanner_areaSelect_label,
                 hint: AppLang.i18n.scanner_areaSelect_hint,
@@ -251,7 +252,7 @@ class _ScannerScreenState extends FormBlocBaseScreenState<ScannerScreen, Scanner
                 label: AppLang.i18n.scanner_receiverField_label,
                 hint: AppLang.i18n.scanner_receiverField_hint,
               ),
-              DropDownBlocBuilder(
+              I18nDropDownBlocBuilder(
                 bloc: formBloc.main.documentType,
                 label: AppLang.i18n.scanner_docTypeSelect_label,
                 hint: AppLang.i18n.scanner_docTypeSelect_hint,

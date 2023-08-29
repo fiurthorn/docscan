@@ -22,8 +22,8 @@ class AttachState extends GroupFieldBloc<FieldBloc, dynamic> {
 
   TextFieldBloc<String> get senderName => state.fieldBlocs["senderName"] as TextFieldBloc<String>;
 
-  SelectFieldBloc<I18nLabel, dynamic> get receiverName =>
-      state.fieldBlocs["receiverName"] as SelectFieldBloc<I18nLabel, dynamic>;
+  SelectFieldBloc<DropDownEntry, dynamic> get receiverName =>
+      state.fieldBlocs["receiverName"] as SelectFieldBloc<DropDownEntry, dynamic>;
 
   DateTimeBloc get documentDate => state.fieldBlocs["documentDate"] as DateTimeBloc;
 
@@ -43,7 +43,7 @@ class AttachState extends GroupFieldBloc<FieldBloc, dynamic> {
             validators: [notEmpty()],
             suggestions: senderNames,
           ),
-          SelectFieldBloc<I18nLabel, dynamic>(
+          SelectFieldBloc<DropDownEntry, dynamic>(
             name: "receiverName",
             validators: [notEmptyObject()],
           ),
@@ -80,14 +80,14 @@ class AttachState extends GroupFieldBloc<FieldBloc, dynamic> {
         );
   }
 
-  static Future<List<I18nLabel>> receiverNameItems() async {
+  static Future<List<DropDownEntry>> receiverNameItems() async {
     return sl<LoadListItemsUseCase>()
         .call(LoadListItemsParam(KeyValueNames.receiverNames))
         .then((value) => value.eval())
         .then(
           (value) => value
               .map(
-                (element) => I18nLabel.build(label: element),
+                (element) => DropDownEntry.build(label: element),
               )
               .toList()
             ..sort((a, b) => a.label.compareTo(b.label)),

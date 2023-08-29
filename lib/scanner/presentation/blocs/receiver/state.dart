@@ -11,7 +11,7 @@ class ItemState extends GroupFieldBloc<FieldBloc, dynamic> {
           ListFieldBloc<ItemStateBloc, String>(name: "receivers"),
         ]) {
     sl<LoadListItemsUseCase>()
-        .call(LoadListItemsParam(KeyValueNames.senderNames))
+        .call(LoadListItemsParam(KeyValueNames.receiverNames))
         .then((value) => value.eval())
         .then((value) {
       for (var element in value) {

@@ -167,6 +167,10 @@
   "@senders_senderField_label": {
     "description": ""
   },
+  "technical_field_hint": "tech;Name",
+  "@technical_field_hint": {
+    "description": ""
+  },
   "validate_email_errorHint": "a valid email <name@example.com> need",
   "@validate_email_errorHint": {
     "description": "validation error on regex match error"

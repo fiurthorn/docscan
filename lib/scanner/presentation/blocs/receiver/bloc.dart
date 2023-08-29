@@ -30,7 +30,7 @@ class ItemBloc extends FormBloc<String, ErrorValue> {
     try {
       await sl<StoreListItemsUseCase>().call(
         StoreListItemsParam(
-          KeyValueNames.senderNames,
+          KeyValueNames.receiverNames,
           main.receivers.value.map((e) => e.value).toList(),
         ),
       );
