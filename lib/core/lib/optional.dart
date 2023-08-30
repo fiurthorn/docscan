@@ -8,9 +8,6 @@ abstract class Optional<V> {
   static Value<V> newValue<V>(V value) => Value<V>(value);
   static Error<V> newError<V>(Exception value, [StackTrace? stackTrace]) => Error<V>(value, stackTrace);
 
-  bool get isValue;
-  bool get isError;
-
   R fold<R>(Folder<V, R> left, ErrorFolder<R> right);
   Optional<R> convert<R>(Folder<V, R> converter);
 
@@ -20,12 +17,6 @@ abstract class Optional<V> {
 class Value<V> implements Optional<V> {
   final V value;
   Value(this.value);
-
-  @override
-  bool get isValue => true;
-
-  @override
-  bool get isError => false;
 
   @override
   R fold<R>(Folder<V, R> left, ErrorFolder<R> right) => left(value);
@@ -58,12 +49,6 @@ class Error<V> implements Optional<V> {
     Exception exception, [
     StackTrace? stackTrace,
   ]) : error = ErrorValue(exception, stackTrace);
-
-  @override
-  bool get isValue => false;
-
-  @override
-  bool get isError => true;
 
   @override
   R fold<R>(Folder<V, R> left, ErrorFolder<R> right) => right(error.exception, error.stackTrace);

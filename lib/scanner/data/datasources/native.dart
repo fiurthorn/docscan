@@ -14,12 +14,12 @@ class Native {
     return _tempDir ??= (await _getTempDir());
   }
 
-  Future<String> _getLibraryDirectory() {
-    return platform.invokeMethod('getLibraryDirectory').then((value) => value as String);
+  Future<String> _appConfigurationDir() {
+    return platform.invokeMethod('appConfigurationDir').then((value) => value as String);
   }
 
-  Future<String> getLibraryDirectory() async {
-    return libraryDirectory ??= (await _getLibraryDirectory());
+  Future<String> appConfigurationDir() async {
+    return libraryDirectory ??= (await _appConfigurationDir());
   }
 
   Future<dynamic> saveFileInMediaStore(String input, String folder, String fileName) async {

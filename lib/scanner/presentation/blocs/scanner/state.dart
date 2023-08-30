@@ -67,55 +67,48 @@ class AttachState extends GroupFieldBloc<FieldBloc, dynamic> {
   }
 
   static Future<List<String>> senderNames(String pattern) async {
-    return sl<LoadListItemsUseCase>()
-        .call(LoadListItemsParam(KeyValueNames.senderNames))
-        .then((value) => value.eval())
-        .then(
-          (value) => value
-              .where(
-                (element) => element.toLowerCase().contains(pattern.toLowerCase()),
-              )
-              .toList()
-            ..sort((a, b) => a.compareTo(b)),
-        );
+    return usecase<List<String>, LoadListItemsParam>(LoadListItemsParam(KeyValueNames.senderNames)).then(
+      (value) => value
+          .where(
+            (element) => element.toLowerCase().contains(pattern.toLowerCase()),
+          )
+          .toList()
+        ..sort((a, b) => a.compareTo(b)),
+    );
   }
 
   static Future<List<DropDownEntry>> receiverNameItems() async {
-    return sl<LoadListItemsUseCase>()
-        .call(LoadListItemsParam(KeyValueNames.receiverNames))
-        .then((value) => value.eval())
-        .then(
-          (value) => value
-              .map(
-                (element) => DropDownEntry.build(label: element),
-              )
-              .toList()
-            ..sort((a, b) => a.label.compareTo(b.label)),
-        );
+    return usecase<List<String>, LoadListItemsParam>(LoadListItemsParam(KeyValueNames.receiverNames)).then(
+      (value) => value
+          .map(
+            (element) => DropDownEntry.build(label: element),
+          )
+          .toList()
+        ..sort((a, b) => a.label.compareTo(b.label)),
+    );
   }
 
   static Future<List<I18nLabel>> documentTypeItems() async {
-    return sl<LoadListItemsUseCase>()
-        .call(LoadListItemsParam(KeyValueNames.documentTypes))
-        .then((value) => value.eval())
-        .then(
-          (value) => value
-              .map(
-                (element) => I18nLabel.build(label: element),
-              )
-              .toList()
-            ..sort((a, b) => a.label.compareTo(b.label)),
-        );
+    return usecase<List<String>, LoadListItemsParam>(LoadListItemsParam(KeyValueNames.documentTypes)).then(
+      (value) => value
+          .map(
+            (element) => I18nLabel.build(label: element),
+          )
+          .toList()
+        ..sort((a, b) => a.label.compareTo(b.label)),
+    );
   }
 
   static Future<List<I18nLabel>> areaItems() async {
-    return sl<LoadListItemsUseCase>().call(LoadListItemsParam(KeyValueNames.areas)).then((value) => value.eval()).then(
-          (value) => value
-              .map(
-                (element) => I18nLabel.build(label: element),
-              )
-              .toList()
-            ..sort((a, b) => a.label.compareTo(b.label)),
-        );
+    return usecase<List<String>, LoadListItemsParam>(
+      LoadListItemsParam(KeyValueNames.areas),
+    ).then(
+      (value) => value
+          .map(
+            (element) => I18nLabel.build(label: element),
+          )
+          .toList()
+        ..sort((a, b) => a.label.compareTo(b.label)),
+    );
   }
 }

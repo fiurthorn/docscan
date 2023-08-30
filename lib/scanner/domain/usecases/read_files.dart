@@ -5,17 +5,19 @@ import 'package:document_scanner/scanner/domain/repositories/disk_source.dart';
 import 'package:document_scanner/scanner/domain/usecases/usecase.dart';
 import 'package:flutter/foundation.dart';
 
+export 'call.dart';
+
 class ReadFilesParam {
   final List<String> path;
 
   ReadFilesParam(this.path);
 }
 
-typedef Result = List<Tuple2<String, Uint8List>>;
+typedef ReadFiles = UseCase<List<Tuple2<String, Uint8List>>, ReadFilesParam>;
 
-class ReadFilesUseCase implements UseCase<Result, ReadFilesParam> {
+class ReadFilesUseCase implements UseCase<List<Tuple2<String, Uint8List>>, ReadFilesParam> {
   @override
-  Future<Optional<Result>> call(ReadFilesParam param) async {
+  Future<Optional<List<Tuple2<String, Uint8List>>>> call(ReadFilesParam param) async {
     try {
       return Optional.newValue(sl<DiskSource>().readFiles(param.path));
     } on Exception catch (e, st) {

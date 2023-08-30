@@ -10,10 +10,7 @@ class ItemState extends GroupFieldBloc<FieldBloc, dynamic> {
       : super(name: "main", fieldBlocs: [
           ListFieldBloc<ItemStateBloc, String>(name: "senders"),
         ]) {
-    sl<LoadListItemsUseCase>()
-        .call(LoadListItemsParam(KeyValueNames.senderNames))
-        .then((value) => value.eval())
-        .then((value) {
+    usecase<List<String>, LoadListItemsParam>(LoadListItemsParam(KeyValueNames.senderNames)).then((value) {
       for (var element in value) {
         createItem(initialValue: element);
       }

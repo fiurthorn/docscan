@@ -5,6 +5,8 @@ import 'package:document_scanner/scanner/domain/repositories/pdf.dart';
 import 'package:document_scanner/scanner/domain/usecases/usecase.dart';
 import 'package:flutter/foundation.dart';
 
+export 'call.dart';
+
 class AttachmentParam extends Tuple2<String, Uint8List> {
   String get path => a;
   Uint8List get image => b;
@@ -20,11 +22,11 @@ class CreatePdfFileParam {
   CreatePdfFileParam(this.documentTypes);
 }
 
-typedef Result = Uint8List;
+typedef CreatePdfFile = UseCase<Uint8List, CreatePdfFileParam>;
 
-class CreatePdfFileUseCase implements UseCase<Result, CreatePdfFileParam> {
+class CreatePdfFileUseCase implements UseCase<Uint8List, CreatePdfFileParam> {
   @override
-  Future<Optional<Result>> call(CreatePdfFileParam param) async {
+  Future<Optional<Uint8List>> call(CreatePdfFileParam param) async {
     try {
       final value = await sl<PdfCreator>()
           .createPdfFromImages(

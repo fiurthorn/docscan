@@ -64,17 +64,14 @@ class ScannerBloc extends FormBloc<String, ErrorValue> {
   @override
   FutureOr<void> onSubmitting() async {
     try {
-      sl<ExportAttachmentUseCase>()
-          .call(ExportAttachmentsParam(
-            main.area.value!.technical!,
-            main.senderName.value,
-            main.receiverName.value!.technical,
-            main.documentType.value!.technical!,
-            main.documentDate.dateTime!,
-            main.attachments.value.map((e) => ExportAttachmentParam(e.value.name, e.value.data)).toList(),
-          ))
-          .then((_) => main.attachments.value.clear())
-          .whenComplete(
+      usecase<void, ExportAttachmentsParam>(ExportAttachmentsParam(
+        main.area.value!.technical!,
+        main.senderName.value,
+        main.receiverName.value!.technical,
+        main.documentType.value!.technical!,
+        main.documentDate.dateTime!,
+        main.attachments.value.map((e) => ExportAttachmentParam(e.value.name, e.value.data)).toList(),
+      )).then((_) => main.attachments.value.clear()).whenComplete(
             () => emitSuccess(successResponse: "files created", canSubmitAgain: true),
           );
     } on Exception catch (err, stack) {
@@ -83,9 +80,8 @@ class ScannerBloc extends FormBloc<String, ErrorValue> {
   }
 
   void storeScanResult(List<String> value, {required void Function() ready}) {
-    sl<ReadFilesUseCase>().call(ReadFilesParam(value)).then((value) {
-      final list = value.eval();
-      scannedImages.updateValue(list);
+    usecase<List<Tuple2<String, Uint8List>>, ReadFilesParam>(ReadFilesParam(value)).then((value) {
+      scannedImages.updateValue(value);
       clearImageCache();
     }).whenComplete(ready);
   }
@@ -125,12 +121,12 @@ class ScannerBloc extends FormBloc<String, ErrorValue> {
       pdfImageData.add(Tuple2(scannedImages.value[i].a, image));
     }
 
-    final pdfData = await sl<CreatePdfFileUseCase>().call(
+    final pdfData = await usecase<Uint8List, CreatePdfFileParam>(
       CreatePdfFileParam(
         pdfImageData.map((e) => AttachmentParam.fromTuple(e)).toList(),
       ),
     );
-    uploadAttachment("scan.pdf", pdfData.eval());
+    uploadAttachment("scan.pdf", pdfData);
 
     scannedImages.updateValue([]);
     clearImageCache();

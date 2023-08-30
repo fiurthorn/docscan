@@ -6,6 +6,8 @@ import 'package:document_scanner/scanner/domain/repositories/media_store.dart';
 import 'package:document_scanner/scanner/domain/usecases/usecase.dart';
 import 'package:flutter/foundation.dart';
 
+export 'call.dart';
+
 class ExportAttachmentParam extends Tuple2<String, Uint8List> {
   String get name => a;
   Uint8List get image => b;
@@ -33,11 +35,11 @@ class ExportAttachmentsParam {
   );
 }
 
-typedef Result = void;
+typedef ExportAttachment = UseCase<void, ExportAttachmentsParam>;
 
-class ExportAttachmentUseCase implements UseCase<Result, ExportAttachmentsParam> {
+class ExportAttachmentUseCase implements UseCase<void, ExportAttachmentsParam> {
   @override
-  Future<Optional<Result>> call(ExportAttachmentsParam param) async {
+  Future<Optional<void>> call(ExportAttachmentsParam param) async {
     try {
       return Optional.newValue(
         sl<MediaStore>().upload(

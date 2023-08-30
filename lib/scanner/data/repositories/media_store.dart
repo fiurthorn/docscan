@@ -8,7 +8,8 @@ import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 import 'package:path/path.dart' as p;
 
 class MediaStoreImpl implements MediaStore {
-  final df = DateFormat("yyyy-MM-dd");
+  final filenameDateFormat = DateFormat("MM-dd");
+  final folderDateFormat = DateFormat("yyyy");
 
   @override
   Future<void> upload(
@@ -27,8 +28,11 @@ class MediaStoreImpl implements MediaStore {
       final file = File("$downloadsDirectory/tmpfile");
       file.writeAsBytesSync(element.image);
 
-      final structure = "$area/$senderName/$receiverName/$documentType";
-      final fileName = "${documentType}_${df.format(documentDate)}.$extension";
+      final structureDate = folderDateFormat.format(documentDate);
+      final structure = "$area/$senderName/$receiverName/$documentType/$structureDate";
+
+      final fileNameDate = filenameDateFormat.format(documentDate);
+      final fileName = "${documentType}_$fileNameDate.$extension";
 
       await sl<Native>().saveFileInMediaStore(file.path, structure, fileName);
       Log.high("filepath: $fileName");

@@ -32,19 +32,19 @@ Future<GetIt> initServiceLocator() async {
 
     // repositories
     sl.registerSingletonAsync<KeyValues>(
-        () async => KeyValuesImpl(await initHive(await sl<Native>().getLibraryDirectory())));
+        () async => KeyValuesImpl(await initHive(await sl<Native>().appConfigurationDir())));
     sl.registerSingletonAsync<DiskSource>(() async => DiskSourceImpl());
     sl.registerSingletonAsync<PdfCreator>(() async => PdfCreatorImpl());
     sl.registerSingletonAsync<MediaStore>(() async => MediaStoreImpl());
     sl.registerSingletonAsync<ImageConverter>(() async => ImageConverterImpl());
 
     // use cases
-    sl.registerLazySingleton(() => ReadFilesUseCase());
-    sl.registerLazySingleton(() => CreatePdfFileUseCase());
-    sl.registerLazySingleton(() => LoadListItemsUseCase());
-    sl.registerLazySingleton(() => ExportDatabaseUseCase());
-    sl.registerLazySingleton(() => StoreListItemsUseCase());
-    sl.registerLazySingleton(() => ExportAttachmentUseCase());
+    sl.registerLazySingleton<ReadFiles>(() => ReadFilesUseCase());
+    sl.registerLazySingleton<CreatePdfFile>(() => CreatePdfFileUseCase());
+    sl.registerLazySingleton<LoadListItems>(() => LoadListItemsUseCase());
+    sl.registerLazySingleton<ExportDatabase>(() => ExportDatabaseUseCase());
+    sl.registerLazySingleton<StoreListItems>(() => StoreListItemsUseCase());
+    sl.registerLazySingleton<ExportAttachment>(() => ExportAttachmentUseCase());
 
     // wait to ready
     return sl.allReady().then((value) => sl).whenComplete(() => Log.less("service locator ready"));

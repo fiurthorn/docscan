@@ -1,6 +1,5 @@
 import 'package:document_scanner/core/design/theme_colors.dart';
 import 'package:document_scanner/core/design/theme_icons.dart';
-import 'package:document_scanner/core/service_locator/service_locator.dart';
 import 'package:document_scanner/core/toaster/error.dart';
 import 'package:document_scanner/core/toaster/success.dart';
 import 'package:document_scanner/l10n/app_lang.dart';
@@ -77,8 +76,7 @@ Drawer rightMenu(
       title: const Text("Export database"),
       leading: Icon(ThemeIcons.database, color: themeGrey4Color),
       onTap: () {
-        sl<ExportDatabaseUseCase>()
-            .call(ExportDatabaseParam())
+        usecase<bool, ExportDatabaseParam>(ExportDatabaseParam())
             .then(
               (value) => showSnackBarSuccess(context, "export", "Database exported successfully."),
             )
