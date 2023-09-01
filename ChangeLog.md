@@ -1,3 +1,10 @@
+## Version 0.0.8
+
+97181d3 feat: app flavor
+c4fbcc2 refactor! call usecase like a function; png optimizing
+43a95a3 refactor: usecase call def; extract native module
+2154765 feat: DropDown with technical label
+
 ## Version 0.0.7
 
 fdcf6f1 feat: receiver name
