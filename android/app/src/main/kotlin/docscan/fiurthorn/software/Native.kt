@@ -49,7 +49,7 @@ class Native : AutoCloseable {
                 )
             }
             "getAppConfigurationDir" -> result.success(getAppConfigurationDir())
-            "getFlavor" -> result.success(BuildConfig.FLAVOR)
+            "flavor" -> result.success(BuildConfig.flavor)
             "getTempDir" -> result.success(getTempDir())
             else -> result.notImplemented()
         }

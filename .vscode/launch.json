@@ -4,22 +4,13 @@
 	"version": "v1.6.0",
 	"configurations": [
 		{
-			"name": "android",
+			"name": "android-dev",
 			"type": "dart",
 			"request": "launch",
 			"args": [
 				"-d",
 				"Pixel 6 Pro",
-			],
-			"program": "lib/main.dart",
-		},
-		{
-			"name": "android-emulator",
-			"type": "dart",
-			"request": "launch",
-			"args": [
-				"-d",
-				"emulator-5554",
+				"--flavor=dev",
 			],
 			"program": "lib/main.dart",
 		},

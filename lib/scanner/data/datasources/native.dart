@@ -14,20 +14,20 @@ class Native {
 
   String? _appConfigurationDir;
   Future<String> _getAppConfigurationDir() {
-    return platform.invokeMethod('appConfigurationDir').then((value) => value as String);
+    return platform.invokeMethod('getAppConfigurationDir').then((value) => value as String);
   }
 
   Future<String> getAppConfigurationDir() async {
     return _appConfigurationDir ??= (await _getAppConfigurationDir());
   }
 
-  String? _flavor;
-  static Future<String> _getFlavor() async {
-    return platform.invokeMethod('getFlavor').then((value) => value as String);
+  String? __flavor;
+  static Future<String> _flavor() async {
+    return platform.invokeMethod('flavor').then((value) => value as String);
   }
 
-  Future<String> getFlavor() async {
-    return _flavor ??= (await _getFlavor());
+  Future<String> flavor() async {
+    return __flavor ??= (await _flavor());
   }
 
   Future<dynamic> saveFileInMediaStore(String input, String folder, String fileName) async {

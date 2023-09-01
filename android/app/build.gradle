@@ -53,10 +53,16 @@ android {
     // resValue "string", "app_name", "intex document"
 
     productFlavors {
+        dev {
+            dimension "app"
+            resValue "string", "app_label", "Document Scanner (dev)"
+            buildConfigField 'String', 'flavor', '"dev"'
+            applicationIdSuffix ".dev"
+        }
         prod {
             dimension "app"
             resValue "string", "app_label", "Document Scanner"
-            resValue "string", "app_name", "Document Scanner"
+            buildConfigField 'String', 'flavor', '"prod"'
             applicationIdSuffix ".prod"
         }
     }
