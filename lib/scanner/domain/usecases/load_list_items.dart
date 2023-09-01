@@ -13,7 +13,7 @@ class LoadListItemsParam {
 
 typedef LoadListItems = UseCase<List<String>, LoadListItemsParam>;
 
-class LoadListItemsUseCase implements UseCase<List<String>, LoadListItemsParam> {
+class LoadListItemsUseCase implements LoadListItems {
   @override
   Future<Optional<List<String>>> call(LoadListItemsParam param) async {
     try {

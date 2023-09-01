@@ -32,7 +32,7 @@ Future<GetIt> initServiceLocator() async {
 
     // repositories
     sl.registerSingletonAsync<KeyValues>(
-        () async => KeyValuesImpl(await initHive(await sl<Native>().appConfigurationDir())));
+        () async => KeyValuesImpl(await initHive(await sl<Native>().getAppConfigurationDir())));
     sl.registerSingletonAsync<DiskSource>(() async => DiskSourceImpl());
     sl.registerSingletonAsync<PdfCreator>(() async => PdfCreatorImpl());
     sl.registerSingletonAsync<MediaStore>(() async => MediaStoreImpl());

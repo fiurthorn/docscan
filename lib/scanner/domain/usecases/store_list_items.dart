@@ -14,7 +14,7 @@ class StoreListItemsParam {
 
 typedef StoreListItems = UseCase<bool, StoreListItemsParam>;
 
-class StoreListItemsUseCase implements UseCase<bool, StoreListItemsParam> {
+class StoreListItemsUseCase implements StoreListItems {
   @override
   Future<Optional<bool>> call(StoreListItemsParam param) async {
     try {

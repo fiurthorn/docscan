@@ -4,8 +4,6 @@ class Native {
   static const platform = MethodChannel('flutter.native/helper');
 
   String? _tempDir;
-  String? libraryDirectory;
-
   Future<String> _getTempDir() {
     return platform.invokeMethod('getTempDir').then((value) => value as String);
   }
@@ -14,12 +12,22 @@ class Native {
     return _tempDir ??= (await _getTempDir());
   }
 
-  Future<String> _appConfigurationDir() {
+  String? _appConfigurationDir;
+  Future<String> _getAppConfigurationDir() {
     return platform.invokeMethod('appConfigurationDir').then((value) => value as String);
   }
 
-  Future<String> appConfigurationDir() async {
-    return libraryDirectory ??= (await _appConfigurationDir());
+  Future<String> getAppConfigurationDir() async {
+    return _appConfigurationDir ??= (await _getAppConfigurationDir());
+  }
+
+  String? _flavor;
+  static Future<String> _getFlavor() async {
+    return platform.invokeMethod('getFlavor').then((value) => value as String);
+  }
+
+  Future<String> getFlavor() async {
+    return _flavor ??= (await _getFlavor());
   }
 
   Future<dynamic> saveFileInMediaStore(String input, String folder, String fileName) async {

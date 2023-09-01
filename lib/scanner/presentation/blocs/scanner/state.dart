@@ -100,9 +100,7 @@ class AttachState extends GroupFieldBloc<FieldBloc, dynamic> {
   }
 
   static Future<List<I18nLabel>> areaItems() async {
-    return usecase<List<String>, LoadListItemsParam>(
-      LoadListItemsParam(KeyValueNames.areas),
-    ).then(
+    return usecase<List<String>, LoadListItemsParam>(LoadListItemsParam(KeyValueNames.areas)).then(
       (value) => value
           .map(
             (element) => I18nLabel.build(label: element),

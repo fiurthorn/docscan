@@ -37,7 +37,7 @@ class ExportAttachmentsParam {
 
 typedef ExportAttachment = UseCase<void, ExportAttachmentsParam>;
 
-class ExportAttachmentUseCase implements UseCase<void, ExportAttachmentsParam> {
+class ExportAttachmentUseCase implements ExportAttachment {
   @override
   Future<Optional<void>> call(ExportAttachmentsParam param) async {
     try {

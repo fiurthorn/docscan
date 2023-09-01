@@ -15,7 +15,7 @@ class ReadFilesParam {
 
 typedef ReadFiles = UseCase<List<Tuple2<String, Uint8List>>, ReadFilesParam>;
 
-class ReadFilesUseCase implements UseCase<List<Tuple2<String, Uint8List>>, ReadFilesParam> {
+class ReadFilesUseCase implements ReadFiles {
   @override
   Future<Optional<List<Tuple2<String, Uint8List>>>> call(ReadFilesParam param) async {
     try {

@@ -24,7 +24,7 @@ class CreatePdfFileParam {
 
 typedef CreatePdfFile = UseCase<Uint8List, CreatePdfFileParam>;
 
-class CreatePdfFileUseCase implements UseCase<Uint8List, CreatePdfFileParam> {
+class CreatePdfFileUseCase implements CreatePdfFile {
   @override
   Future<Optional<Uint8List>> call(CreatePdfFileParam param) async {
     try {

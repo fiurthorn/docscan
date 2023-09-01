@@ -2,7 +2,6 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
@@ -50,7 +49,17 @@ func AdbQrcode(port string) (err error) {
 }
 
 func OptimizePng() (err error) {
-	err = mage.NewTask("find", "-name", "'*.png'", "-exec", "zopflipng", "-m", "-y", "'{}'", "'{}'", "';'").WorkingDir(".").Result(&bytes.Buffer{}, &bytes.Buffer{})
+	err = mage.NewTask("find", "android", "icons", "-name", "*.png", "-exec", "zopflipng", "-m", "-y", "{}", "{}", ";").WorkingDir(".").Run()
+	return
+}
+
+func BuildApk() (err error) {
+	err = mage.NewTask("flutter", "build", "apk", "--flavor", "prod").Run()
+	return
+}
+
+func BuildAppBundle() (err error) {
+	err = mage.NewTask("flutter", "build", "appbundle", "--flavor", "prod").Run()
 	return
 }
 
@@ -90,7 +99,7 @@ func flutterAllPackages(args ...string) (err error) {
 		return
 	}
 
-	packages := []string{}
+	packages := []string{""}
 	for _, dir := range plugins {
 		packages = append(packages, filepath.Dir(dir))
 	}

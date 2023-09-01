@@ -49,6 +49,18 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
+    flavorDimensions "app"
+    // resValue "string", "app_name", "intex document"
+
+    productFlavors {
+        prod {
+            dimension "app"
+            resValue "string", "app_label", "Document Scanner"
+            resValue "string", "app_name", "Document Scanner"
+            applicationIdSuffix ".prod"
+        }
+    }
+
     defaultConfig {
         applicationId "docscan.fiurthorn.software"
         minSdkVersion localProperties.getProperty('flutter.minSdkVersion')

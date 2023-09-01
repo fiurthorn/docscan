@@ -48,8 +48,9 @@ class Native : AutoCloseable {
                         )
                 )
             }
+            "getAppConfigurationDir" -> result.success(getAppConfigurationDir())
+            "getFlavor" -> result.success(BuildConfig.FLAVOR)
             "getTempDir" -> result.success(getTempDir())
-            "appConfigurationDir" -> result.success(appConfigurationDir())
             else -> result.notImplemented()
         }
     }
@@ -62,7 +63,7 @@ class Native : AutoCloseable {
         return context.getCacheDir().absolutePath
     }
 
-    private fun appConfigurationDir(): String {
+    private fun getAppConfigurationDir(): String {
         return context.getFilesDir().absolutePath
     }
 

@@ -12,7 +12,7 @@ class ImportDatabaseParam {
 
 typedef ImportDatabase = UseCase<bool, ImportDatabaseParam>;
 
-class ImportDatabaseUseCase implements UseCase<bool, ImportDatabaseParam> {
+class ImportDatabaseUseCase implements ImportDatabase {
   @override
   Future<Optional<bool>> call(ImportDatabaseParam param) async {
     try {

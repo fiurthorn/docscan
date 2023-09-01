@@ -11,7 +11,7 @@ class ExportDatabaseParam {
 
 typedef ExportDatabase = UseCase<bool, ExportDatabaseParam>;
 
-class ExportDatabaseUseCase implements UseCase<bool, ExportDatabaseParam> {
+class ExportDatabaseUseCase implements ExportDatabase {
   @override
   Future<Optional<bool>> call(ExportDatabaseParam param) async {
     try {
