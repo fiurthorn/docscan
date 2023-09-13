@@ -10,8 +10,7 @@ import 'package:document_scanner/core/widgets/style/round_icon_button.dart';
 import 'package:document_scanner/l10n/app_lang.dart';
 import 'package:document_scanner/scanner/presentation/blocs/documenttypes/bloc.dart';
 import 'package:document_scanner/scanner/presentation/screens/base.dart';
-import 'package:document_scanner/scanner/presentation/screens/base/right_menu.dart';
-import 'package:document_scanner/scanner/presentation/screens/base/top_nav.dart';
+import 'package:document_scanner/scanner/presentation/screens/base/template_page.dart';
 import 'package:document_scanner/scanner/presentation/screens/scanner/page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
@@ -31,18 +30,12 @@ class DocumentTypesScreen extends BaseScreen {
       );
 }
 
-class _DocumentTypesState extends FormBlocBaseScreenState<DocumentTypesScreen, ItemBloc> {
+class _DocumentTypesState extends TemplateBaseScreenState<DocumentTypesScreen, ItemBloc> {
   @override
   ItemBloc createBloc(BuildContext context) => ItemBloc();
 
   @override
   String title(BuildContext context) => AppLang.i18n.docTypes_page_title;
-
-  @override
-  PreferredSizeWidget? buildAppBar(BuildContext context) => fullTopNavBar(context, title(context), scaffold, update);
-
-  @override
-  Drawer? buildEndDrawer(BuildContext context) => rightMenu(context, scaffold, update);
 
   @override
   Widget buildScreen(BuildContext context) => buildScannerForm(context);
@@ -51,8 +44,7 @@ class _DocumentTypesState extends FormBlocBaseScreenState<DocumentTypesScreen, I
   Widget buildScannerForm(BuildContext context) {
     final formBloc = BlocProvider.of<ItemBloc>(context);
 
-    return responsiveScreenWidthPadding(
-      context,
+    return ResponsiveWidthPadding(
       FormBlocListener<ItemBloc, String, ErrorValue>(
         onSubmitting: (context, state) => LoadingDialog.show(context),
         onSuccess: (context, state) {

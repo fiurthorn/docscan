@@ -12,26 +12,28 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.10.6"
+          flutter-version: "3.13.2"
           channel: "stable"
+      - uses: actions/setup-go@v4
+        with:
+          go-version: "^1.21.0"
+
+      - name: compile mage
+        run: go mod download && go run magefiles/cmd/mage.go -compile ../mage
+
+      - name: display telemetry
+        run: flutter --disable-telemetry
 
       - name: Install dependencies
-        run: dart pub get
+        run: ./mage PubGlobalUpgrade PubGet CreateI18nSynthetic BuildRunner CreateVersion CreateI18n
 
-      - name: Build dependencies
-        run: dart run build_runner build
+      - name: Install dependencies
+        run: lic_ck check-licenses -c lic_ck.yaml -i
 
-      - name: Build dependencies
-        run: flutter gen-l10n --arb-dir=lib/l10n --template-arb-file=app_en.arb --output-dir=lib/l10n/translations --output-class=S --output-localization-file=S.dart
-
-      - name: Build dependencies
-        run: flutter gen-l10n --arb-dir=lib/l10n --template-arb-file=app_en.arb --output-dir=lib/l10n/translations --output-class=S --no-nullable-getter --output-localization-file=translations.dart
-
-      - name: format generated files
-        run: dart format --line-length=120 lib/core/lib/hive_store/value.g.dart lib/l10n/translations/translations*.dart
+      - name: Format generated files
+        run: dart format --line-length=120 lib/scanner/data/datasources/hive_store/value.g.dart lib/l10n/translations/translations*.dart lib/core/version.g.dart
 
       - name: Verify formatting
         run: dart format --line-length=120 --output=none --set-exit-if-changed .
@@ -40,4 +42,4 @@ jobs:
         run: dart analyze --fatal-infos
 
       - name: Run tests
-        run: dart test
+        run: flutter test

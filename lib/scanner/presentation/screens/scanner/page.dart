@@ -20,7 +20,7 @@ import 'package:document_scanner/l10n/app_lang.dart';
 import 'package:document_scanner/scanner/domain/repositories/convert.dart';
 import 'package:document_scanner/scanner/presentation/blocs/scanner/bloc.dart';
 import 'package:document_scanner/scanner/presentation/screens/base.dart';
-import 'package:document_scanner/scanner/presentation/screens/base/right_menu.dart';
+import 'package:document_scanner/scanner/presentation/screens/base/template_page.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/top_nav.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -42,7 +42,7 @@ class ScannerScreen extends BaseScreen {
       );
 }
 
-class _ScannerScreenState extends FormBlocBaseScreenState<ScannerScreen, ScannerBloc> {
+class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, ScannerBloc> {
   @override
   ScannerBloc createBloc(BuildContext context) => ScannerBloc();
 
@@ -57,38 +57,39 @@ class _ScannerScreenState extends FormBlocBaseScreenState<ScannerScreen, Scanner
       return cropTopNavBar(formBloc);
     }
 
-    return fullTopNavBar(context, title(context), scaffold, update);
+    return super.buildAppBar(context);
   }
 
-  AppBar cropTopNavBar(ScannerBloc formBloc) => customButtonTopNavBar(
-      context,
-      title(context),
-      Row(
-        children: [
-          InkWell(
-            onTap: () {
-              formBloc.displayCropper.changeValue(false);
-              update();
-            },
-            child: Center(
-              child: Icon(
-                ThemeIcons.close,
-                color: themeGrey4Color,
+  PreferredSizeWidget cropTopNavBar(ScannerBloc formBloc) => CustomButtonTopNavBar(
+        title: title(context),
+        button: Row(
+          children: [
+            InkWell(
+              onTap: () {
+                formBloc.displayCropper.changeValue(false);
+                update();
+              },
+              child: Center(
+                child: Icon(
+                  ThemeIcons.close,
+                  color: themeGrey4Color,
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-      update);
+          ],
+        ),
+        refresh: update,
+      );
 
   @override
-  Drawer? buildEndDrawer(BuildContext context) {
+  Widget? buildEndDrawer(BuildContext context) {
     final formBloc = BlocProvider.of<ScannerBloc>(context);
+
     if (formBloc.displayCropper.value) {
       return null;
     }
 
-    return rightMenu(context, scaffold, update);
+    return super.buildEndDrawer(context);
   }
 
   @override
@@ -98,8 +99,7 @@ class _ScannerScreenState extends FormBlocBaseScreenState<ScannerScreen, Scanner
   Widget buildScannerForm(BuildContext context) {
     final formBloc = BlocProvider.of<ScannerBloc>(context);
 
-    return responsiveScreenWidthPadding(
-      context,
+    return ResponsiveWidthPadding(
       FormBlocListener<ScannerBloc, String, ErrorValue>(
         onSubmitting: (context, state) => LoadingDialog.show(context),
         onSuccess: (context, state) {

@@ -1,10 +1,11 @@
 permittedLicenses:
-  - MIT
+  - Apache-2.0
   - BSD-2-Clause
   - BSD-3-Clause
-  - Apache-2.0
   - ECL-2.0
   - JSON
+  - MIT
+  - MIT-Modern-Variant
   - Zlib
 
 rejectedLicenses:
@@ -14,10 +15,11 @@ rejectedLicenses:
 
 approvedPackages:
   "unknown-license":
-    - rxdart
+    - hive_generator
     - dependency_validator
+    - rxdart
   "no-file":
-    - flutter_test
     - flutter_gen
     - flutter_localizations
+    - flutter_test
     - flutter_web_plugins

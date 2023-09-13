@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:document_scanner/core/widgets/viewer/viewer.dart';
+import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
 
 class PdfViewer extends DocumentViewer {
@@ -59,22 +59,22 @@ class PdfViewer extends DocumentViewer {
   Widget get next => IconButton(icon: const Icon(Icons.navigate_next), onPressed: nextAction);
   Widget get previous => IconButton(icon: const Icon(Icons.navigate_before), onPressed: previousAction);
 
-  PhotoViewGalleryPageOptions _pageBuilder(
-    BuildContext context,
-    Future<PdfPageImage> pageImage,
-    int index,
-    PdfDocument document,
-  ) {
-    return PhotoViewGalleryPageOptions(
-      imageProvider: PdfPageImageProvider(
-        pageImage,
-        index,
-        document.id,
-      ),
-      minScale: PhotoViewComputedScale.contained * 1,
-      maxScale: PhotoViewComputedScale.contained * 2,
-      initialScale: PhotoViewComputedScale.contained * 1.0,
-      heroAttributes: PhotoViewHeroAttributes(tag: '${document.id}-$index'),
-    );
-  }
+//   PhotoViewGalleryPageOptions _pageBuilder(
+//     BuildContext context,
+//     Future<PdfPageImage> pageImage,
+//     int index,
+//     PdfDocument document,
+//   ) {
+//     return PhotoViewGalleryPageOptions(
+//       imageProvider: PdfPageImageProvider(
+//         pageImage,
+//         index,
+//         document.id,
+//       ),
+//       minScale: PhotoViewComputedScale.contained * 1,
+//       maxScale: PhotoViewComputedScale.contained * 2,
+//       initialScale: PhotoViewComputedScale.contained * 1.0,
+//       heroAttributes: PhotoViewHeroAttributes(tag: '${document.id}-$index'),
+//     );
+//   }
 }

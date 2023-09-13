@@ -3,11 +3,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class ThemeIcons {
   static Image get logo => Image.asset(
-        "icons/transparent/xxxhdpi.png",
+        "icons/logo.png",
         color: Colors.white,
       );
   static Image logo2({double? height, Color? color}) => Image.asset(
-        'icons/transparent/xxxhdpi.png',
+        'icons/logo.png',
         height: height,
         color: color,
       );

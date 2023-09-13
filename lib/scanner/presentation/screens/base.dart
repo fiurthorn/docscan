@@ -95,8 +95,8 @@ abstract class BaseScreenState<T extends StatefulWidget> extends State<T> {
   PreferredSizeWidget? buildAppBar(BuildContext context) => null;
   String title(BuildContext context);
   Widget buildScreen(BuildContext context);
-  Drawer? buildEndDrawer(BuildContext context) => null;
-  Drawer? buildDrawer(BuildContext context) => null;
+  Widget? buildEndDrawer(BuildContext context) => null;
+  Widget? buildDrawer(BuildContext context) => null;
   Widget? buildBottomNavigationBar(BuildContext context) => null;
   Widget? buildFloatingActionButton(BuildContext context) => null;
 
