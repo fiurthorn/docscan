@@ -1,3 +1,8 @@
+## Version 0.1.0
+
+8d1eac9 feat!: update list item on save; rotate image; pdf compose
+62d4738 fix: formatting build
+
 ## Version 0.0.8
 
 97181d3 feat: app flavor
