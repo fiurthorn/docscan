@@ -15,34 +15,44 @@ class PdfCreatorImpl implements PdfCreator {
     final pdf = pw.Document();
     for (final image in images) {
       final src = pw.MemoryImage(image.image);
-      final result = await sl<Ocr>().ocr(image.path);
+      final ocr = await sl<Ocr>().ocr(image.path);
 
-      final text = pw.Text(
-        result,
-        style: pw.TextStyle(
-          color: const PdfColor(1, 1, 1, 1),
-          fontSize: (src.height! / 80) * 0.8,
-        ),
+      final text = ocrContent(
+        ocr,
+        (src.height! / 80) * 0.8,
       );
-
-      final page = pw.Page(
-        pageFormat: PdfPageFormat(
-          src.width!.toDouble(),
-          src.height!.toDouble(),
-          marginAll: 0.0,
-        ),
-        // margin: ,
-        build: (pw.Context context) => pw.Stack(
-          children: [
-            text,
-            pw.Image(src),
-          ],
-        ),
-      );
+      final page = composePage(src, text);
 
       pdf.addPage(page);
     }
 
     return pdf.save();
+  }
+
+  pw.Page composePage(pw.MemoryImage src, pw.Text text) {
+    return pw.Page(
+      pageFormat: PdfPageFormat(
+        src.width!.toDouble(),
+        src.height!.toDouble(),
+        marginAll: 0.0,
+      ),
+      // margin: ,
+      build: (pw.Context context) => pw.Stack(
+        children: [
+          pw.Padding(padding: pw.EdgeInsets.all(src.height! / 20.0), child: text),
+          pw.Image(src),
+        ],
+      ),
+    );
+  }
+
+  pw.Text ocrContent(String ocr, double fontSize) {
+    return pw.Text(
+      ocr,
+      style: pw.TextStyle(
+        color: const PdfColor(0, 0, 0, 0),
+        fontSize: fontSize,
+      ),
+    );
   }
 }

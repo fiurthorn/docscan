@@ -51,10 +51,14 @@ class AttachState extends GroupFieldBloc<FieldBloc, dynamic> {
         ]) {
     attachments.emit(attachments.state.copyWith(isValidating: false));
 
-    receiverNameItems().then((value) => receiverName.updateItems(value));
-    documentTypeItems().then((value) => documentType.updateItems(value));
-    areaItems().then((value) => area.updateItems(value));
+    updateReceiverNames();
+    updateDocumentTypeItems();
+    updateAreaItems();
   }
+
+  updateReceiverNames() => receiverNameItems().then((value) => receiverName.updateItems(value));
+  updateDocumentTypeItems() => documentTypeItems().then((value) => documentType.updateItems(value));
+  updateAreaItems() => areaItems().then((value) => area.updateItems(value));
 
   void uploadAttachment(String filename, Uint8List bytes) {
     final value = FileAttachment(filename, bytes, bytes.length);

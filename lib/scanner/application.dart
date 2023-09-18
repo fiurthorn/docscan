@@ -117,6 +117,9 @@ abstract class ApplicationState<T extends Application> extends State<T> {
     final router = GoRouter(
       navigatorKey: navigatorKey,
       routes: routes.toList(),
+      observers: [
+        sl<GoRouterObserver>(),
+      ],
       errorBuilder: (context, state) {
         if (!routePaths.contains(state.fullPath)) {
           return const NotFoundScreen();

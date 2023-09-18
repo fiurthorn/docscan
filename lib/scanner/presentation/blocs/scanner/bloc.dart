@@ -7,12 +7,14 @@ import 'package:document_scanner/core/service_locator/service_locator.dart';
 import 'package:document_scanner/core/widgets/bloc_builder/dropdown.dart';
 import 'package:document_scanner/core/widgets/bloc_builder/i18n_dropdown.dart';
 import 'package:document_scanner/core/widgets/blocs/datetime.dart';
+import 'package:document_scanner/core/widgets/goroute/route.dart';
 import 'package:document_scanner/scanner/domain/repositories/convert.dart';
 import 'package:document_scanner/scanner/domain/repositories/key_values.dart';
 import 'package:document_scanner/scanner/domain/usecases/create_pdf_file.dart';
 import 'package:document_scanner/scanner/domain/usecases/export_attachment.dart';
 import 'package:document_scanner/scanner/domain/usecases/load_list_items.dart';
 import 'package:document_scanner/scanner/domain/usecases/read_files.dart';
+import 'package:document_scanner/scanner/presentation/screens/scanner/page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -20,7 +22,7 @@ import 'package:path/path.dart' as p;
 
 part 'state.dart';
 
-class ScannerBloc extends FormBloc<String, ErrorValue> {
+class ScannerBloc extends FormBloc<String, ErrorValue> implements GoRouteAware {
   final displayCropper = InputFieldBloc<bool, String>(initialValue: false);
   String? cropperFilename;
   Uint8List? cropperImage;
@@ -30,6 +32,7 @@ class ScannerBloc extends FormBloc<String, ErrorValue> {
 
   final amount = InputFieldBloc<double, dynamic>(initialValue: 1.0);
   final threshold = InputFieldBloc<double, dynamic>(initialValue: 0.5);
+  int currentImage = 0;
 
   void uploadAttachment(String filename, Uint8List bytes) => main.uploadAttachment(p.basename(filename), bytes);
   void removeAttachment(int index) => main.removeAttachment(index);
@@ -55,6 +58,8 @@ class ScannerBloc extends FormBloc<String, ErrorValue> {
       ..updateInitialValue(items[1]);
 
     converter.subscribeToFieldBlocs([threshold, amount]);
+
+    sl<GoRouterObserver>().subscribe(this);
   }
 
   Future<bool> validate() {
@@ -71,7 +76,11 @@ class ScannerBloc extends FormBloc<String, ErrorValue> {
         main.documentType.value!.technical!,
         main.documentDate.dateTime!,
         main.attachments.value.map((e) => ExportAttachmentParam(e.value.name, e.value.data)).toList(),
-      )).then((_) => main.attachments.value.clear()).whenComplete(
+      ))
+          .then(
+            (_) => main.attachments.value.clear(),
+          )
+          .whenComplete(
             () => emitSuccess(successResponse: "files created", canSubmitAgain: true),
           );
     } on Exception catch (err, stack) {
@@ -112,6 +121,10 @@ class ScannerBloc extends FormBloc<String, ErrorValue> {
     return cachedImages[index]!;
   }
 
+  updateReceiverNames() => main.updateReceiverNames();
+  updateDocumentTypeItems() => main.updateDocumentTypeItems();
+  updateAreaItems() => main.updateAreaItems();
+
   Future<void> createPDF() async {
     emitLoading();
 
@@ -148,12 +161,28 @@ class ScannerBloc extends FormBloc<String, ErrorValue> {
     clearImageCache();
   }
 
+  void counterClockwise() {
+    final current = scannedImages.value[currentImage];
+    final filename = current.a;
+    final image = sl<ImageConverter>().rotate(current.b, true);
+    scannedImages.value[currentImage] = Tuple2(filename, image);
+    clearImageCache();
+  }
+
+  void clockwise() {
+    final current = scannedImages.value[currentImage];
+    final filename = current.a;
+    final image = sl<ImageConverter>().rotate(current.b, false);
+    scannedImages.value[currentImage] = Tuple2(filename, image);
+    clearImageCache();
+  }
+
   void amountChanged(double value) {
     amount.updateValue(value);
     clearImageCache();
   }
 
-  // TODO! move to usecase->repos->usecase->datasource?
+  //! TODO move to usecase->repos->usecase->datasource?
   Future<void> loadCropperImage(XFile? file) async {
     if (file == null) {
       return;
@@ -162,5 +191,23 @@ class ScannerBloc extends FormBloc<String, ErrorValue> {
     cropperFilename = file.name;
     cropperImage = await file.readAsBytes();
     displayCropper.changeValue(true);
+  }
+
+  @override
+  void didPop(String? name, String? previousName) {
+    if (previousName == ScannerScreen.path) {
+      updateAreaItems();
+      updateDocumentTypeItems();
+      updateReceiverNames();
+    }
+  }
+
+  @override
+  void didPush(String? name, String? previousName) {}
+
+  @override
+  Future<void> close() {
+    sl<GoRouterObserver>().unsubscribe(this);
+    return super.close();
   }
 }

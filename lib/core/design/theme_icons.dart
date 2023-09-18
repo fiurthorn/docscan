@@ -27,6 +27,8 @@ class ThemeIcons {
   static IconData get clearCache => const IconDataSolid(0xf12d);
   static IconData get copyPosition => const IconDataRegular(0xf0c5);
   static IconData get crop => const IconDataSolid(0xf565);
+  static IconData get clockwise => FontAwesomeIcons.rotateLeft;
+  static IconData get counterClockwise => FontAwesomeIcons.rotateRight;
 
   static IconData get database => const IconDataSolid(0xf1c0);
   static IconData get defaultUser => const IconDataRegular(0xf007);
@@ -35,7 +37,8 @@ class ThemeIcons {
   static IconData get docType => FontAwesomeIcons.fileInvoice;
 
   static IconData get email => FontAwesomeIcons.share;
-  static IconData get envelopeOpenText => FontAwesomeIcons.envelopeOpenText;
+  static IconData get envelopeOpen => FontAwesomeIcons.envelopeOpen;
+  static IconData get envelope => FontAwesomeIcons.envelope;
   static IconData get exit => FontAwesomeIcons.rightFromBracket;
 
   static IconData get firebase => const IconDataRegular(0xf0e0);

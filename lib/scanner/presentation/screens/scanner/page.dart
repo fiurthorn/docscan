@@ -11,6 +11,7 @@ import 'package:document_scanner/core/widgets/bloc_builder/datetime.dart';
 import 'package:document_scanner/core/widgets/bloc_builder/dropdown.dart';
 import 'package:document_scanner/core/widgets/bloc_builder/i18n_dropdown.dart';
 import 'package:document_scanner/core/widgets/bloc_builder/text.dart';
+import 'package:document_scanner/core/widgets/confirm/confirm.dart';
 import 'package:document_scanner/core/widgets/cropper/widget.dart';
 import 'package:document_scanner/core/widgets/goroute/route.dart';
 import 'package:document_scanner/core/widgets/loading_dialog/loading_dialog.dart';
@@ -38,6 +39,7 @@ class ScannerScreen extends BaseScreen {
 
   static AuthGoRoute get route => AuthGoRoute.unauthorized(
         path: path,
+        name: path,
         child: (context, state) => const ScannerScreen(),
       );
 }
@@ -185,6 +187,28 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
                     });
               }),
         ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              IconButton(
+                icon: Icon(ThemeIcons.counterClockwise),
+                onPressed: () {
+                  formBloc.counterClockwise();
+                  update();
+                },
+              ),
+              IconButton(
+                icon: Icon(ThemeIcons.clockwise),
+                onPressed: () {
+                  formBloc.clockwise();
+                  update();
+                },
+              ),
+            ],
+          ),
+        ),
         SizedBox(
           height: 400,
           width: 400,
@@ -197,6 +221,7 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
                 heroAttributes: PhotoViewHeroAttributes(tag: index),
               );
             },
+            onPageChanged: (index) => formBloc.currentImage = index,
             itemCount: formBloc.scannedImages.value.length,
             loadingBuilder: (context, event) => Center(
               child: SizedBox(
@@ -432,7 +457,18 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
                     child: IconButton(
                       color: nord6SnowStorm,
                       onPressed: () {
-                        formBloc.removeAttachment(index);
+                        showDialog<bool>(
+                          context: context,
+                          builder: (context) => ConfirmDialog(
+                            title: "Löschen",
+                            content: "Soll der Anhang entfernt werden?",
+                            navigator: Navigator.of(context),
+                          ),
+                        ).then((value) {
+                          if (value ?? false) {
+                            formBloc.removeAttachment(index);
+                          }
+                        }).then((value) => update());
                       },
                       icon: Icon(
                         ThemeIcons.deletePosition,

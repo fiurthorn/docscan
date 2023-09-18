@@ -1,4 +1,5 @@
 import 'package:document_scanner/core/lib/logger.dart';
+import 'package:document_scanner/core/widgets/goroute/route.dart';
 import 'package:document_scanner/scanner/data/datasources/file_source.dart';
 import 'package:document_scanner/scanner/data/datasources/hive_store/initialize.dart';
 import 'package:document_scanner/scanner/data/datasources/native.dart';
@@ -45,6 +46,9 @@ Future<GetIt> initServiceLocator() async {
     sl.registerLazySingleton<ExportDatabase>(() => ExportDatabaseUseCase());
     sl.registerLazySingleton<StoreListItems>(() => StoreListItemsUseCase());
     sl.registerLazySingleton<ExportAttachment>(() => ExportAttachmentUseCase());
+
+    // others
+    sl.registerSingleton<GoRouterObserver>(GoRouterObserver());
 
     // wait to ready
     return sl.allReady().then((value) => sl).whenComplete(() => Log.less("service locator ready"));

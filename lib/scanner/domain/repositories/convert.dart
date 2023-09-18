@@ -15,4 +15,6 @@ abstract class ImageConverter {
     double amount = 1,
     double threshold = 0.5,
   });
+
+  Uint8List rotate(Uint8List input, bool counterClockwise);
 }

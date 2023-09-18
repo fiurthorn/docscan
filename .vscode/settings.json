@@ -44,6 +44,7 @@
     "docscanner",
     "grayscale",
     "Grayscale",
+    "Memoizer",
     "nord"
   ],
   "commentTranslate.targetLanguage": "de",

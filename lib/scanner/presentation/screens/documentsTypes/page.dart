@@ -11,7 +11,6 @@ import 'package:document_scanner/l10n/app_lang.dart';
 import 'package:document_scanner/scanner/presentation/blocs/documenttypes/bloc.dart';
 import 'package:document_scanner/scanner/presentation/screens/base.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/template_page.dart';
-import 'package:document_scanner/scanner/presentation/screens/scanner/page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -26,6 +25,7 @@ class DocumentTypesScreen extends BaseScreen {
 
   static AuthGoRoute get route => AuthGoRoute.unauthorized(
         path: path,
+        name: path,
         child: (context, state) => const DocumentTypesScreen(),
       );
 }
@@ -50,7 +50,7 @@ class _DocumentTypesState extends TemplateBaseScreenState<DocumentTypesScreen, I
         onSuccess: (context, state) {
           LoadingDialog.hide(context);
           showSnackBarSuccess(context, "attach", "${state.successResponse}");
-          context.go(ScannerScreen.path);
+          context.pop();
         },
         onLoaded: (context, state) => update(),
         onLoadFailed: (context, state) {

@@ -67,4 +67,10 @@ class ImageConverterImpl implements ImageConverter {
       img.luminanceThreshold(_load(input), threshold: threshold, outputColor: false),
     );
   }
+
+  Uint8List rotate(Uint8List input, bool counterClockwise) {
+    return _resize(
+      img.copyRotate(_load(input), angle: counterClockwise ? 90.0 : -90.0),
+    );
+  }
 }

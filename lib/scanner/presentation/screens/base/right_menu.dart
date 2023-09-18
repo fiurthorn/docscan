@@ -48,7 +48,7 @@ class RightMenu extends BaseMenu {
           leading: Icon(ThemeIcons.area, color: themeGrey4Color),
           onTap: () {
             Scaffold.of(context).closeEndDrawer();
-            context.go(AreasScreen.path);
+            context.push(AreasScreen.path);
           },
         ),
         ListTile(
@@ -56,23 +56,23 @@ class RightMenu extends BaseMenu {
           leading: Icon(ThemeIcons.docType, color: themeGrey4Color),
           onTap: () {
             Scaffold.of(context).closeEndDrawer();
-            context.go(DocumentTypesScreen.path);
+            context.push(DocumentTypesScreen.path);
           },
         ),
         ListTile(
           title: Text(AppLang.i18n.senders_page_title),
-          leading: Icon(ThemeIcons.envelopeOpenText, color: themeGrey4Color),
+          leading: Icon(ThemeIcons.envelope, color: themeGrey4Color),
           onTap: () {
             Scaffold.of(context).closeEndDrawer();
-            context.go(SendersScreen.path);
+            context.push(SendersScreen.path);
           },
         ),
         ListTile(
           title: Text(AppLang.i18n.receivers_page_title),
-          leading: Icon(ThemeIcons.envelopeOpenText, color: themeGrey4Color),
+          leading: Icon(ThemeIcons.envelopeOpen, color: themeGrey4Color),
           onTap: () {
             Scaffold.of(context).closeEndDrawer();
-            context.go(ReceiversScreen.path);
+            context.push(ReceiversScreen.path);
           },
         ),
       ];

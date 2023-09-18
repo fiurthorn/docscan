@@ -55,7 +55,7 @@ android {
     productFlavors {
         dev {
             dimension "app"
-            resValue "string", "app_label", "Document Scanner (dev)"
+            resValue "string", "app_label", "!Document Scanner"
             buildConfigField 'String', 'flavor', '"dev"'
             applicationIdSuffix ".dev"
         }

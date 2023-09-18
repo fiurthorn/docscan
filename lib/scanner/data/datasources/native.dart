@@ -1,39 +1,33 @@
+import 'package:async/async.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 class Native {
   static const platform = MethodChannel('flutter.native/helper');
 
-  String? _tempDir;
-  Future<String> _getTempDir() {
-    return platform.invokeMethod('getTempDir').then((value) => value as String);
-  }
-
+  final _getTempDir = AsyncMemoizer<String>();
   Future<String> getTempDir() async {
-    return _tempDir ??= (await _getTempDir());
+    return _getTempDir.runOnce(() => platform.invokeMethod('getTempDir').then((value) => value as String));
   }
 
-  String? _appConfigurationDir;
-  Future<String> _getAppConfigurationDir() {
-    return platform.invokeMethod('getAppConfigurationDir').then((value) => value as String);
-  }
-
+  final _getAppConfigurationDir = AsyncMemoizer<String>();
   Future<String> getAppConfigurationDir() async {
-    return _appConfigurationDir ??= (await _getAppConfigurationDir());
+    return _getAppConfigurationDir
+        .runOnce(() => platform.invokeMethod('getAppConfigurationDir').then((value) => value as String));
   }
 
-  String? __flavor;
-  static Future<String> _flavor() async {
-    return platform.invokeMethod('flavor').then((value) => value as String);
-  }
-
+  final _flavor = AsyncMemoizer<String>();
   Future<String> flavor() async {
-    return __flavor ??= (await _flavor());
+    return _flavor.runOnce(() => platform.invokeMethod('flavor').then((value) => value as String));
   }
+
+  String get prefix => kReleaseMode ? "" : "!";
+  String get name => "docscan";
 
   Future<dynamic> saveFileInMediaStore(String input, String folder, String fileName) async {
     return platform.invokeMethod('saveFileInMediaStore', {
       "input": input,
-      "folder": "docscan/$folder",
+      "folder": "$prefix$name/$folder",
       "fileName": fileName,
     });
   }

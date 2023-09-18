@@ -1,11 +1,12 @@
 import 'package:document_scanner/core/lib/optional.dart';
 import 'package:document_scanner/core/lib/platform/platform.dart';
-import 'package:document_scanner/core/lib/transition_page_fade.dart';
+import 'package:document_scanner/core/version.g.dart';
 import 'package:document_scanner/core/widgets/loading_widget/loading_widget.dart';
 import 'package:document_scanner/scanner/presentation/screens/error/error.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:once/once.dart';
 
 abstract class BaseScreen extends StatefulWidget {
   // static const String path = "/";.map((e) => null) baseLocation
@@ -24,12 +25,6 @@ abstract class BaseScreen extends StatefulWidget {
         ),
         queryParameters: queryParameters.isEmpty ? null : queryParameters,
       ).toString();
-
-  static CustomTransitionPage<void> defaultTransitionPage({
-    required LocalKey key,
-    required Widget child,
-  }) =>
-      FadeTransitionPage(key: key, child: child);
 }
 
 abstract class BaseScreenState<T extends StatefulWidget> extends State<T> {
@@ -106,6 +101,23 @@ abstract class BaseScreenState<T extends StatefulWidget> extends State<T> {
     return theme;
   }
 
+  Widget _onNewVersion(BuildContext context) {
+    return Center(
+      child: Column(
+        children: [
+          const Text("What's new on version $buildVersion"),
+          const Text("this dialog"),
+          const Text("scanned image rotation"),
+          const Text("update dropdown list values on change"),
+          TextButton(
+            onPressed: () => update(),
+            child: const Text("Okay"),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _scaffold(BuildContext context) => _theme(
       context,
       WillPopScope(
@@ -113,7 +125,10 @@ abstract class BaseScreenState<T extends StatefulWidget> extends State<T> {
         child: Scaffold(
           extendBodyBehindAppBar: extendBodyBehindAppBar,
           appBar: buildAppBar(context),
-          body: buildScreen(context),
+          body: OnceWidget.showOnEveryNewVersion(
+            builder: () => _onNewVersion(context),
+            fallback: () => buildScreen(context),
+          ),
           key: scaffold,
           drawer: buildDrawer(context),
           endDrawer: buildEndDrawer(context),

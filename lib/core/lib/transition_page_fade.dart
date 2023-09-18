@@ -7,6 +7,8 @@ class FadeTransitionPage extends CustomTransitionPage<void> {
   FadeTransitionPage({
     required LocalKey key,
     required Widget child,
+    required super.name,
+    super.arguments,
   }) : super(
           key: key,
           transitionsBuilder: (
