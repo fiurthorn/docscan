@@ -1,3 +1,7 @@
+## Version 0.1.2
+
+c7a0936 refactor: Theme consistency
+
 ## Version 0.1.1
 
 a27a01a bug: unstable widget tree
