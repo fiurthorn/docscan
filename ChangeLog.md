@@ -1,3 +1,7 @@
+## Version 0.1.1
+
+a27a01a bug: unstable widget tree
+
 ## Version 0.1.0
 
 8d1eac9 feat!: update list item on save; rotate image; pdf compose
