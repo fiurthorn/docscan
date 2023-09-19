@@ -28,7 +28,7 @@ class RightMenu extends BaseMenu {
           leading: CircleAvatar(
             radius: 25,
             backgroundColor: themeGrey4Color,
-            child: ThemeIcons.logo2(color: nord4SnowStorm),
+            child: ThemeIcons.logo2(color: nord4SnowStorm, height: 40),
           ),
         ),
         const SizedBox(height: 10),
@@ -87,9 +87,11 @@ class RightMenu extends BaseMenu {
                 .then(
                   (value) => showSnackBarSuccess(context, "export", "Database exported successfully."),
                 )
-                .onError((error, stackTrace) => showSnackBarFailure(
-                    context, "export", "Error while exporting database.", error,
-                    stackTrace: stackTrace));
+                .onError(
+                  (error, stackTrace) => showSnackBarFailure(
+                      context, "export", "Error while exporting database.", error,
+                      stackTrace: stackTrace),
+                );
             Scaffold.of(context).closeEndDrawer();
             context.go(SendersScreen.path);
           },

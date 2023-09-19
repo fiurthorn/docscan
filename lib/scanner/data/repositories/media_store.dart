@@ -32,7 +32,7 @@ class MediaStoreImpl implements MediaStore {
       final structure = "$area/$senderName/$receiverName/$documentType/$structureDate";
 
       final fileNameDate = filenameDateFormat.format(documentDate);
-      final fileName = "${documentType}_$fileNameDate.$extension";
+      final fileName = "${documentType}_$fileNameDate$extension";
 
       await sl<Native>().saveFileInMediaStore(file.path, structure, fileName);
       Log.high("filepath: $fileName");

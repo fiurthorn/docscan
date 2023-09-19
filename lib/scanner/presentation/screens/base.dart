@@ -6,7 +6,6 @@ import 'package:document_scanner/scanner/presentation/screens/error/error.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:once/once.dart';
 
 abstract class BaseScreen extends StatefulWidget {
   // static const String path = "/";.map((e) => null) baseLocation
@@ -125,10 +124,12 @@ abstract class BaseScreenState<T extends StatefulWidget> extends State<T> {
         child: Scaffold(
           extendBodyBehindAppBar: extendBodyBehindAppBar,
           appBar: buildAppBar(context),
-          body: OnceWidget.showOnEveryNewVersion(
+          //! TODO OnceWidget showOnEveryNewVersion
+          body: /*OnceWidget.showOnEveryNewVersion(
             builder: () => _onNewVersion(context),
-            fallback: () => buildScreen(context),
-          ),
+            fallback: () =>*/
+              buildScreen(context),
+          //),
           key: scaffold,
           drawer: buildDrawer(context),
           endDrawer: buildEndDrawer(context),

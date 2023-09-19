@@ -1,3 +1,4 @@
+import 'package:document_scanner/core/lib/logger.dart';
 import 'package:document_scanner/core/service_locator/service_locator.dart';
 import 'package:document_scanner/scanner/data/datasources/ocr.dart';
 import 'package:document_scanner/scanner/domain/repositories/pdf.dart';
@@ -6,6 +7,12 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 class PdfCreatorImpl implements PdfCreator {
+  static const double inch = 72.0;
+  static const double cm = inch / 2.54;
+
+  static const PdfPageFormat portrait = PdfPageFormat(21.0 * cm, 29.7 * cm, marginAll: 0);
+  static const PdfPageFormat landscape = PdfPageFormat(29.7 * cm, 21.0 * cm, marginAll: 0);
+
   @override
   Future<Uint8List?> createPdfFromImages(List<ImageAttachment> images) async {
     if (images.isEmpty) {
@@ -17,6 +24,7 @@ class PdfCreatorImpl implements PdfCreator {
       final src = pw.MemoryImage(image.image);
       final ocr = await sl<Ocr>().ocr(image.path);
 
+      Log.high("ratio ${src.width! > src.height! ? src.width! / src.height! : src.height! / src.width!}");
       final text = ocrContent(
         ocr,
         (src.height! / 80) * 0.8,
@@ -31,18 +39,32 @@ class PdfCreatorImpl implements PdfCreator {
 
   pw.Page composePage(pw.MemoryImage src, pw.Text text) {
     return pw.Page(
-      pageFormat: PdfPageFormat(
-        src.width!.toDouble(),
-        src.height!.toDouble(),
-        marginAll: 0.0,
-      ),
-      // margin: ,
+      pageFormat: pageFormat(src),
       build: (pw.Context context) => pw.Stack(
         children: [
           pw.Padding(padding: pw.EdgeInsets.all(src.height! / 20.0), child: text),
-          pw.Image(src),
+          pw.Image(src, fit: pw.BoxFit.fill),
         ],
       ),
+    );
+  }
+
+  bool isA4Portrait(pw.MemoryImage src) => (((src.height! / src.width!) * 10.0).round() == 14);
+  bool isA4Landscape(pw.MemoryImage src) => (((src.width! / src.height!) * 10.0).round() == 14);
+
+  PdfPageFormat pageFormat(pw.MemoryImage src) {
+    if (isA4Portrait(src)) {
+      return portrait;
+    }
+
+    if (isA4Landscape(src)) {
+      return landscape;
+    }
+
+    return PdfPageFormat(
+      src.width!.toDouble(),
+      src.height!.toDouble(),
+      marginAll: 0.0,
     );
   }
 

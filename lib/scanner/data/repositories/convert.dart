@@ -68,6 +68,7 @@ class ImageConverterImpl implements ImageConverter {
     );
   }
 
+  @override
   Uint8List rotate(Uint8List input, bool counterClockwise) {
     return _resize(
       img.copyRotate(_load(input), angle: counterClockwise ? 90.0 : -90.0),
