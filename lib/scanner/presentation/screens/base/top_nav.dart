@@ -1,4 +1,3 @@
-import 'package:document_scanner/core/design/theme_colors.dart';
 import 'package:document_scanner/core/design/theme_icons.dart';
 import 'package:document_scanner/core/widgets/custom_text/custom_text.dart';
 import 'package:document_scanner/core/widgets/responsive.dart';
@@ -25,7 +24,7 @@ class NavbarTitle extends StatelessWidget {
         child: IconButton(
           icon: Icon(
             ThemeIcons.back,
-            color: themeGrey3Color,
+            color: Theme.of(context).appBarTheme.foregroundColor,
           ),
           onPressed: () {
             context.pop();
@@ -35,7 +34,7 @@ class NavbarTitle extends StatelessWidget {
       ),
       CustomText(
         title,
-        color: themeGrey4Color,
+        color: Theme.of(context).appBarTheme.foregroundColor,
         size: 20,
         weight: FontWeight.bold,
       ),
@@ -71,8 +70,6 @@ class CustomButtonTopNavBar extends StatelessWidget implements PreferredSizeWidg
 
   @override
   Widget build(BuildContext context) => AppBar(
-        backgroundColor: themePrimaryColor,
-        elevation: 0,
         actions: const [SizedBox()],
         automaticallyImplyLeading: false,
         title: ResponsiveWidthPadding(Row(
@@ -102,8 +99,6 @@ class LightSubTopNavBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) => AppBar(
-        backgroundColor: themePrimaryColor,
-        elevation: 0,
         actions: const [SizedBox()],
         leading: home ? const Leading() : null,
         automaticallyImplyLeading: false,
@@ -132,8 +127,6 @@ class FullTopNavBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) => AppBar(
-        backgroundColor: themePrimaryColor,
-        elevation: 0,
         actions: const [SizedBox()],
         leading: home ? const Leading() : null,
         automaticallyImplyLeading: false,
@@ -158,7 +151,7 @@ class FullTopNavBar extends StatelessWidget implements PreferredSizeWidget {
         child: Center(
           child: Icon(
             ThemeIcons.menu,
-            color: themeGrey4Color,
+            color: Theme.of(context).appBarTheme.foregroundColor,
           ),
         ),
       );

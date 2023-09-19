@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:document_scanner/core/design/theme_colors.dart';
+import 'package:flutter/material.dart';
 
 class RoundDropdownAction<T> extends StatelessWidget {
   final Color color;
@@ -38,8 +38,8 @@ class RoundDropdownAction<T> extends StatelessWidget {
                 hint: leftIcon(label, color, icon),
                 value: value,
                 underline: Container(),
-                iconEnabledColor: themeGrey4Color,
-                dropdownColor: themeGrey4Color,
+                iconEnabledColor: nord3PolarNight,
+                dropdownColor: nord3PolarNight,
                 selectedItemBuilder: selectedItemBuilder,
                 items: items,
                 onChanged: onChanged,

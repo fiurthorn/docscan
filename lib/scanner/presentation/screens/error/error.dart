@@ -46,7 +46,7 @@ class ErrorScaffold extends StatelessWidget {
 
   ThemeData themeData() {
     return theme().copyWith(
-      scaffoldBackgroundColor: themeGrey4Color,
+      scaffoldBackgroundColor: nord3PolarNight,
       appBarTheme: const AppBarTheme(elevation: 0),
     );
   }

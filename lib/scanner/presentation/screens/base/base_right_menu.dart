@@ -32,7 +32,7 @@ class BaseMenu extends StatelessWidget {
               ...accountItems(context),
               const Divider(thickness: 1, height: 2),
               ListTile(
-                leading: Icon(ThemeIcons.lang, color: themeGrey4Color),
+                leading: Icon(ThemeIcons.lang, color: nord3PolarNight),
                 title: DropdownButton<String>(
                   value: AppLang.lang,
                   underline: Container(),
@@ -53,19 +53,17 @@ class BaseMenu extends StatelessWidget {
               ),
               const Divider(thickness: 1, height: 2),
               ListTile(
-                leading: Icon(ThemeIcons.info, color: themeGrey4Color),
+                leading: Icon(ThemeIcons.info, color: nord3PolarNight),
                 title: Text(AppLang.i18n.baseScreen_about_label('docscan')),
                 onTap: () {
                   showAboutDialog(
                       context: context,
-                      applicationIcon: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(100),
-                            border: Border.all(width: 2, color: themeGrey4Color),
-                          ),
+                      applicationIcon: CircleAvatar(
+                          radius: 40,
+                          backgroundColor: nord3PolarNight,
                           child: ThemeIcons.logo2(
-                            height: 100,
-                            color: themeGrey4Color,
+                            height: 70,
+                            color: nord4SnowStorm,
                           )),
                       applicationName: 'docscan',
                       applicationVersion: buildVersion,

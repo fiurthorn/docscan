@@ -49,10 +49,6 @@
       }
     }
   },
-  "baseScreen_signOut_label": "Sign out",
-  "@baseScreen_signOut_label": {
-    "description": "logout label"
-  },
   "docTypes_docTypeField_label": "Document type",
   "@docTypes_docTypeField_label": {
     "description": ""
@@ -94,10 +90,6 @@
         "example": "db error, server error, etc."
       }
     }
-  },
-  "needOnePosition_errorHint": "At least one Position required",
-  "@needOnePosition_errorHint": {
-    "description": "error hint, if lesser than one position to create"
   },
   "receivers_page_title": "Receivers",
   "@receivers_page_title": {
@@ -206,14 +198,6 @@
   "validate_notEmpty_errorHint": "required",
   "@validate_notEmpty_errorHint": {
     "description": "validation error for empty values"
-  },
-  "validate_passwordEquals_errorHint": "The old ant the new password are not allowed to match",
-  "@validate_passwordEquals_errorHint": {
-    "description": "old password and new password must not match"
-  },
-  "validate_passwordNotEquals_errorHint": "The passwords must match.",
-  "@validate_passwordNotEquals_errorHint": {
-    "description": "check password and new password have to match"
   },
   "validate_regexMatch_errorHint": "the value does not match the pattern",
   "@validate_regexMatch_errorHint": {

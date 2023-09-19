@@ -104,7 +104,6 @@ class _SendersState extends TemplateBaseScreenState<SendersScreen, ItemBloc> {
                   RoundIconButton(
                     icon: ThemeIcons.newPosition,
                     tooltip: "add",
-                    backgroundColor: Theme.of(context).primaryColor,
                     onPressed: () {
                       formBloc.main.createItem();
                       update();
@@ -116,7 +115,8 @@ class _SendersState extends TemplateBaseScreenState<SendersScreen, ItemBloc> {
                     return RoundIconButton(
                       icon: ThemeIcons.send,
                       tooltip: "add",
-                      backgroundColor: valid ? themeSignalColor : themeGrey2Color,
+                      backgroundColor:
+                          valid ? nord12AuroraOrange : Theme.of(context).floatingActionButtonTheme.backgroundColor,
                       onPressed: () => valid ? formBloc.submit() : formBloc.validate(),
                     );
                   }),

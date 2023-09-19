@@ -1,4 +1,3 @@
-import 'package:document_scanner/core/design/theme_colors.dart';
 import 'package:document_scanner/core/design/theme_icons.dart';
 import 'package:document_scanner/core/toaster/error.dart';
 import 'package:document_scanner/core/toaster/success.dart';
@@ -22,81 +21,91 @@ class RightMenu extends BaseMenu {
   });
 
   @override
-  List<Widget> menuItems(BuildContext context) => [
-        ListTile(
-          title: const Text("docscan"),
-          leading: CircleAvatar(
-            radius: 25,
-            backgroundColor: themeGrey4Color,
-            child: ThemeIcons.logo2(color: nord4SnowStorm, height: 40),
+  List<Widget> menuItems(BuildContext context) {
+    final foregroundColor = Theme.of(context).primaryColor;
+
+    return [
+      ListTile(
+        title: const Text("docscan"),
+        leading: CircleAvatar(
+          radius: 25,
+          backgroundColor: foregroundColor,
+          child: ThemeIcons.logo2(
+            color: Theme.of(context).colorScheme.onPrimary,
+            height: 40,
           ),
         ),
-        const SizedBox(height: 10),
-        const Divider(thickness: 1, height: 2),
-        const SizedBox(height: 10),
-        ListTile(
-          title: Text(AppLang.i18n.scanner_page_title),
-          leading: Icon(ThemeIcons.scanner, color: themeGrey4Color),
-          onTap: () {
-            Scaffold.of(context).closeEndDrawer();
-            context.go(ScannerScreen.path);
-          },
-        ),
-        const Divider(thickness: 1, height: 2),
-        ListTile(
-          title: Text(AppLang.i18n.areas_page_title),
-          leading: Icon(ThemeIcons.area, color: themeGrey4Color),
-          onTap: () {
-            Scaffold.of(context).closeEndDrawer();
-            context.push(AreasScreen.path);
-          },
-        ),
-        ListTile(
-          title: Text(AppLang.i18n.docTypes_page_title),
-          leading: Icon(ThemeIcons.docType, color: themeGrey4Color),
-          onTap: () {
-            Scaffold.of(context).closeEndDrawer();
-            context.push(DocumentTypesScreen.path);
-          },
-        ),
-        ListTile(
-          title: Text(AppLang.i18n.senders_page_title),
-          leading: Icon(ThemeIcons.envelope, color: themeGrey4Color),
-          onTap: () {
-            Scaffold.of(context).closeEndDrawer();
-            context.push(SendersScreen.path);
-          },
-        ),
-        ListTile(
-          title: Text(AppLang.i18n.receivers_page_title),
-          leading: Icon(ThemeIcons.envelopeOpen, color: themeGrey4Color),
-          onTap: () {
-            Scaffold.of(context).closeEndDrawer();
-            context.push(ReceiversScreen.path);
-          },
-        ),
-      ];
+      ),
+      const SizedBox(height: 10),
+      const Divider(thickness: 1, height: 2),
+      const SizedBox(height: 10),
+      ListTile(
+        title: Text(AppLang.i18n.scanner_page_title),
+        leading: Icon(ThemeIcons.scanner, color: foregroundColor),
+        onTap: () {
+          Scaffold.of(context).closeEndDrawer();
+          context.go(ScannerScreen.path);
+        },
+      ),
+      const Divider(thickness: 1, height: 2),
+      ListTile(
+        title: Text(AppLang.i18n.areas_page_title),
+        leading: Icon(ThemeIcons.area, color: foregroundColor),
+        onTap: () {
+          Scaffold.of(context).closeEndDrawer();
+          context.push(AreasScreen.path);
+        },
+      ),
+      ListTile(
+        title: Text(AppLang.i18n.docTypes_page_title),
+        leading: Icon(ThemeIcons.docType, color: foregroundColor),
+        onTap: () {
+          Scaffold.of(context).closeEndDrawer();
+          context.push(DocumentTypesScreen.path);
+        },
+      ),
+      ListTile(
+        title: Text(AppLang.i18n.senders_page_title),
+        leading: Icon(ThemeIcons.envelope, color: foregroundColor),
+        onTap: () {
+          Scaffold.of(context).closeEndDrawer();
+          context.push(SendersScreen.path);
+        },
+      ),
+      ListTile(
+        title: Text(AppLang.i18n.receivers_page_title),
+        leading: Icon(ThemeIcons.envelopeOpen, color: foregroundColor),
+        onTap: () {
+          Scaffold.of(context).closeEndDrawer();
+          context.push(ReceiversScreen.path);
+        },
+      ),
+    ];
+  }
 
   @override
-  List<Widget> accountItems(BuildContext context) => <Widget>[
-        ListTile(
-          title: const Text("Export database"),
-          leading: Icon(ThemeIcons.database, color: themeGrey4Color),
-          onTap: () {
-            usecase<bool, ExportDatabaseParam>(ExportDatabaseParam())
-                .then(
-                  (value) => showSnackBarSuccess(context, "export", "Database exported successfully."),
-                )
-                .onError(
-                  (error, stackTrace) => showSnackBarFailure(
-                      context, "export", "Error while exporting database.", error,
-                      stackTrace: stackTrace),
-                );
-            Scaffold.of(context).closeEndDrawer();
-            context.go(SendersScreen.path);
-          },
-        )
-      ];
+  List<Widget> accountItems(BuildContext context) {
+    final foregroundColor = Theme.of(context).primaryColor;
+
+    return <Widget>[
+      ListTile(
+        title: const Text("Export database"),
+        leading: Icon(ThemeIcons.database, color: foregroundColor),
+        onTap: () {
+          usecase<bool, ExportDatabaseParam>(ExportDatabaseParam())
+              .then(
+                (value) => showSnackBarSuccess(context, "export", "Database exported successfully."),
+              )
+              .onError(
+                (error, stackTrace) => showSnackBarFailure(context, "export", "Error while exporting database.", error,
+                    stackTrace: stackTrace),
+              );
+          Scaffold.of(context).closeEndDrawer();
+          // context.go(SendersScreen.path);
+        },
+      )
+    ];
+  }
 
   Widget menuItem(MenuItem item) => Builder(builder: (context) {
         return ListTile(

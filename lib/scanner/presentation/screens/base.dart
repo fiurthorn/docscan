@@ -1,6 +1,5 @@
 import 'package:document_scanner/core/lib/optional.dart';
 import 'package:document_scanner/core/lib/platform/platform.dart';
-import 'package:document_scanner/core/version.g.dart';
 import 'package:document_scanner/core/widgets/loading_widget/loading_widget.dart';
 import 'package:document_scanner/scanner/presentation/screens/error/error.dart';
 import 'package:flutter/material.dart';
@@ -100,22 +99,22 @@ abstract class BaseScreenState<T extends StatefulWidget> extends State<T> {
     return theme;
   }
 
-  Widget _onNewVersion(BuildContext context) {
-    return Center(
-      child: Column(
-        children: [
-          const Text("What's new on version $buildVersion"),
-          const Text("this dialog"),
-          const Text("scanned image rotation"),
-          const Text("update dropdown list values on change"),
-          TextButton(
-            onPressed: () => update(),
-            child: const Text("Okay"),
-          ),
-        ],
-      ),
-    );
-  }
+//   Widget _onNewVersion(BuildContext context) {
+//     return Center(
+//       child: Column(
+//         children: [
+//           const Text("What's new on version $buildVersion"),
+//           const Text("this dialog"),
+//           const Text("scanned image rotation"),
+//           const Text("update dropdown list values on change"),
+//           TextButton(
+//             onPressed: () => update(),
+//             child: const Text("Okay"),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
 
   Widget _scaffold(BuildContext context) => _theme(
       context,

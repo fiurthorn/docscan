@@ -4,14 +4,12 @@
   "baseScreen_about_label": "Über {applicationName}",
   "baseScreen_about_system_label_browser": "Läuft in {browser} auf {device}/{os}",
   "baseScreen_about_system_label_desktop": "Läuft auf {device}/{os}",
-  "baseScreen_signOut_label": "Ausloggen",
   "docTypes_docTypeField_label": "Dokumententyp",
   "docTypes_page_title": "Dokumententypen",
   "dropdown_empty_hint": "{label} auswählen",
   "example_plural_title": "{n,plural, other{{n}.}} Item",
   "i18n_field_hint": "tech;de:Name;en:translation",
   "message_failure_genericError": "Fehler bei der Übertragung: {serverMessage}",
-  "needOnePosition_errorHint": "Mindestens eine Position erfassen",
   "receivers_page_title": "Empfänger",
   "receivers_receiverField_label": "Empfänger",
   "scanner_areaSelect_hint": "Bereich",
@@ -36,7 +34,5 @@
   "validate_notADate_errorHint": "kein Datum",
   "validate_notANumber_errorHint": "keine Zahl",
   "validate_notEmpty_errorHint": "Pflichtfeld",
-  "validate_passwordEquals_errorHint": "Das aktuell und der Neue Passwort müssen sich unterscheiden",
-  "validate_passwordNotEquals_errorHint": "Die Passwörter stimmen nicht über ein",
   "validate_regexMatch_errorHint": "entspricht nicht dem vorgegebenem Muster"
 }

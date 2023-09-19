@@ -1,3 +1,4 @@
+import 'package:document_scanner/core/design/theme_colors.dart';
 import 'package:document_scanner/l10n/app_lang.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,7 @@ class DropDownBlocBuilder extends DropdownFieldBlocBuilder<DropDownEntry> {
           selectFieldBloc: bloc,
           decoration: InputDecoration(
             labelText: label,
-            hintStyle: const TextStyle(color: Colors.amber),
+            hintStyle: const TextStyle(color: nord12AuroraOrange),
           ),
           emptyItemLabel: AppLang.i18n.dropdown_empty_hint(hint),
           itemBuilder: (context, item) {

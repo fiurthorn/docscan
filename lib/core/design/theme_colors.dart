@@ -1,17 +1,5 @@
 import 'package:flutter/material.dart';
 
-const themePrimaryColor = nord10Frost; //       #5E81AC
-const themeSecondaryColor = nord8Frost; //      #88C0D0
-const themeSignalColor = nord12AuroraOrange; // #D08770
-const themeTextColor = nord1PolarNight; //      #2E3440
-
-const themeGrey1Color = nord0PolarNight; //     #2E3440
-const themeGrey2Color = nord1PolarNight; //     #3B4252
-const themeGrey3Color = nord2PolarNight; //     #434C5E
-const themeGrey4Color = nord3PolarNight; //     #4C566A
-
-const themeBorderColor = nord1PolarNight; //    #3B4252
-
 const nord0PolarNight = Color(0xff2E3440); // #2E3440
 const nord1PolarNight = Color(0xff3B4252); // #3B4252
 const nord2PolarNight = Color(0xff434C5E); // #434C5E

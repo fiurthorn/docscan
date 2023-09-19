@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 class RoundIconButton extends StatelessWidget {
-  final Color backgroundColor;
+  final Color? backgroundColor;
   final VoidCallback? onPressed;
   final String tooltip;
   final IconData icon;
 
   const RoundIconButton({
     super.key,
-    required this.backgroundColor,
+    this.backgroundColor,
     required this.onPressed,
     required this.tooltip,
     required this.icon,

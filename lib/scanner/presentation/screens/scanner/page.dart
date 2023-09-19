@@ -6,6 +6,7 @@ import 'package:document_scanner/core/design/theme_icons.dart';
 import 'package:document_scanner/core/lib/optional.dart';
 import 'package:document_scanner/core/lib/size.dart';
 import 'package:document_scanner/core/toaster/error.dart';
+import 'package:document_scanner/core/toaster/signal.dart';
 import 'package:document_scanner/core/toaster/success.dart';
 import 'package:document_scanner/core/widgets/bloc_builder/datetime.dart';
 import 'package:document_scanner/core/widgets/bloc_builder/dropdown.dart';
@@ -74,7 +75,7 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
               child: Center(
                 child: Icon(
                   ThemeIcons.close,
-                  color: themeGrey4Color,
+                  //color: themeGrey4Color,
                 ),
               ),
             ),
@@ -243,7 +244,6 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               RoundIconButton(
-                backgroundColor: themeGrey2Color,
                 onPressed: () => formBloc.createPDF().then((value) => update()),
                 icon: ThemeIcons.filePDF,
                 tooltip: '',
@@ -328,8 +328,7 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
     final formBloc = BlocProvider.of<ScannerBloc>(context);
 
     if (formBloc.attachments.isEmpty) {
-      showSnackBarFailure(context, "create pre send (dirty)", AppLang.i18n.needOnePosition_errorHint,
-          AppLang.i18n.scanner_noAttachment_hint);
+      showSnackBarSignal(context, "create (dirty)", AppLang.i18n.scanner_noAttachment_hint);
       // } else {
       // showSnackBarFailure(context, "create pre send (dirty)", "missing required values");
     }
@@ -344,7 +343,8 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
     final valid = bloc.state.isValid();
 
     return RoundIconButton(
-      backgroundColor: valid && !empty ? themeSignalColor : themeGrey2Color,
+      backgroundColor:
+          valid && !empty ? nord12AuroraOrange : Theme.of(context).floatingActionButtonTheme.backgroundColor,
       onPressed: () => valid && !empty ? submit(context) : dirty(context),
       icon: ThemeIcons.send,
       tooltip: '',
@@ -353,7 +353,6 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
 
   Widget scannerButton(ScannerBloc formBloc) {
     return RoundIconButton(
-      backgroundColor: Theme.of(context).primaryColor,
       onPressed: () async {
         LoadingDialog.show(context);
         CunningDocumentScanner.getPictures().then((value) {
@@ -369,7 +368,6 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
 
   Widget cameraButton(ScannerBloc formBloc) {
     return RoundIconButton(
-      backgroundColor: Theme.of(context).primaryColor,
       onPressed: () => camera(
         formBloc,
         source: ImageSource.camera,
@@ -403,7 +401,6 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
 
   Widget filePickerButton(ScannerBloc formBloc) {
     return RoundIconButton(
-      backgroundColor: Theme.of(context).primaryColor,
       onPressed: () async {
         LoadingDialog.show(context);
 
@@ -425,10 +422,10 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
 
   IndexedWidgetBuilder attachmentItemBuilder(ScannerBloc formBloc) => (context, index) {
         return Card(
-          color: themeGrey3Color,
+          color: Theme.of(context).colorScheme.primary,
           elevation: 0,
           child: Padding(
-            padding: const EdgeInsets.only(left: 12, right: 12, top: 5, bottom: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

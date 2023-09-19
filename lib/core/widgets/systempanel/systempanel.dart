@@ -40,19 +40,18 @@ class RuntimeWidget extends StatelessWidget {
           hoverIcon: hover,
           tooltip: tip,
           size: 20,
-          color: themeGrey1Color,
-          hoverColor: themeSignalColor,
+          color: nord0PolarNight,
           onPressed: onPressed,
         ),
       );
 
   Widget _fragment(String msg) => Padding(
         padding: const EdgeInsets.only(left: 3, right: 3),
-        child: Text(msg, style: const TextStyle(color: themeGrey2Color)),
+        child: Text(msg, style: const TextStyle(color: nord1PolarNight)),
       );
 
   Widget _miniFragment(String msg) => Padding(
         padding: const EdgeInsets.only(left: 3, right: 3),
-        child: Text(msg, style: const TextStyle(color: themeGrey2Color, fontSize: 12)),
+        child: Text(msg, style: const TextStyle(color: nord1PolarNight, fontSize: 12)),
       );
 }

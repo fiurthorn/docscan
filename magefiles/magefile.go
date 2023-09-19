@@ -75,17 +75,24 @@ func CreateVersion() (err error) {
 		return
 	}
 
+	buildNumber, err := getVersionYamlKeyValue()
+	if err != nil {
+		return
+	}
+
 	return os.WriteFile("lib/core/version.g.dart", []byte(fmt.Sprintf(`// Generated file. Do not edit.
 
 import 'package:flutter/foundation.dart';
 
 const buildVersion = "%s${kDebugMode ? '-debug' : ''}";
+const buildNumber = %d;
 final buildDate = DateTime(%s);
 final copyright = 'Copyright ${_span(DateTime.now().year)} fiurthorn';
 
 String _span(int now) => %s == now ? '%s' : '%s-$now';
 `,
 		version,
+		buildNumber,
 		now.Format("2006, 1, 2, 15, 4, 5"),
 		now.Format("2006"),
 		now.Format("2006"),
@@ -449,6 +456,30 @@ func checkGitReposClean() bool {
 	}
 
 	return true
+}
+
+func getVersionYamlKeyValue() (versionCode int, err error) {
+	data, err := os.ReadFile("pubspec.yaml")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	versionCodeMatcher, err := regexp.Compile(`version: \d+\.\d+\.\d+(?:\+(\d+))?`)
+	if err != nil {
+		return
+	}
+
+	match := versionCodeMatcher.FindStringSubmatch(string(data))
+	if len(match) < 2 {
+		versionCode = 0
+	} else {
+		versionCode, err = strconv.Atoi(match[1])
+		if err != nil {
+			return
+		}
+	}
+
+	return
 }
 
 func replaceVersionYamlKeyValue(path, version string) (err error) {

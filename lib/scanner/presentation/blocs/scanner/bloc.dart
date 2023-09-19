@@ -8,6 +8,7 @@ import 'package:document_scanner/core/widgets/bloc_builder/dropdown.dart';
 import 'package:document_scanner/core/widgets/bloc_builder/i18n_dropdown.dart';
 import 'package:document_scanner/core/widgets/blocs/datetime.dart';
 import 'package:document_scanner/core/widgets/goroute/route.dart';
+import 'package:document_scanner/scanner/data/datasources/file_source.dart';
 import 'package:document_scanner/scanner/domain/repositories/convert.dart';
 import 'package:document_scanner/scanner/domain/repositories/key_values.dart';
 import 'package:document_scanner/scanner/domain/usecases/create_pdf_file.dart';
@@ -182,14 +183,14 @@ class ScannerBloc extends FormBloc<String, ErrorValue> implements GoRouteAware {
     clearImageCache();
   }
 
-  //! TODO move to usecase->repos->usecase->datasource?
   Future<void> loadCropperImage(XFile? file) async {
     if (file == null) {
       return;
     }
 
-    cropperFilename = file.name;
-    cropperImage = await file.readAsBytes();
+    final content = await sl<FileSource>().readImageFile(file);
+    cropperFilename = content.a;
+    cropperImage = content.b;
     displayCropper.changeValue(true);
   }
 

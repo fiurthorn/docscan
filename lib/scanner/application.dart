@@ -5,16 +5,15 @@ import 'dart:math';
 import 'package:document_scanner/core/design/theme_data.dart';
 import 'package:document_scanner/core/lib/platform/platform.dart';
 import 'package:document_scanner/core/lib/simple_bloc_observer.dart';
-import 'package:document_scanner/core/lib/trace.dart';
 import 'package:document_scanner/core/lib/tuple.dart';
 import 'package:document_scanner/core/service_locator/service_locator.dart';
 import 'package:document_scanner/core/widgets/goroute/route.dart';
-import 'package:document_scanner/core/widgets/loading_widget/loading_widget.dart';
 import 'package:document_scanner/l10n/app_lang.dart';
 import 'package:document_scanner/l10n/translations/translations.dart';
 import 'package:document_scanner/scanner/domain/repositories/key_values.dart';
 import 'package:document_scanner/scanner/presentation/screens/error/error.dart' as err;
 import 'package:document_scanner/scanner/presentation/screens/notfound/notfound.dart';
+import 'package:document_scanner/scanner/presentation/screens/splash/page.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -56,7 +55,7 @@ abstract class ApplicationState<T extends Application> extends State<T> {
 
   Future<bool> setLanguage() async {
     final systemLocale = await findSystemLocale();
-    AppLang.lang = trace(sl<KeyValues>().get(KeyValueNames.locale, systemLocale));
+    AppLang.lang = sl<KeyValues>().get(KeyValueNames.locale, systemLocale);
     return true;
   }
 
@@ -70,9 +69,11 @@ abstract class ApplicationState<T extends Application> extends State<T> {
             if (snapshot.hasError) {
               return error(snapshot);
             }
+
             if (!snapshot.hasData) {
-              return const LoadingWidget();
+              return const SplashPage();
             }
+
             return app;
           }),
     );
