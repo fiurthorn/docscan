@@ -1,3 +1,7 @@
+## Version 0.1.3
+
+ae5364a refactor: layout, whats new dialog
+
 ## Version 0.1.2
 
 c7a0936 refactor: Theme consistency
