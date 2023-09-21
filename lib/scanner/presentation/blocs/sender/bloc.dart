@@ -27,7 +27,7 @@ class ItemBloc extends FormBloc<String, ErrorValue> {
   @override
   FutureOr<void> onSubmitting() async {
     try {
-      await usecase<bool, StoreListItemsParam>(
+      await usecase<StoreListItemsResult, StoreListItemsParam>(
         StoreListItemsParam(
           KeyValueNames.senderNames,
           main.senders.value.map((e) => e.value).toList(),

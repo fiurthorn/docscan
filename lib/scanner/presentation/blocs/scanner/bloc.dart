@@ -15,6 +15,7 @@ import 'package:document_scanner/scanner/domain/usecases/create_pdf_file.dart';
 import 'package:document_scanner/scanner/domain/usecases/export_attachment.dart';
 import 'package:document_scanner/scanner/domain/usecases/load_list_items.dart';
 import 'package:document_scanner/scanner/domain/usecases/read_files.dart';
+import 'package:document_scanner/scanner/domain/usecases/rotate_image.dart';
 import 'package:document_scanner/scanner/presentation/screens/scanner/page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
@@ -70,7 +71,7 @@ class ScannerBloc extends FormBloc<String, ErrorValue> implements GoRouteAware {
   @override
   FutureOr<void> onSubmitting() async {
     try {
-      usecase<void, ExportAttachmentsParam>(ExportAttachmentsParam(
+      usecase<ExportAttachmentResult, ExportAttachmentsParam>(ExportAttachmentsParam(
         main.area.value!.technical!,
         main.senderName.value,
         main.receiverName.value!.technical,
@@ -90,7 +91,7 @@ class ScannerBloc extends FormBloc<String, ErrorValue> implements GoRouteAware {
   }
 
   void storeScanResult(List<String> value, {required void Function() ready}) {
-    usecase<List<Tuple2<String, Uint8List>>, ReadFilesParam>(ReadFilesParam(value)).then((value) {
+    usecase<ReadFilesResult, ReadFilesParam>(ReadFilesParam(value)).then((value) {
       scannedImages.updateValue(value);
       clearImageCache();
     }).whenComplete(ready);
@@ -135,7 +136,7 @@ class ScannerBloc extends FormBloc<String, ErrorValue> implements GoRouteAware {
       pdfImageData.add(Tuple2(scannedImages.value[i].a, image));
     }
 
-    final pdfData = await usecase<Uint8List, CreatePdfFileParam>(
+    final pdfData = await usecase<CreatePdfFileResult, CreatePdfFileParam>(
       CreatePdfFileParam(
         pdfImageData.map((e) => AttachmentParam.fromTuple(e)).toList(),
       ),
@@ -165,17 +166,19 @@ class ScannerBloc extends FormBloc<String, ErrorValue> implements GoRouteAware {
   void counterClockwise() {
     final current = scannedImages.value[currentImage];
     final filename = current.a;
-    final image = sl<ImageConverter>().rotate(current.b, true);
-    scannedImages.value[currentImage] = Tuple2(filename, image);
-    clearImageCache();
+    usecase<Uint8List, RotateImageParam>(RotateImageParam(current.b, true)).then((value) {
+      scannedImages.value[currentImage] = Tuple2(filename, value);
+      clearImageCache();
+    });
   }
 
   void clockwise() {
     final current = scannedImages.value[currentImage];
     final filename = current.a;
-    final image = sl<ImageConverter>().rotate(current.b, false);
-    scannedImages.value[currentImage] = Tuple2(filename, image);
-    clearImageCache();
+    usecase<Uint8List, RotateImageParam>(RotateImageParam(current.b, false)).then((value) {
+      scannedImages.value[currentImage] = Tuple2(filename, value);
+      clearImageCache();
+    });
   }
 
   void amountChanged(double value) {
@@ -211,4 +214,8 @@ class ScannerBloc extends FormBloc<String, ErrorValue> implements GoRouteAware {
     sl<GoRouterObserver>().unsubscribe(this);
     return super.close();
   }
+
+  closedWhatsNew() => sl<KeyValues>().resetBuildNumber();
+
+  bool shouldShowWhatsNew() => sl<KeyValues>().hasNewBuildNumber();
 }

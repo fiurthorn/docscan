@@ -53,7 +53,7 @@ class RightMenu extends BaseMenu {
         leading: Icon(ThemeIcons.area, color: foregroundColor),
         onTap: () {
           Scaffold.of(context).closeEndDrawer();
-          context.push(AreasScreen.path);
+          push(context, AreasScreen.path);
         },
       ),
       ListTile(
@@ -61,7 +61,7 @@ class RightMenu extends BaseMenu {
         leading: Icon(ThemeIcons.docType, color: foregroundColor),
         onTap: () {
           Scaffold.of(context).closeEndDrawer();
-          context.push(DocumentTypesScreen.path);
+          push(context, DocumentTypesScreen.path);
         },
       ),
       ListTile(
@@ -69,7 +69,7 @@ class RightMenu extends BaseMenu {
         leading: Icon(ThemeIcons.envelope, color: foregroundColor),
         onTap: () {
           Scaffold.of(context).closeEndDrawer();
-          context.push(SendersScreen.path);
+          push(context, SendersScreen.path);
         },
       ),
       ListTile(
@@ -77,7 +77,7 @@ class RightMenu extends BaseMenu {
         leading: Icon(ThemeIcons.envelopeOpen, color: foregroundColor),
         onTap: () {
           Scaffold.of(context).closeEndDrawer();
-          context.push(ReceiversScreen.path);
+          push(context, ReceiversScreen.path);
         },
       ),
     ];
@@ -92,7 +92,7 @@ class RightMenu extends BaseMenu {
         title: const Text("Export database"),
         leading: Icon(ThemeIcons.database, color: foregroundColor),
         onTap: () {
-          usecase<bool, ExportDatabaseParam>(ExportDatabaseParam())
+          usecase<ExportDatabaseResult, ExportDatabaseParam>(ExportDatabaseParam())
               .then(
                 (value) => showSnackBarSuccess(context, "export", "Database exported successfully."),
               )

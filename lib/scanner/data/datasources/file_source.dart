@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 class FileSource {
   Future<String> assetFileAsString(String asset) async => rootBundle.loadString(asset);
 
+  // TODO
   List<Tuple2<String, Uint8List>> readFiles(List<String> paths) {
     final images = paths.map((path) => Tuple2(path, File(path).readAsBytesSync())).toList();
     for (var path in paths) {
@@ -15,6 +16,7 @@ class FileSource {
     return images;
   }
 
+  // TODO
   Future<String> getTempDir() async {
     return Directory.systemTemp.path;
   }
@@ -23,6 +25,7 @@ class FileSource {
     return File(path).writeAsBytesSync(data);
   }
 
+  // TODO
   Future<Tuple2<String, Uint8List>> readImageFile(XFile file) {
     return file.readAsBytes().then((value) => Tuple2(file.name, value));
   }

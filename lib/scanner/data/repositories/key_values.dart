@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:document_scanner/core/lib/trace.dart';
 import 'package:document_scanner/core/service_locator/service_locator.dart';
+import 'package:document_scanner/core/version.g.dart';
 import 'package:document_scanner/scanner/data/datasources/native.dart';
 import 'package:document_scanner/scanner/domain/repositories/key_values.dart';
 import 'package:hive/hive.dart';
@@ -13,7 +14,7 @@ class KeyValuesImpl implements KeyValues {
   KeyValuesImpl(Box keyValues) : _box = keyValues;
 
   @override
-  bool flag(KeyValueNames key) => get(key) == "true";
+  bool flag(KeyValueNames key) => get(key, "false") == "true";
 
   @override
   String get(KeyValueNames key, [String defaultValue = ""]) => (_box.get(key.name) ?? defaultValue);
@@ -62,6 +63,16 @@ class KeyValuesImpl implements KeyValues {
   Future<void> close() => _box.close();
 
   @override
+  bool hasNewBuildNumber() {
+    return num.parse(get(KeyValueNames.lastBuildNumber, "-1")) < buildNumber;
+  }
+
+  @override
+  void resetBuildNumber() {
+    set(KeyValueNames.lastBuildNumber, "$buildNumber");
+  }
+
+  @override
   Future<void> importDatabase(Map<dynamic, dynamic> map) {
     return Future.wait(
         map.entries.map((e) => _box.put(KeyValueNames.values.firstWhere((key) => key.name == e.key).name, e.value)));
@@ -86,49 +97,53 @@ class KeyValuesImpl implements KeyValues {
 
   @override
   Future<void> init() async {
-    await setItems(KeyValueNames.areas, [
-      "archived;de:Archiv;en:Archive",
-      "cards;de:Karten;en:Cards",
-      "commercial;de:Handel;en:Commercial",
-      "common;de:Allgemein;en:Common",
-      "financial;de:Finanzen;en:Financial",
-      "insurance;de:Versicherung;en:Insurance",
-      "private;de:Privat;en:Private",
-      "tax;de:Steuer;en:Tax",
-      "traveling;de:Reisen;en:Traveling",
-    ]);
+    if (trace(!flag(KeyValueNames.listsInitOnStartup), "!flag(KeyValueNames.listsInitOnStartup)")) {
+      set(KeyValueNames.listsInitOnStartup, "true");
 
-    await setItems(KeyValueNames.documentTypes, [
-      "bankDocument;de:Bankunterlagen;en:Bank document",
-      "birthCertificate;de:Geburtsurkunde;en:Birth certificate",
-      "business;de:Geschäftliche;en:Business",
-      "children;de:Kinder;en:Children",
-      "contract;de:Vertrag;en:Contract",
-      "correspondence;de:Korrespondenz;en:Correspondence",
-      "craftInstruction;de:Bastelanleitung;en:Craft instruction",
-      "deathCertificate;de:Sterbeurkunde;en:Death certificate",
-      "deliveryNote;de:Lieferschein;en:Delivery note",
-      "gardenPlan;de:Gartenplan;en:Garden plan",
-      "hobbies;de:Hobby;en:Hobbies",
-      "identificationDocument;de:Ausweisdokument;en:Identification document",
-      "insurance;de:Versicherung;en:Insurance",
-      "invoice;de:Rechnung;en:Invoice",
-      "statementOfAccount;de:Kontoauszug;en:Statement of account",
-      "marriageCertificate;de:Heiratsurkunde;en:Marriage certificate",
-      "music;de:Musik;en:Music",
-      "orderConfirmation;de:Auftragsbestätigung;en:Order confirmation",
-      "other;de:Sonstiges;en:Other",
-      "personal;de:Persönliche;en:Personal",
-      "pets;de:Haustier;en:Pets",
-      "photo;de:Foto;en:Photo",
-      "prescription;de:Rezept;en:Prescription",
-      "presentation;de:Präsentation;en:Presentation",
-      "recipe;de:Quittung;en:Recipe",
-      "reports;de:Berichte;en:Reports",
-      "sportsResult;de:Sportergebnis;en:Sports result",
-      "taxDocument;de:Steuerunterlagen;en:Tax document",
-      "travelDocument;de:Reiseunterlagen;en:Travel document",
-      "video;de:Video;en:Video",
-    ]);
+      await setItems(KeyValueNames.areas, [
+        "archived;de:Archiv;en:Archive",
+        "cards;de:Karten;en:Cards",
+        "commercial;de:Handel;en:Commercial",
+        "common;de:Allgemein;en:Common",
+        "financial;de:Finanzen;en:Financial",
+        "insurance;de:Versicherung;en:Insurance",
+        "private;de:Privat;en:Private",
+        "tax;de:Steuer;en:Tax",
+        "traveling;de:Reisen;en:Traveling",
+      ]);
+
+      await setItems(KeyValueNames.documentTypes, [
+        "bankDocument;de:Bankunterlagen;en:Bank document",
+        "birthCertificate;de:Geburtsurkunde;en:Birth certificate",
+        "business;de:Geschäftliche;en:Business",
+        "children;de:Kinder;en:Children",
+        "contract;de:Vertrag;en:Contract",
+        "correspondence;de:Korrespondenz;en:Correspondence",
+        "craftInstruction;de:Bastelanleitung;en:Craft instruction",
+        "deathCertificate;de:Sterbeurkunde;en:Death certificate",
+        "deliveryNote;de:Lieferschein;en:Delivery note",
+        "gardenPlan;de:Gartenplan;en:Garden plan",
+        "hobbies;de:Hobby;en:Hobbies",
+        "identificationDocument;de:Ausweisdokument;en:Identification document",
+        "insurance;de:Versicherung;en:Insurance",
+        "invoice;de:Rechnung;en:Invoice",
+        "statementOfAccount;de:Kontoauszug;en:Statement of account",
+        "marriageCertificate;de:Heiratsurkunde;en:Marriage certificate",
+        "music;de:Musik;en:Music",
+        "orderConfirmation;de:Auftragsbestätigung;en:Order confirmation",
+        "other;de:Sonstiges;en:Other",
+        "personal;de:Persönliche;en:Personal",
+        "pets;de:Haustier;en:Pets",
+        "photo;de:Foto;en:Photo",
+        "prescription;de:Rezept;en:Prescription",
+        "presentation;de:Präsentation;en:Presentation",
+        "recipe;de:Quittung;en:Recipe",
+        "reports;de:Berichte;en:Reports",
+        "sportsResult;de:Sportergebnis;en:Sports result",
+        "taxDocument;de:Steuerunterlagen;en:Tax document",
+        "travelDocument;de:Reiseunterlagen;en:Travel document",
+        "video;de:Video;en:Video",
+      ]);
+    }
   }
 }

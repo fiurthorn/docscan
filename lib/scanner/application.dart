@@ -19,7 +19,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:once/once.dart';
 
 abstract class Application extends StatefulWidget {
   Application({super.key}) {
@@ -46,7 +45,7 @@ abstract class ApplicationState<T extends Application> extends State<T> {
     super.initState();
     loaded();
 
-    Once.runOnce("initKeyValues", callback: () => sl<KeyValues>().init());
+    sl<KeyValues>().init();
   }
 
   Widget error(AsyncSnapshot snapshot) {

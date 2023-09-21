@@ -35,11 +35,12 @@ class ExportAttachmentsParam {
   );
 }
 
-typedef ExportAttachment = UseCase<void, ExportAttachmentsParam>;
+typedef ExportAttachmentResult = void;
+typedef ExportAttachment = UseCase<ExportAttachmentResult, ExportAttachmentsParam>;
 
 class ExportAttachmentUseCase implements ExportAttachment {
   @override
-  Future<Optional<void>> call(ExportAttachmentsParam param) async {
+  Future<Optional<ExportAttachmentResult>> call(ExportAttachmentsParam param) async {
     try {
       return Optional.newValue(
         sl<MediaStore>().upload(

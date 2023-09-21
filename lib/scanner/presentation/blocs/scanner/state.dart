@@ -70,47 +70,51 @@ class AttachState extends GroupFieldBloc<FieldBloc, dynamic> {
     attachments.removeFieldBlocAt(index);
   }
 
+  static int compare(String a, String b) => a.toLowerCase().compareTo(b.toLowerCase());
+  static int compareLabel(I18nLabel a, I18nLabel b) => a.label.toLowerCase().compareTo(b.label.toLowerCase());
+  static int compareEntry(DropDownEntry a, DropDownEntry b) => a.label.toLowerCase().compareTo(b.label.toLowerCase());
+
   static Future<List<String>> senderNames(String pattern) async {
-    return usecase<List<String>, LoadListItemsParam>(LoadListItemsParam(KeyValueNames.senderNames)).then(
+    return usecase<LoadListItemsResult, LoadListItemsParam>(LoadListItemsParam(KeyValueNames.senderNames)).then(
       (value) => value
           .where(
             (element) => element.toLowerCase().contains(pattern.toLowerCase()),
           )
           .toList()
-        ..sort((a, b) => a.compareTo(b)),
+        ..sort(compare),
     );
   }
 
   static Future<List<DropDownEntry>> receiverNameItems() async {
-    return usecase<List<String>, LoadListItemsParam>(LoadListItemsParam(KeyValueNames.receiverNames)).then(
+    return usecase<LoadListItemsResult, LoadListItemsParam>(LoadListItemsParam(KeyValueNames.receiverNames)).then(
       (value) => value
           .map(
             (element) => DropDownEntry.build(label: element),
           )
           .toList()
-        ..sort((a, b) => a.label.compareTo(b.label)),
+        ..sort(compareEntry),
     );
   }
 
   static Future<List<I18nLabel>> documentTypeItems() async {
-    return usecase<List<String>, LoadListItemsParam>(LoadListItemsParam(KeyValueNames.documentTypes)).then(
+    return usecase<LoadListItemsResult, LoadListItemsParam>(LoadListItemsParam(KeyValueNames.documentTypes)).then(
       (value) => value
           .map(
             (element) => I18nLabel.build(label: element),
           )
           .toList()
-        ..sort((a, b) => a.label.compareTo(b.label)),
+        ..sort(compareLabel),
     );
   }
 
   static Future<List<I18nLabel>> areaItems() async {
-    return usecase<List<String>, LoadListItemsParam>(LoadListItemsParam(KeyValueNames.areas)).then(
+    return usecase<LoadListItemsResult, LoadListItemsParam>(LoadListItemsParam(KeyValueNames.areas)).then(
       (value) => value
           .map(
             (element) => I18nLabel.build(label: element),
           )
           .toList()
-        ..sort((a, b) => a.label.compareTo(b.label)),
+        ..sort(compareLabel),
     );
   }
 }

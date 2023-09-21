@@ -12,11 +12,12 @@ class StoreListItemsParam {
   StoreListItemsParam(this.key, this.items);
 }
 
-typedef StoreListItems = UseCase<bool, StoreListItemsParam>;
+typedef StoreListItemsResult = bool;
+typedef StoreListItems = UseCase<StoreListItemsResult, StoreListItemsParam>;
 
 class StoreListItemsUseCase implements StoreListItems {
   @override
-  Future<Optional<bool>> call(StoreListItemsParam param) async {
+  Future<Optional<StoreListItemsResult>> call(StoreListItemsParam param) async {
     try {
       sl<KeyValues>().setItems(param.key, param.items);
       return Optional.newValue(true);

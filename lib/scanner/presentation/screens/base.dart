@@ -91,6 +91,7 @@ abstract class BaseScreenState<T extends StatefulWidget> extends State<T> {
   Widget? buildEndDrawer(BuildContext context) => null;
   Widget? buildDrawer(BuildContext context) => null;
   Widget? buildBottomNavigationBar(BuildContext context) => null;
+  List<Widget>? buildPersistentFooterButtons(BuildContext context) => null;
   Widget? buildFloatingActionButton(BuildContext context) => null;
 
   ThemeData? themeData(BuildContext context) => null;
@@ -99,23 +100,6 @@ abstract class BaseScreenState<T extends StatefulWidget> extends State<T> {
     return theme;
   }
 
-//   Widget _onNewVersion(BuildContext context) {
-//     return Center(
-//       child: Column(
-//         children: [
-//           const Text("What's new on version $buildVersion"),
-//           const Text("this dialog"),
-//           const Text("scanned image rotation"),
-//           const Text("update dropdown list values on change"),
-//           TextButton(
-//             onPressed: () => update(),
-//             child: const Text("Okay"),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-
   Widget _scaffold(BuildContext context) => _theme(
       context,
       WillPopScope(
@@ -123,15 +107,11 @@ abstract class BaseScreenState<T extends StatefulWidget> extends State<T> {
         child: Scaffold(
           extendBodyBehindAppBar: extendBodyBehindAppBar,
           appBar: buildAppBar(context),
-          //! TODO OnceWidget showOnEveryNewVersion
-          body: /*OnceWidget.showOnEveryNewVersion(
-            builder: () => _onNewVersion(context),
-            fallback: () =>*/
-              buildScreen(context),
-          //),
+          body: buildScreen(context),
           key: scaffold,
           drawer: buildDrawer(context),
           endDrawer: buildEndDrawer(context),
+          persistentFooterButtons: buildPersistentFooterButtons(context),
           bottomNavigationBar: buildBottomNavigationBar(context),
           floatingActionButtonLocation: floatingActionButtonLocation,
           floatingActionButton: buildFloatingActionButton(context),
@@ -159,11 +139,11 @@ abstract class BaseScreenState<T extends StatefulWidget> extends State<T> {
   Future<bool> _onWillPop(BuildContext context) async {
     if (!isMobile || isWeb) return true;
 
-    bool? exitResult = await showDialog(
-      context: context,
-      builder: (context) => _buildExitDialog(context),
-    );
-    return exitResult ?? false;
+    return await showDialog(
+          context: context,
+          builder: (context) => _buildExitDialog(context),
+        ) ??
+        false;
   }
 
   AlertDialog _buildExitDialog(BuildContext context) {

@@ -5,11 +5,14 @@ enum KeyValueNames {
   receiverNames,
   documentTypes,
   areas,
+  //
+  listsInitOnStartup,
+  lastBuildNumber,
 }
 
 extension KeyValueNamesExtension on KeyValueNames {
   String get name {
-    return toString().substring(14);
+    return toString().substring(runtimeType.toString().length + 1);
   }
 }
 
@@ -31,6 +34,8 @@ abstract class KeyValues {
   Future<void> addSenderName(String senderName);
 
   Future<void> init();
+  bool hasNewBuildNumber();
+  void resetBuildNumber();
 
   Future<void> exportDatabase();
 

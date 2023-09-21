@@ -22,11 +22,12 @@ class CreatePdfFileParam {
   CreatePdfFileParam(this.documentTypes);
 }
 
-typedef CreatePdfFile = UseCase<Uint8List, CreatePdfFileParam>;
+typedef CreatePdfFileResult = Uint8List;
+typedef CreatePdfFile = UseCase<CreatePdfFileResult, CreatePdfFileParam>;
 
 class CreatePdfFileUseCase implements CreatePdfFile {
   @override
-  Future<Optional<Uint8List>> call(CreatePdfFileParam param) async {
+  Future<Optional<CreatePdfFileResult>> call(CreatePdfFileParam param) async {
     try {
       final value = await sl<PdfCreator>()
           .createPdfFromImages(

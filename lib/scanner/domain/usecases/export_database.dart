@@ -9,11 +9,12 @@ class ExportDatabaseParam {
   ExportDatabaseParam();
 }
 
-typedef ExportDatabase = UseCase<bool, ExportDatabaseParam>;
+typedef ExportDatabaseResult = bool;
+typedef ExportDatabase = UseCase<ExportDatabaseResult, ExportDatabaseParam>;
 
 class ExportDatabaseUseCase implements ExportDatabase {
   @override
-  Future<Optional<bool>> call(ExportDatabaseParam param) async {
+  Future<Optional<ExportDatabaseResult>> call(ExportDatabaseParam param) async {
     try {
       return sl<KeyValues>().exportDatabase().then((value) => Optional.newValue(true));
     } on Exception catch (e, st) {

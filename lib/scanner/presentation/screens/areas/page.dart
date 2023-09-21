@@ -6,7 +6,6 @@ import 'package:document_scanner/core/toaster/success.dart';
 import 'package:document_scanner/core/widgets/goroute/route.dart';
 import 'package:document_scanner/core/widgets/loading_dialog/loading_dialog.dart';
 import 'package:document_scanner/core/widgets/responsive.dart';
-import 'package:document_scanner/core/widgets/style/round_icon_button.dart';
 import 'package:document_scanner/l10n/app_lang.dart';
 import 'package:document_scanner/scanner/presentation/blocs/areas/bloc.dart';
 import 'package:document_scanner/scanner/presentation/screens/base.dart';
@@ -73,7 +72,7 @@ class _AreasScreenState extends TemplateBaseScreenState<AreasScreen, ItemBloc> {
         physics: const ClampingScrollPhysics(),
         primary: true,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 15),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 15),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -84,6 +83,7 @@ class _AreasScreenState extends TemplateBaseScreenState<AreasScreen, ItemBloc> {
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: formBloc.main.areas.value.length,
                 itemBuilder: (context, index) => TextFieldBlocBuilder(
+                  autofocus: index == formBloc.main.areas.value.length - 1,
                   textFieldBloc: formBloc.main.areas.value[index],
                   decoration: InputDecoration(
                     labelText: AppLang.i18n.areas_areaField_label,
@@ -98,32 +98,41 @@ class _AreasScreenState extends TemplateBaseScreenState<AreasScreen, ItemBloc> {
                   ),
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  RoundIconButton(
-                    icon: ThemeIcons.newPosition,
-                    tooltip: "add",
-                    onPressed: () {
-                      formBloc.main.createItem();
-                      update();
-                    },
-                  ),
-                  Builder(builder: (context) {
-                    final valid = formBloc.state.isValid();
-
-                    return RoundIconButton(
-                      icon: ThemeIcons.send,
-                      tooltip: "send",
-                      backgroundColor:
-                          valid ? nord12AuroraOrange : Theme.of(context).floatingActionButtonTheme.backgroundColor,
-                      onPressed: () => valid ? formBloc.submit() : formBloc.validate(),
-                    );
-                  }),
-                ],
-              ),
             ],
           ),
         ),
       );
+
+  @override
+  List<Widget>? buildPersistentFooterButtons(BuildContext context) {
+    final formBloc = BlocProvider.of<ItemBloc>(context);
+    final valid = formBloc.state.isValid();
+
+    return [
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            FloatingActionButton(
+              heroTag: "areas_btn1",
+              child: Icon(ThemeIcons.newPosition),
+              onPressed: () {
+                formBloc.main.createItem();
+                update();
+
+                // WidgetsBinding.instance.addPostFrameCallback((_) => _focusNode.requestFocus());
+              },
+            ),
+            FloatingActionButton(
+              heroTag: "areas_btn2",
+              backgroundColor: valid ? nord12AuroraOrange : Theme.of(context).floatingActionButtonTheme.backgroundColor,
+              onPressed: () => valid ? formBloc.submit() : formBloc.validate(),
+              child: Icon(ThemeIcons.send),
+            ),
+          ],
+        ),
+      ),
+    ];
+  }
 }

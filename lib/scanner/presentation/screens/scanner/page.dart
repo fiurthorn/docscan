@@ -17,15 +17,16 @@ import 'package:document_scanner/core/widgets/cropper/widget.dart';
 import 'package:document_scanner/core/widgets/goroute/route.dart';
 import 'package:document_scanner/core/widgets/loading_dialog/loading_dialog.dart';
 import 'package:document_scanner/core/widgets/responsive.dart';
-import 'package:document_scanner/core/widgets/style/round_icon_button.dart';
 import 'package:document_scanner/l10n/app_lang.dart';
 import 'package:document_scanner/scanner/domain/repositories/convert.dart';
 import 'package:document_scanner/scanner/presentation/blocs/scanner/bloc.dart';
 import 'package:document_scanner/scanner/presentation/screens/base.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/template_page.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/top_nav.dart';
+import 'package:document_scanner/scanner/presentation/screens/whats_new/page.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pdfx/pdfx.dart';
@@ -101,6 +102,15 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
 
   Widget buildScannerForm(BuildContext context) {
     final formBloc = BlocProvider.of<ScannerBloc>(context);
+
+    if (formBloc.shouldShowWhatsNew()) {
+      SchedulerBinding.instance.addPostFrameCallback(
+        (_) => showDialog(
+          context: context,
+          builder: (context) => const WhatsNew(),
+        ).then((value) => formBloc.closedWhatsNew()),
+      );
+    }
 
     return ResponsiveWidthPadding(
       FormBlocListener<ScannerBloc, String, ErrorValue>(
@@ -243,10 +253,10 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              RoundIconButton(
+              FloatingActionButton(
+                heroTag: "scanner_btn_pdf",
                 onPressed: () => formBloc.createPDF().then((value) => update()),
-                icon: ThemeIcons.filePDF,
-                tooltip: '',
+                child: Icon(ThemeIcons.filePDF),
               ),
             ],
           ),
@@ -259,7 +269,7 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
         physics: const ClampingScrollPhysics(),
         primary: true,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 15),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 15),
           child: Column(
             children: [
               I18nDropDownBlocBuilder(
@@ -300,29 +310,38 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
                       itemBuilder: attachmentItemBuilder(formBloc),
                     );
                   }),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      scannerButton(formBloc),
-                      const SizedBox(width: 8),
-                      filePickerButton(formBloc),
-                      const SizedBox(width: 8),
-                      cameraButton(formBloc),
-                    ],
-                  ),
-                  sendButton(context, formBloc),
-                ],
-              ),
             ],
           ),
         ),
       );
+
+  @override
+  List<Widget>? buildPersistentFooterButtons(BuildContext context) {
+    final formBloc = BlocProvider.of<ScannerBloc>(context);
+    return [
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                scannerButton(formBloc),
+                const SizedBox(width: 8),
+                filePickerButton(formBloc),
+                const SizedBox(width: 8),
+                cameraButton(formBloc),
+              ],
+            ),
+            sendButton(context, formBloc),
+          ],
+        ),
+      ),
+    ];
+  }
 
   void dirty(BuildContext context) {
     final formBloc = BlocProvider.of<ScannerBloc>(context);
@@ -342,17 +361,18 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
     final empty = bloc.main.attachments.value.isEmpty;
     final valid = bloc.state.isValid();
 
-    return RoundIconButton(
+    return FloatingActionButton(
+      heroTag: "scanner_btn_send",
       backgroundColor:
           valid && !empty ? nord12AuroraOrange : Theme.of(context).floatingActionButtonTheme.backgroundColor,
       onPressed: () => valid && !empty ? submit(context) : dirty(context),
-      icon: ThemeIcons.send,
-      tooltip: '',
+      child: Icon(ThemeIcons.send),
     );
   }
 
   Widget scannerButton(ScannerBloc formBloc) {
-    return RoundIconButton(
+    return FloatingActionButton(
+      heroTag: "scanner_btn_scanner",
       onPressed: () async {
         LoadingDialog.show(context);
         CunningDocumentScanner.getPictures().then((value) {
@@ -361,13 +381,13 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
           }
         }).whenComplete(() => LoadingDialog.hide(context));
       },
-      tooltip: "Scan Document",
-      icon: ThemeIcons.scanner,
+      child: Icon(ThemeIcons.scanner),
     );
   }
 
   Widget cameraButton(ScannerBloc formBloc) {
-    return RoundIconButton(
+    return FloatingActionButton(
+      heroTag: "scanner_btn_camera",
       onPressed: () => camera(
         formBloc,
         source: ImageSource.camera,
@@ -375,8 +395,7 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
         maxWidth: 2048,
         imageQuality: 66,
       ),
-      tooltip: "Picture",
-      icon: ThemeIcons.camera,
+      child: Icon(ThemeIcons.camera),
     );
   }
 
@@ -400,7 +419,8 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
   }
 
   Widget filePickerButton(ScannerBloc formBloc) {
-    return RoundIconButton(
+    return FloatingActionButton(
+      heroTag: "scanner_btn_filePicker",
       onPressed: () async {
         LoadingDialog.show(context);
 
@@ -415,8 +435,7 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
           },
         ).whenComplete(() => LoadingDialog.hide(context));
       },
-      tooltip: "Pick Document",
-      icon: ThemeIcons.file,
+      child: Icon(ThemeIcons.file),
     );
   }
 

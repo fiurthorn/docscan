@@ -39,7 +39,6 @@ dependencies:
   intl: any
   mime: ^1.0.4
   mobile_scanner: ^3.3.0
-  once: ^1.5.3
   path: ^1.8.3
   pdf: ^3.10.4
   pdfx: ^2.4.0

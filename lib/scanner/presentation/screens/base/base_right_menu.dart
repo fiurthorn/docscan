@@ -5,6 +5,7 @@ import 'package:document_scanner/core/version.g.dart';
 import 'package:document_scanner/core/widgets/systempanel/systempanel.dart';
 import 'package:document_scanner/l10n/app_lang.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class BaseMenu extends StatelessWidget {
   final Function refresh;
@@ -19,6 +20,14 @@ class BaseMenu extends StatelessWidget {
     this.logout = false,
     super.key,
   });
+
+  void push(BuildContext context, String path) {
+    if (context.canPop()) {
+      context.pushReplacement(path);
+    } else {
+      context.push(path);
+    }
+  }
 
   @override
   Widget build(BuildContext context) => Drawer(

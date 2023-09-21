@@ -16,6 +16,7 @@ ThemeData theme() {
       surface: nord4SnowStorm,
       onSurface: nord1PolarNight,
     ),
+    useMaterial3: false,
     textTheme: Typography.blackMountainView,
   ).copyWith(
     appBarTheme: const AppBarTheme(

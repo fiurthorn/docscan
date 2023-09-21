@@ -6,7 +6,6 @@ import 'package:document_scanner/core/toaster/success.dart';
 import 'package:document_scanner/core/widgets/goroute/route.dart';
 import 'package:document_scanner/core/widgets/loading_dialog/loading_dialog.dart';
 import 'package:document_scanner/core/widgets/responsive.dart';
-import 'package:document_scanner/core/widgets/style/round_icon_button.dart';
 import 'package:document_scanner/l10n/app_lang.dart';
 import 'package:document_scanner/scanner/presentation/blocs/documenttypes/bloc.dart';
 import 'package:document_scanner/scanner/presentation/screens/base.dart';
@@ -73,7 +72,7 @@ class _DocumentTypesState extends TemplateBaseScreenState<DocumentTypesScreen, I
         physics: const ClampingScrollPhysics(),
         primary: true,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 15),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 15),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -85,6 +84,7 @@ class _DocumentTypesState extends TemplateBaseScreenState<DocumentTypesScreen, I
                 itemCount: formBloc.main.documentTypes.value.length,
                 itemBuilder: (context, index) => TextFieldBlocBuilder(
                   textFieldBloc: formBloc.main.documentTypes.value[index],
+                  autofocus: index == formBloc.main.documentTypes.value.length - 1,
                   decoration: InputDecoration(
                     labelText: AppLang.i18n.docTypes_docTypeField_label,
                     hintText: AppLang.i18n.i18n_field_hint,
@@ -98,32 +98,39 @@ class _DocumentTypesState extends TemplateBaseScreenState<DocumentTypesScreen, I
                   ),
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  RoundIconButton(
-                    icon: ThemeIcons.newPosition,
-                    tooltip: "add",
-                    onPressed: () {
-                      formBloc.main.createItem();
-                      update();
-                    },
-                  ),
-                  Builder(builder: (context) {
-                    final valid = formBloc.state.isValid();
-
-                    return RoundIconButton(
-                      icon: ThemeIcons.send,
-                      tooltip: "add",
-                      backgroundColor:
-                          valid ? nord12AuroraOrange : Theme.of(context).floatingActionButtonTheme.backgroundColor,
-                      onPressed: () => valid ? formBloc.submit() : formBloc.validate(),
-                    );
-                  }),
-                ],
-              ),
             ],
           ),
         ),
       );
+
+  @override
+  List<Widget>? buildPersistentFooterButtons(BuildContext context) {
+    final formBloc = BlocProvider.of<ItemBloc>(context);
+    final valid = formBloc.state.isValid();
+
+    return [
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            FloatingActionButton(
+              heroTag: "dt_btn1",
+              child: Icon(ThemeIcons.newPosition),
+              onPressed: () {
+                formBloc.main.createItem();
+                update();
+              },
+            ),
+            FloatingActionButton(
+              heroTag: "dt_btn2",
+              backgroundColor: valid ? nord12AuroraOrange : Theme.of(context).floatingActionButtonTheme.backgroundColor,
+              onPressed: () => valid ? formBloc.submit() : formBloc.validate(),
+              child: Icon(ThemeIcons.send),
+            ),
+          ],
+        ),
+      ),
+    ];
+  }
 }
