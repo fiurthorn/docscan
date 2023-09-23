@@ -1,3 +1,7 @@
+## Version 0.1.4
+
+ad713a1 feat!: restructuring; backbutton close dialog; UX
+
 ## Version 0.1.3
 
 ae5364a refactor: layout, whats new dialog

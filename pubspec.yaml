@@ -3,7 +3,7 @@ description: fiurthorn document scanner
 
 publish_to: "none"
 
-version: 0.1.3+12
+version: 0.1.4+13
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
