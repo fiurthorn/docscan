@@ -1,22 +1,20 @@
 import 'dart:io';
 
-import 'package:document_scanner/core/lib/tuple.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 class FileSource {
   Future<String> assetFileAsString(String asset) async => rootBundle.loadString(asset);
 
-  // TODO
-  List<Tuple2<String, Uint8List>> readFiles(List<String> paths) {
-    final images = paths.map((path) => Tuple2(path, File(path).readAsBytesSync())).toList();
-    for (var path in paths) {
-      File(path).deleteSync();
-    }
-    return images;
+  Uint8List readFile(String path) {
+    final b = File(path).existsSync();
+    return File(path).readAsBytesSync();
   }
 
-  // TODO
+  void deleteFile(String path) {
+    return File(path).deleteSync();
+  }
+
   Future<String> getTempDir() async {
     return Directory.systemTemp.path;
   }
@@ -25,8 +23,7 @@ class FileSource {
     return File(path).writeAsBytesSync(data);
   }
 
-  // TODO
-  Future<Tuple2<String, Uint8List>> readImageFile(XFile file) {
-    return file.readAsBytes().then((value) => Tuple2(file.name, value));
+  Future<Uint8List> readXFile(XFile file) {
+    return file.readAsBytes();
   }
 }

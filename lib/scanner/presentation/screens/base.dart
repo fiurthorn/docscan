@@ -138,6 +138,7 @@ abstract class BaseScreenState<T extends StatefulWidget> extends State<T> {
 
   Future<bool> _onWillPop(BuildContext context) async {
     if (!isMobile || isWeb) return true;
+    if (Navigator.of(context).canPop()) return true;
 
     return await showDialog(
           context: context,

@@ -5,15 +5,16 @@ import 'package:document_scanner/scanner/data/datasources/hive_store/initialize.
 import 'package:document_scanner/scanner/data/datasources/native.dart';
 import 'package:document_scanner/scanner/data/datasources/ocr.dart';
 import 'package:document_scanner/scanner/data/repositories/convert.dart';
-import 'package:document_scanner/scanner/data/repositories/disk_source.dart';
+import 'package:document_scanner/scanner/data/repositories/file_repos.dart';
 import 'package:document_scanner/scanner/data/repositories/key_values.dart';
 import 'package:document_scanner/scanner/data/repositories/media_store.dart';
 import 'package:document_scanner/scanner/data/repositories/pdf.dart';
 import 'package:document_scanner/scanner/domain/repositories/convert.dart';
-import 'package:document_scanner/scanner/domain/repositories/disk_source.dart';
+import 'package:document_scanner/scanner/domain/repositories/file_repos.dart';
 import 'package:document_scanner/scanner/domain/repositories/key_values.dart';
 import 'package:document_scanner/scanner/domain/repositories/media_store.dart';
 import 'package:document_scanner/scanner/domain/repositories/pdf.dart';
+import 'package:document_scanner/scanner/domain/usecases/convert_image.dart';
 import 'package:document_scanner/scanner/domain/usecases/create_pdf_file.dart';
 import 'package:document_scanner/scanner/domain/usecases/export_attachment.dart';
 import 'package:document_scanner/scanner/domain/usecases/export_database.dart';
@@ -35,15 +36,16 @@ Future<GetIt> initServiceLocator() async {
     // repositories
     sl.registerSingletonAsync<KeyValues>(
         () async => KeyValuesImpl(await initHive(await sl<Native>().getAppConfigurationDir())));
-    sl.registerSingletonAsync<DiskSource>(() async => DiskSourceImpl());
+    sl.registerSingletonAsync<FileRepos>(() async => FileReposImpl());
     sl.registerSingletonAsync<PdfCreator>(() async => PdfCreatorImpl());
     sl.registerSingletonAsync<MediaStore>(() async => MediaStoreImpl());
     sl.registerSingletonAsync<ImageConverter>(() async => ImageConverterImpl());
 
     // use cases
     sl.registerLazySingleton<ReadFiles>(() => ReadFilesUseCase());
-    sl.registerLazySingleton<CreatePdfFile>(() => CreatePdfFileUseCase());
     sl.registerLazySingleton<RotateImage>(() => RotateImageUseCase());
+    sl.registerLazySingleton<ConvertImage>(() => ConvertImageUseCase());
+    sl.registerLazySingleton<CreatePdfFile>(() => CreatePdfFileUseCase());
     sl.registerLazySingleton<LoadListItems>(() => LoadListItemsUseCase());
     sl.registerLazySingleton<ExportDatabase>(() => ExportDatabaseUseCase());
     sl.registerLazySingleton<StoreListItems>(() => StoreListItemsUseCase());

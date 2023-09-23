@@ -7,20 +7,20 @@ import 'package:flutter/foundation.dart';
 
 export 'call.dart';
 
-class ReadFilesParam {
-  final List<String> path;
+class ReadFileParam {
+  final String path;
 
-  ReadFilesParam(this.path);
+  ReadFileParam(this.path);
 }
 
-typedef ReadFilesResult = List<Tuple2<String, Uint8List>>;
-typedef ReadFiles = UseCase<ReadFilesResult, ReadFilesParam>;
+typedef ReadFileResult = Tuple2<String, Uint8List>;
+typedef ReadFile = UseCase<ReadFileResult, ReadFileParam>;
 
-class ReadFilesUseCase implements ReadFiles {
+class ReadFilesUseCase implements ReadFile {
   @override
-  Future<Optional<ReadFilesResult>> call(ReadFilesParam param) async {
+  Future<Optional<ReadFileResult>> call(ReadFileParam param) async {
     try {
-      return Optional.newValue(sl<FileRepos>().readFiles(param.path));
+      return Optional.newValue(sl<FileRepos>().readFile(param.path));
     } on Exception catch (e, st) {
       return Optional.newError(e, st);
     }

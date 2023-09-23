@@ -25,6 +25,7 @@ import 'package:document_scanner/scanner/presentation/screens/base/template_page
 import 'package:document_scanner/scanner/presentation/screens/base/top_nav.dart';
 import 'package:document_scanner/scanner/presentation/screens/whats_new/page.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
@@ -134,7 +135,9 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
         child: Builder(builder: (context) {
           if (formBloc.scannedImages.value.isNotEmpty) {
             return buildImageEnhancementViewer(context, formBloc);
-          } else if (formBloc.displayCropper.value) {
+          }
+
+          if (formBloc.displayCropper.value) {
             return cropper(context);
           }
 
@@ -198,37 +201,23 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
                     });
               }),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              IconButton(
-                icon: Icon(ThemeIcons.counterClockwise),
-                onPressed: () {
-                  formBloc.counterClockwise();
-                  update();
-                },
-              ),
-              IconButton(
-                icon: Icon(ThemeIcons.clockwise),
-                onPressed: () {
-                  formBloc.clockwise();
-                  update();
-                },
-              ),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: 400,
-          width: 400,
+        Expanded(
+          // height: 400,
+          //width: 400,
           child: PhotoViewGallery.builder(
             scrollPhysics: const BouncingScrollPhysics(),
             builder: (BuildContext context, int index) {
-              return PhotoViewGalleryPageOptions(
-                imageProvider: MemoryImage(formBloc.convertedImage(index)),
-                initialScale: PhotoViewComputedScale.contained * 0.8,
+              return PhotoViewGalleryPageOptions.customChild(
+                child: FutureBuilder<Uint8List>(
+                  future: formBloc.convertedImage(index),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    return Image.memory(snapshot.data!);
+                  },
+                ),
+                //initialScale: PhotoViewComputedScale.contained * 0.8,
                 heroAttributes: PhotoViewHeroAttributes(tag: index),
               );
             },
@@ -247,20 +236,6 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              FloatingActionButton(
-                heroTag: "scanner_btn_pdf",
-                onPressed: () => formBloc.createPDF().then((value) => update()),
-                child: Icon(ThemeIcons.filePDF),
-              ),
-            ],
-          ),
-        )
       ],
     );
   }
@@ -318,6 +293,50 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
   @override
   List<Widget>? buildPersistentFooterButtons(BuildContext context) {
     final formBloc = BlocProvider.of<ScannerBloc>(context);
+
+    if (formBloc.displayCropper.value) {
+      return null;
+    }
+
+    if (formBloc.scannedImages.value.isNotEmpty) {
+      return [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                FloatingActionButton(
+                  heroTag: "scanner_counterClockwise_pdf",
+                  child: Icon(ThemeIcons.counterClockwise),
+                  onPressed: () {
+                    formBloc.counterClockwise();
+                    update();
+                  },
+                ),
+                const SizedBox(
+                  width: 20,
+                ),
+                FloatingActionButton(
+                  heroTag: "scanner_clockwise_pdf",
+                  child: Icon(ThemeIcons.clockwise),
+                  onPressed: () {
+                    formBloc.clockwise();
+                    update();
+                  },
+                ),
+              ],
+            ),
+            FloatingActionButton(
+              heroTag: "scanner_btn_pdf",
+              onPressed: () => formBloc.createPDF().then((value) => update()),
+              child: Icon(ThemeIcons.filePDF),
+            ),
+          ],
+        )
+      ];
+    }
+
     return [
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),

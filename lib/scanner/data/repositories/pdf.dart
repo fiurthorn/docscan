@@ -25,11 +25,7 @@ class PdfCreatorImpl implements PdfCreator {
       final ocr = await sl<Ocr>().ocr(image.path);
 
       Log.high("ratio ${src.width! > src.height! ? src.width! / src.height! : src.height! / src.width!}");
-      final text = ocrContent(
-        ocr,
-        (src.height! / 80) * 0.8,
-      );
-      final page = composePage(src, text);
+      final page = composePage(src, ocr);
 
       pdf.addPage(page);
     }
@@ -37,12 +33,18 @@ class PdfCreatorImpl implements PdfCreator {
     return pdf.save();
   }
 
-  pw.Page composePage(pw.MemoryImage src, pw.Text text) {
+  pw.Page composePage(pw.MemoryImage src, String ocr) {
+    final pageFormat = this.pageFormat(src);
+    final text = ocrContent(
+      ocr,
+      pageFormat.height * 0.008,
+    );
+
     return pw.Page(
-      pageFormat: pageFormat(src),
+      pageFormat: pageFormat,
       build: (pw.Context context) => pw.Stack(
         children: [
-          pw.Padding(padding: pw.EdgeInsets.all(src.height! / 20.0), child: text),
+          pw.Padding(padding: pw.EdgeInsets.all(pageFormat.height * 0.9), child: text),
           pw.Image(src, fit: pw.BoxFit.fill),
         ],
       ),

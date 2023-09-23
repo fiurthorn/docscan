@@ -7,7 +7,7 @@ import 'package:image/image.dart' as img;
 
 class ImageConverterImpl implements ImageConverter {
   @override
-  Uint8List convertImage(
+  Future<Uint8List> convertImage(
     String converter,
     Tuple2<String, Uint8List> item, {
     double amount = 1,
@@ -16,7 +16,7 @@ class ImageConverterImpl implements ImageConverter {
     final path = item.a;
     final image = item.b;
 
-    Uint8List cachedImage;
+    Future<Uint8List> cachedImage;
     switch (converter) {
       case original:
         cachedImage = convertToResize(image);
@@ -34,44 +34,59 @@ class ImageConverterImpl implements ImageConverter {
         cachedImage = convertToResize(image);
     }
 
-    sl<FileSource>().writeImageFile(path, cachedImage);
-    return cachedImage;
+    return cachedImage.then((value) {
+      sl<FileSource>().writeImageFile(path, value);
+      return value;
+    });
   }
 
-  img.Image _load(Uint8List src) {
-    return img.JpegDecoder().decode(src)!;
+  img.Command _load(Uint8List input) {
+    return img.Command()..decodeJpg(input);
   }
 
-  Uint8List _resize(img.Image src) {
-    return img.JpegEncoder(quality: 75).encode(src);
+  Future<Uint8List> _store(img.Command command) {
+    return img
+        .executeCommandBytesAsync(
+          command..encodeJpg(quality: 75),
+        )
+        .then((value) => value!);
   }
 
-  Uint8List convertToResize(Uint8List input) {
-    return _resize(_load(input));
+  Future<Uint8List> convertToResize(Uint8List input) {
+    return _store(_load(input));
   }
 
-  Uint8List convertToGreyScale(Uint8List input) {
-    return _resize(
-      img.grayscale(_load(input)),
+  Future<Uint8List> convertToGreyScale(Uint8List input) {
+    return _store(_load(input)..grayscale());
+  }
+
+  Future<Uint8List> convertToMonochrome(Uint8List input, {double amount = 1}) {
+    return _store(
+      _load(input)
+        ..monochrome(
+          color: img.ColorInt16.rgb(0, 0, 0),
+          amount: amount,
+        ),
     );
   }
 
-  Uint8List convertToMonochrome(Uint8List input, {double amount = 1}) {
-    return _resize(
-      img.monochrome(_load(input), color: img.ColorInt16.rgb(0, 0, 0), amount: amount),
-    );
-  }
-
-  Uint8List convertToLuminance(Uint8List input, {double threshold = 0.5}) {
-    return _resize(
-      img.luminanceThreshold(_load(input), threshold: threshold, outputColor: false),
+  Future<Uint8List> convertToLuminance(Uint8List input, {double threshold = 0.5}) {
+    return _store(
+      _load(input)
+        ..luminanceThreshold(
+          threshold: threshold,
+          outputColor: false,
+        ),
     );
   }
 
   @override
-  Uint8List rotate(Uint8List input, bool counterClockwise) {
-    return _resize(
-      img.copyRotate(_load(input), angle: counterClockwise ? 90.0 : -90.0),
+  Future<Uint8List> rotate(Uint8List input, bool counterClockwise) {
+    return _store(
+      _load(input)
+        ..copyRotate(
+          angle: counterClockwise ? 90.0 : -90.0,
+        ),
     );
   }
 }

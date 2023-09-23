@@ -24,11 +24,11 @@ class Native {
   String get prefix => kReleaseMode ? "" : "!";
   String get name => "docscan";
 
-  Future<dynamic> saveFileInMediaStore(String input, String folder, String fileName) async {
+  Future<bool> saveFileInMediaStore(String input, String folder, String fileName) async {
     return platform.invokeMethod('saveFileInMediaStore', {
       "input": input,
       "folder": "$prefix$name/$folder",
       "fileName": fileName,
-    });
+    }).then((value) => value as bool);
   }
 }

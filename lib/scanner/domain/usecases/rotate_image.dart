@@ -20,7 +20,7 @@ class RotateImageUseCase implements RotateImage {
   @override
   Future<Optional<RotateImageResult>> call(RotateImageParam param) async {
     try {
-      return Optional.newValue(sl<ImageConverter>().rotate(param.image, param.counterClockwise));
+      return sl<ImageConverter>().rotate(param.image, param.counterClockwise).then((value) => Optional.newValue(value));
     } on Exception catch (e, st) {
       return Optional.newError(e, st);
     }

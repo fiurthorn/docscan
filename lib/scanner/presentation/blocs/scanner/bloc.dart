@@ -8,9 +8,10 @@ import 'package:document_scanner/core/widgets/bloc_builder/dropdown.dart';
 import 'package:document_scanner/core/widgets/bloc_builder/i18n_dropdown.dart';
 import 'package:document_scanner/core/widgets/blocs/datetime.dart';
 import 'package:document_scanner/core/widgets/goroute/route.dart';
-import 'package:document_scanner/scanner/data/datasources/file_source.dart';
 import 'package:document_scanner/scanner/domain/repositories/convert.dart';
+import 'package:document_scanner/scanner/domain/repositories/file_repos.dart';
 import 'package:document_scanner/scanner/domain/repositories/key_values.dart';
+import 'package:document_scanner/scanner/domain/usecases/convert_image.dart';
 import 'package:document_scanner/scanner/domain/usecases/create_pdf_file.dart';
 import 'package:document_scanner/scanner/domain/usecases/export_attachment.dart';
 import 'package:document_scanner/scanner/domain/usecases/load_list_items.dart';
@@ -106,21 +107,19 @@ class ScannerBloc extends FormBloc<String, ErrorValue> implements GoRouteAware {
     ];
   }
 
-  Uint8List convertedImage(int index) {
+  Future<Uint8List> convertedImage(int index) {
     if (cachedImages[index] == null) {
       emitLoading();
 
-      cachedImages[index] = sl<ImageConverter>().convertImage(
-        converter.value!.technical,
-        scannedImages.value[index],
+      return usecase<ConvertImageResult, ConvertImageParam>(ConvertImageParam(
+        converter: converter.value!.technical,
+        item: scannedImages.value[index],
         amount: amount.value,
         threshold: threshold.value,
-      );
-
-      emitLoaded();
+      )).then((value) => cachedImages[index] = value).then((_) => emitLoaded()).then((_) => cachedImages[index]!);
     }
 
-    return cachedImages[index]!;
+    return Future.sync(() => cachedImages[index]!);
   }
 
   updateReceiverNames() => main.updateReceiverNames();
@@ -132,7 +131,7 @@ class ScannerBloc extends FormBloc<String, ErrorValue> implements GoRouteAware {
 
     final pdfImageData = <Tuple2<String, Uint8List>>[];
     for (var i = 0, len = scannedImages.value.length; i < len; i++) {
-      final image = convertedImage(i);
+      final image = await convertedImage(i);
       pdfImageData.add(Tuple2(scannedImages.value[i].a, image));
     }
 
@@ -163,22 +162,28 @@ class ScannerBloc extends FormBloc<String, ErrorValue> implements GoRouteAware {
     clearImageCache();
   }
 
-  void counterClockwise() {
-    final current = scannedImages.value[currentImage];
-    final filename = current.a;
-    usecase<Uint8List, RotateImageParam>(RotateImageParam(current.b, true)).then((value) {
-      scannedImages.value[currentImage] = Tuple2(filename, value);
-      clearImageCache();
-    });
-  }
+  void counterClockwise() => _rotate(true);
 
-  void clockwise() {
+  void clockwise() => _rotate(false);
+
+  void _rotate(bool counterClockwise) {
+    emitLoading();
+
     final current = scannedImages.value[currentImage];
     final filename = current.a;
-    usecase<Uint8List, RotateImageParam>(RotateImageParam(current.b, false)).then((value) {
-      scannedImages.value[currentImage] = Tuple2(filename, value);
-      clearImageCache();
-    });
+    usecase<Uint8List, RotateImageParam>(RotateImageParam(current.b, true))
+        .then((value) {
+          scannedImages.value[currentImage] = Tuple2(filename, value);
+        })
+        .then((_) => clearImageCache())
+        .then((_) => usecase<ConvertImageResult, ConvertImageParam>(ConvertImageParam(
+              converter: converter.value!.technical,
+              item: scannedImages.value[currentImage],
+              amount: amount.value,
+              threshold: threshold.value,
+            )))
+        .then((value) => cachedImages[currentImage] = value)
+        .then((_) => emitLoaded());
   }
 
   void amountChanged(double value) {
@@ -191,7 +196,7 @@ class ScannerBloc extends FormBloc<String, ErrorValue> implements GoRouteAware {
       return;
     }
 
-    final content = await sl<FileSource>().readImageFile(file);
+    final content = await sl<FileRepos>().readXFile(file);
     cropperFilename = content.a;
     cropperImage = content.b;
     displayCropper.changeValue(true);
