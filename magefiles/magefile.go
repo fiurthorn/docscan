@@ -2,6 +2,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"fmt"
 	"os"
 	"os/exec"
@@ -66,6 +67,10 @@ func BuildAppBundle() (err error) {
 // call the dart build runner
 func BuildRunner() error {
 	return mage.NewTask("dart", "run", "build_runner", "build", "--delete-conflicting-outputs").Run()
+}
+
+func DartAnalyse() error {
+	return mage.NewTask("dart", "analyze", "--fatal-infos").Run()
 }
 
 // run pub get to pre-compile executables
@@ -547,6 +552,10 @@ func GitChangelog() (err error) {
 }
 
 func SetVersion(version string) (err error) {
+	if err = DartAnalyse(); err != nil {
+		return
+	}
+
 	pat, err := regexp.Compile("[0-9]+.[0-9]+.[0-9]+")
 	if err != nil {
 		return
@@ -630,4 +639,20 @@ func gitVersion() (string, error) {
 		_gitVersion = strings.Replace(gv, "-", "+", 1)
 	}
 	return _gitVersion, err
+}
+
+func Base64Decode(envName, output string) (err error) {
+	content, ok := os.LookupEnv(envName)
+	if !ok || len(content) == 0 {
+		err = fmt.Errorf("env %s not found", envName)
+		return
+	}
+
+	data, err := base64.RawStdEncoding.DecodeString(content)
+	if err != nil {
+		return
+	}
+
+	err = os.WriteFile(output, data, 0666)
+	return
 }

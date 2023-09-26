@@ -17,6 +17,8 @@ class WhatsNew extends StatelessWidget {
             padding: const EdgeInsets.all(20.0),
             child: WhatsNewList(
               items: [
+                HeadingItem("v0.1.5"),
+                MessageItem("Packaging", "CI/CD Build und Packaging"),
                 HeadingItem("v0.1.4"),
                 MessageItem("Layout", "Buttons neu ausgerichtet"),
                 MessageItem("Back", "Zurück schließt den Dialog nicht die App"),

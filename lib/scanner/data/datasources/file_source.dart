@@ -7,7 +7,6 @@ class FileSource {
   Future<String> assetFileAsString(String asset) async => rootBundle.loadString(asset);
 
   Uint8List readFile(String path) {
-    final b = File(path).existsSync();
     return File(path).readAsBytesSync();
   }
 
