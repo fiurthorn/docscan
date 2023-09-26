@@ -54,16 +54,16 @@ jobs:
           echo 'keyPassword=${{secrets.KEYSTORE_KEY_PASSWORD}}' >> $KEYSTORE_PROPERTIES_PATH
 
       - name: Build APK
-        run: flutter build --flavor prod appbundle
+        run: flutter build apk --flavor prod
 
       - name: Build AppBundle
-        run: flutter build --flavor prod apk
+        run: flutter build appbundle --flavor prod
 
       - name: Keep apk
         uses: actions/upload-artifact@v3
         with:
           name: android apk
-          path: ${{github.workspace}}build/app/outputs/apk/prod/release/app-prod-release.apk
+          path: ${{github.workspace}}/build/app/outputs/flutter-apk/app-prod-release.apk
 
       - name: Keep appbundle
         uses: actions/upload-artifact@v3
@@ -79,5 +79,5 @@ jobs:
           status: completed
           releaseFiles: ${{github.workspace}}/build/app/outputs/bundle/prodRelease/app-prod-release.aab
           serviceAccountJsonPlainText: "${{secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_KEY_JSON}}"
-          mappingFile: ${{github.workspace}}/build/outputs/mapping/prodRelease/mapping.txt
+          mappingFile: ${{github.workspace}}/build/app/outputs/mapping/prodRelease/mapping.txt
           debugSymbols: ${{github.workspace}}/build/app/intermediates/merged_native_libs/prodRelease/out/lib

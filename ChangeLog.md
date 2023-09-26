@@ -1,3 +1,7 @@
+## Version 0.1.5
+
+3818d0d refactor: building and packaging
+
 ## Version 0.1.4
 
 ad713a1 feat!: restructuring; backbutton close dialog; UX
