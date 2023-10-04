@@ -15,6 +15,15 @@
 			"program": "lib/main.dart",
 		},
 		{
+			"name": "android-select",
+			"type": "dart",
+			"request": "launch",
+			"args": [
+				"--flavor=dev",
+			],
+			"program": "lib/main.dart",
+		},
+		{
 			"name": "test.dart",
 			"type": "dart",
 			"request": "launch",

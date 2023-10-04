@@ -2,6 +2,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/base64"
 	"fmt"
 	"os"
@@ -50,7 +51,7 @@ func AdbQrcode(port string) (err error) {
 }
 
 func OptimizePng() (err error) {
-	err = mage.NewTask("find", "android", "icons", "-name", "*.png", "-exec", "zopflipng", "-m", "-y", "{}", "{}", ";").WorkingDir(".").Run()
+	err = mage.NewTask("find", "images", "-name", "*.png", "-exec", "zopflipng", "-m", "-y", "{}", "{}", ";").WorkingDir(".").Run()
 	return
 }
 
@@ -529,7 +530,24 @@ func writeChangelog(path, changelog, version string) (err error) {
 		return
 	}
 
-	os.WriteFile(path, []byte("## Version "+version+"\n\n"+changelog+"\n"+string(previous)), 0666)
+	output := bytes.Buffer{}
+	lines := strings.Split(changelog, "\n")
+	for _, line := range lines {
+		if len(line) > 0 {
+			line = line[8:]
+			if strings.Contains(line, ":") {
+				parts := strings.SplitN(line, ":", 2)
+				if len(parts) == 2 {
+					line = strings.TrimSpace(parts[1])
+				}
+			}
+			output.WriteString("- ")
+			output.WriteString(line)
+			output.WriteRune('\n')
+		}
+	}
+
+	os.WriteFile(path, []byte("## v"+version+"\n\n"+output.String()+"\n"+string(previous)), 0666)
 
 	return
 }
@@ -546,7 +564,24 @@ func GitChangelog() (err error) {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(changeLogBytes))
+
+	output := bytes.Buffer{}
+	lines := strings.Split(string(changeLogBytes), "\n")
+	for _, line := range lines {
+		if len(line) > 0 {
+			line = line[8:]
+			if strings.Contains(line, ":") {
+				parts := strings.SplitN(line, ":", 2)
+				if len(parts) == 2 {
+					line = strings.TrimSpace(parts[1])
+				}
+			}
+			output.WriteString("- ")
+			output.WriteString(line)
+			output.WriteRune('\n')
+		}
+	}
+	fmt.Println(output.String())
 
 	return
 }

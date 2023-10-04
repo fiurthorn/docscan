@@ -76,7 +76,7 @@ jobs:
         with:
           packageName: docscan.fiurthorn.software.prod
           track: internal
-          status: completed
+          status: draft
           releaseFiles: ${{github.workspace}}/build/app/outputs/bundle/prodRelease/app-prod-release.aab
           serviceAccountJsonPlainText: "${{secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_KEY_JSON}}"
           mappingFile: ${{github.workspace}}/build/app/outputs/mapping/prodRelease/mapping.txt
