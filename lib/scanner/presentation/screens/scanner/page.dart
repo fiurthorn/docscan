@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:cunning_document_scanner/cunning_document_scanner.dart';
 import 'package:document_scanner/core/design/theme_colors.dart';
 import 'package:document_scanner/core/design/theme_icons.dart';
@@ -52,12 +50,6 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
           onSuccess: (context, state) {
             LoadingDialog.hide(context);
             showSnackBarSuccess(context, "scanner", "${state.successResponse}");
-            // context.go(ScannerScreen.path);
-          },
-          onUpdateState: (context, state) {
-            // trace(state.parameter.scannedImages, "sci3");
-            // LoadingDialog.hide(context);
-            // update();
           },
           onFailure: (context, state) {
             LoadingDialog.hide(context);
@@ -92,7 +84,6 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
               child: Center(
                 child: Icon(
                   ThemeIcons.close,
-                  //color: themeGrey4Color,
                 ),
               ),
             ),
@@ -228,7 +219,7 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
               children: [
                 FloatingActionButton(
                   heroTag: "scanner_counterClockwise_pdf",
-                  onPressed: bloc.counterClockwise,
+                  onPressed: bloc.working.value! ? null : bloc.counterClockwise,
                   child: Icon(ThemeIcons.counterClockwise),
                 ),
                 const SizedBox(
@@ -236,14 +227,14 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
                 ),
                 FloatingActionButton(
                   heroTag: "scanner_clockwise_pdf",
-                  onPressed: bloc.clockwise,
+                  onPressed: bloc.working.value! ? null : bloc.clockwise,
                   child: Icon(ThemeIcons.clockwise),
                 ),
               ],
             ),
             FloatingActionButton(
               heroTag: "scanner_btn_pdf",
-              onPressed: () => bloc.createPDF(), // .then((value) => update()),
+              onPressed: () => bloc.working.value! ? null : bloc.createPDF(),
               child: Icon(ThemeIcons.filePDF),
             ),
           ],
@@ -283,8 +274,6 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
   void dirty(BuildContext context) {
     if (bloc.attachments.controls.isEmpty) {
       showSnackBarSignal(context, "create (dirty)", AppLang.i18n.scanner_noAttachment_hint);
-      // } else {
-      // showSnackBarFailure(context, "create pre send (dirty)", "missing required values");
     }
 
     bloc.validate();
@@ -327,12 +316,12 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
             .pickFiles(
               allowMultiple: false,
               dialogTitle: "Choose a file",
-            ) //
+            )
             .then((result) => result?.files.single.path)
             .then(
           (path) {
             if (path != null) {
-              bloc.uploadAttachment(path, File(path).readAsBytesSync());
+              bloc.uploadFile(path);
             }
           },
         ).whenComplete(() => LoadingDialog.hide(context));
@@ -398,14 +387,26 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
             onChanged: bloc.updateConverter,
           ),
           Visibility(
-              visible: bloc.converter.value?.technical == monochrome,
-              child: Slider(value: bloc.state.parameter.amount, divisions: 20, onChanged: bloc.amountChanged)),
+            visible: bloc.converter.value?.technical == monochrome,
+            child: ReactiveSlider(
+              formControl: bloc.amount,
+              min: 0,
+              max: 1,
+              divisions: 20,
+              onChanged: (value) => bloc.amountChanged(),
+            ),
+          ),
           Visibility(
-              visible: bloc.converter.value?.technical == luminance,
-              child: Slider(value: bloc.state.parameter.threshold, divisions: 20, onChanged: bloc.thresholdChanged)),
+            visible: bloc.converter.value?.technical == luminance,
+            child: ReactiveSlider(
+              formControl: bloc.threshold,
+              min: 0,
+              max: 1,
+              divisions: 20,
+              onChanged: (value) => bloc.thresholdChanged(),
+            ),
+          ),
           Expanded(
-            // height: 400,
-            //width: 400,
             child: PhotoViewGallery.builder(
               scrollPhysics: const BouncingScrollPhysics(),
               builder: (BuildContext context, int index) {
@@ -419,7 +420,6 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
                       return Image.memory(snapshot.data!);
                     },
                   ),
-                  //initialScale: PhotoViewComputedScale.contained * 0.8,
                   heroAttributes: PhotoViewHeroAttributes(tag: index),
                 );
               },

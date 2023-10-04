@@ -35,6 +35,7 @@ class ReactiveAutocomplete<T extends Object> extends StatelessWidget {
           controller: textEditingController,
           decoration: decoration,
           enableSuggestions: enableSuggestions,
+          onSubmitted: (control) => onFieldSubmitted(),
         );
       },
     );

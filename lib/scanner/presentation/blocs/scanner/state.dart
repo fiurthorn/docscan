@@ -14,8 +14,8 @@ class StateParameter extends Equatable {
   final List<Tuple2<String, Uint8List>> scannedImages;
   final List<Uint8List?> cachedImages;
 
-  final double amount;
-  final double threshold;
+//   final double amount;
+//   final double threshold;
   final int currentScannedImage;
 
   const StateParameter({
@@ -29,8 +29,8 @@ class StateParameter extends Equatable {
     this.cropperImage,
     this.scannedImages = const [],
     this.cachedImages = const [],
-    this.amount = 1.0,
-    this.threshold = 0.5,
+    // this.amount = 1.0,
+    // this.threshold = 0.5,
     this.currentScannedImage = 0,
   });
 
@@ -45,8 +45,8 @@ class StateParameter extends Equatable {
     Uint8List? cropperImage,
     List<Tuple2<String, Uint8List>>? scannedImages,
     List<Uint8List?>? cachedImages,
-    double? amount,
-    double? threshold,
+    // double? amount,
+    // double? threshold,
     int? currentScannedImage,
   }) {
     return StateParameter(
@@ -60,8 +60,8 @@ class StateParameter extends Equatable {
       cropperImage: cropperImage ?? this.cropperImage,
       scannedImages: scannedImages ?? this.scannedImages,
       cachedImages: cachedImages ?? this.cachedImages,
-      amount: amount ?? this.amount,
-      threshold: threshold ?? this.threshold,
+      //   amount: amount ?? this.amount,
+      //   threshold: threshold ?? this.threshold,
       currentScannedImage: currentScannedImage ?? this.currentScannedImage,
     );
   }
@@ -78,8 +78,8 @@ class StateParameter extends Equatable {
         cropperImage,
         cachedImages,
         scannedImages,
-        amount,
-        threshold,
+        // amount,
+        // threshold,
         currentScannedImage,
       ];
 
