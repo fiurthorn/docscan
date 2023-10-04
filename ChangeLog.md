@@ -1,3 +1,9 @@
+## v0.1.6
+
+- disable controls when convert images.
+- moved from FormBloc to ReactiveForms
+- android packaging
+
 ## v0.1.5
 
 - building and packaging
