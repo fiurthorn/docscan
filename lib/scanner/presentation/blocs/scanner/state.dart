@@ -1,120 +1,108 @@
-part of "bloc.dart";
+part of 'bloc.dart';
 
-class FileAttachment extends Tuple3<String, Uint8List, int> {
-  String get name => a;
-  Uint8List get data => b;
-  int get size => c;
+class StateParameter extends Equatable {
+  final bool showCropper;
+  final bool showScanner;
 
-  const FileAttachment(String name, Uint8List data, int size) : super(name, data, size);
+  final List<I18nLabel> areaItems;
+  final List<String> senderItems;
+  final List<I18nLabel> receiverItems;
+  final List<I18nLabel> docTypeItems;
+
+  final String? cropperFilename;
+  final Uint8List? cropperImage;
+  final List<Tuple2<String, Uint8List>> scannedImages;
+  final List<Uint8List?> cachedImages;
+
+  final double amount;
+  final double threshold;
+  final int currentScannedImage;
+
+  const StateParameter({
+    this.showCropper = false,
+    this.showScanner = false,
+    this.areaItems = const [],
+    this.senderItems = const [],
+    this.receiverItems = const [],
+    this.docTypeItems = const [],
+    this.cropperFilename,
+    this.cropperImage,
+    this.scannedImages = const [],
+    this.cachedImages = const [],
+    this.amount = 1.0,
+    this.threshold = 0.5,
+    this.currentScannedImage = 0,
+  });
+
+  StateParameter copyWith({
+    bool? showCropper,
+    bool? showScanner,
+    List<I18nLabel>? areaItems,
+    List<String>? senderItems,
+    List<I18nLabel>? receiverItems,
+    List<I18nLabel>? docTypeItems,
+    String? cropperFilename,
+    Uint8List? cropperImage,
+    List<Tuple2<String, Uint8List>>? scannedImages,
+    List<Uint8List?>? cachedImages,
+    double? amount,
+    double? threshold,
+    int? currentScannedImage,
+  }) {
+    return StateParameter(
+      showCropper: showCropper ?? this.showCropper,
+      showScanner: showScanner ?? this.showScanner,
+      areaItems: areaItems ?? this.areaItems,
+      senderItems: senderItems ?? this.senderItems,
+      receiverItems: receiverItems ?? this.receiverItems,
+      docTypeItems: docTypeItems ?? this.docTypeItems,
+      cropperFilename: cropperFilename ?? this.cropperFilename,
+      cropperImage: cropperImage ?? this.cropperImage,
+      scannedImages: scannedImages ?? this.scannedImages,
+      cachedImages: cachedImages ?? this.cachedImages,
+      amount: amount ?? this.amount,
+      threshold: threshold ?? this.threshold,
+      currentScannedImage: currentScannedImage ?? this.currentScannedImage,
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+        showCropper,
+        showScanner,
+        areaItems,
+        senderItems,
+        receiverItems,
+        docTypeItems,
+        cropperFilename,
+        cropperImage,
+        cachedImages,
+        scannedImages,
+        amount,
+        threshold,
+        currentScannedImage,
+      ];
+
+  List<String> filterSenderItems(String text) {
+    if (text.isEmpty) {
+      return senderItems;
+    } else {
+      return senderItems.where((element) => element.toLowerCase().contains(text.toLowerCase())).toList();
+    }
+  }
 }
 
-typedef AttachmentState
-    = SingleFieldBloc<FileAttachment, dynamic, FieldBlocState<FileAttachment, dynamic, dynamic>, dynamic>;
+class FileAttachment extends Equatable {
+  final String name;
+  final Uint8List data;
+  final int size;
 
-class AttachState extends GroupFieldBloc<FieldBloc, dynamic> {
-  ListFieldBloc<AttachmentState, String> get attachments =>
-      state.fieldBlocs["attachments"] as ListFieldBloc<AttachmentState, String>;
+  const FileAttachment(this.name, this.data, this.size);
 
-  SelectFieldBloc<I18nLabel, dynamic> get documentType =>
-      state.fieldBlocs["documentType"] as SelectFieldBloc<I18nLabel, dynamic>;
-
-  SelectFieldBloc<I18nLabel, dynamic> get area => state.fieldBlocs["area"] as SelectFieldBloc<I18nLabel, dynamic>;
-
-  TextFieldBloc<String> get senderName => state.fieldBlocs["senderName"] as TextFieldBloc<String>;
-
-  SelectFieldBloc<DropDownEntry, dynamic> get receiverName =>
-      state.fieldBlocs["receiverName"] as SelectFieldBloc<DropDownEntry, dynamic>;
-
-  DateTimeBloc get documentDate => state.fieldBlocs["documentDate"] as DateTimeBloc;
-
-  AttachState()
-      : super(name: "main", fieldBlocs: [
-          ListFieldBloc<AttachmentState, String>(name: "attachments"),
-          SelectFieldBloc<I18nLabel, dynamic>(
-            name: "area",
-            validators: [notEmptyObject()],
-          ),
-          SelectFieldBloc<I18nLabel, dynamic>(
-            name: "documentType",
-            validators: [notEmptyObject()],
-          ),
-          TextFieldBloc<String>(
-            name: "senderName",
-            validators: [notEmpty()],
-            suggestions: senderNames,
-          ),
-          SelectFieldBloc<DropDownEntry, dynamic>(
-            name: "receiverName",
-            validators: [notEmptyObject()],
-          ),
-          DateTimeBloc.create(name: "documentDate", validators: [notEmpty()]),
-        ]) {
-    attachments.emit(attachments.state.copyWith(isValidating: false));
-
-    updateReceiverNames();
-    updateDocumentTypeItems();
-    updateAreaItems();
-  }
-
-  updateReceiverNames() => receiverNameItems().then((value) => receiverName.updateItems(value));
-  updateDocumentTypeItems() => documentTypeItems().then((value) => documentType.updateItems(value));
-  updateAreaItems() => areaItems().then((value) => area.updateItems(value));
-
-  void uploadAttachment(String filename, Uint8List bytes) {
-    final value = FileAttachment(filename, bytes, bytes.length);
-    final attachment = InputFieldBloc<FileAttachment, dynamic>(initialValue: value);
-    attachments.addFieldBloc(attachment);
-  }
-
-  void removeAttachment(int index) {
-    attachments.removeFieldBlocAt(index);
-  }
-
-  static int compare(String a, String b) => a.toLowerCase().compareTo(b.toLowerCase());
-  static int compareLabel(I18nLabel a, I18nLabel b) => a.label.toLowerCase().compareTo(b.label.toLowerCase());
-  static int compareEntry(DropDownEntry a, DropDownEntry b) => a.label.toLowerCase().compareTo(b.label.toLowerCase());
-
-  static Future<List<String>> senderNames(String pattern) async {
-    return usecase<LoadListItemsResult, LoadListItemsParam>(LoadListItemsParam(KeyValueNames.senderNames)).then(
-      (value) => value
-          .where(
-            (element) => element.toLowerCase().contains(pattern.toLowerCase()),
-          )
-          .toList()
-        ..sort(compare),
-    );
-  }
-
-  static Future<List<DropDownEntry>> receiverNameItems() async {
-    return usecase<LoadListItemsResult, LoadListItemsParam>(LoadListItemsParam(KeyValueNames.receiverNames)).then(
-      (value) => value
-          .map(
-            (element) => DropDownEntry.build(label: element),
-          )
-          .toList()
-        ..sort(compareEntry),
-    );
-  }
-
-  static Future<List<I18nLabel>> documentTypeItems() async {
-    return usecase<LoadListItemsResult, LoadListItemsParam>(LoadListItemsParam(KeyValueNames.documentTypes)).then(
-      (value) => value
-          .map(
-            (element) => I18nLabel.build(label: element),
-          )
-          .toList()
-        ..sort(compareLabel),
-    );
-  }
-
-  static Future<List<I18nLabel>> areaItems() async {
-    return usecase<LoadListItemsResult, LoadListItemsParam>(LoadListItemsParam(KeyValueNames.areas)).then(
-      (value) => value
-          .map(
-            (element) => I18nLabel.build(label: element),
-          )
-          .toList()
-        ..sort(compareLabel),
-    );
-  }
+  @override
+  List<Object?> get props => [
+        name,
+        data,
+        size,
+      ];
 }

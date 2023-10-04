@@ -30,7 +30,7 @@ abstract class KeyValues {
   Future<void> close();
 
   Future<void> setItems(KeyValueNames key, List<String> list);
-  Future<List<String>> getItems(KeyValueNames key);
+  List<String> getItems(KeyValueNames key);
   Future<void> addSenderName(String senderName);
 
   Future<void> init();

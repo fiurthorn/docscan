@@ -18,6 +18,7 @@ import 'package:document_scanner/scanner/domain/usecases/convert_image.dart';
 import 'package:document_scanner/scanner/domain/usecases/create_pdf_file.dart';
 import 'package:document_scanner/scanner/domain/usecases/export_attachment.dart';
 import 'package:document_scanner/scanner/domain/usecases/export_database.dart';
+import 'package:document_scanner/scanner/domain/usecases/import_database.dart';
 import 'package:document_scanner/scanner/domain/usecases/load_list_items.dart';
 import 'package:document_scanner/scanner/domain/usecases/read_files.dart';
 import 'package:document_scanner/scanner/domain/usecases/rotate_image.dart';
@@ -48,6 +49,7 @@ Future<GetIt> initServiceLocator() async {
     sl.registerLazySingleton<CreatePdfFile>(() => CreatePdfFileUseCase());
     sl.registerLazySingleton<LoadListItems>(() => LoadListItemsUseCase());
     sl.registerLazySingleton<ExportDatabase>(() => ExportDatabaseUseCase());
+    sl.registerLazySingleton<ImportDatabase>(() => ImportDatabaseUseCase());
     sl.registerLazySingleton<StoreListItems>(() => StoreListItemsUseCase());
     sl.registerLazySingleton<ExportAttachment>(() => ExportAttachmentUseCase());
 

@@ -19,8 +19,7 @@ class StoreListItemsUseCase implements StoreListItems {
   @override
   Future<Optional<StoreListItemsResult>> call(StoreListItemsParam param) async {
     try {
-      sl<KeyValues>().setItems(param.key, param.items);
-      return Optional.newValue(true);
+      return sl<KeyValues>().setItems(param.key, param.items).then((_) => Optional.newValue(true));
     } on Exception catch (e, st) {
       return Optional.newError(e, st);
     }

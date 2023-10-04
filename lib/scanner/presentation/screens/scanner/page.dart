@@ -3,19 +3,16 @@ import 'dart:io';
 import 'package:cunning_document_scanner/cunning_document_scanner.dart';
 import 'package:document_scanner/core/design/theme_colors.dart';
 import 'package:document_scanner/core/design/theme_icons.dart';
-import 'package:document_scanner/core/lib/optional.dart';
 import 'package:document_scanner/core/lib/size.dart';
+import 'package:document_scanner/core/reactive/i18n_label.dart';
 import 'package:document_scanner/core/toaster/error.dart';
 import 'package:document_scanner/core/toaster/signal.dart';
 import 'package:document_scanner/core/toaster/success.dart';
-import 'package:document_scanner/core/widgets/bloc_builder/datetime.dart';
-import 'package:document_scanner/core/widgets/bloc_builder/dropdown.dart';
-import 'package:document_scanner/core/widgets/bloc_builder/i18n_dropdown.dart';
-import 'package:document_scanner/core/widgets/bloc_builder/text.dart';
 import 'package:document_scanner/core/widgets/confirm/confirm.dart';
 import 'package:document_scanner/core/widgets/cropper/widget.dart';
 import 'package:document_scanner/core/widgets/goroute/route.dart';
 import 'package:document_scanner/core/widgets/loading_dialog/loading_dialog.dart';
+import 'package:document_scanner/core/widgets/reactive/autocomplete.dart';
 import 'package:document_scanner/core/widgets/responsive.dart';
 import 'package:document_scanner/l10n/app_lang.dart';
 import 'package:document_scanner/scanner/domain/repositories/convert.dart';
@@ -23,14 +20,15 @@ import 'package:document_scanner/scanner/presentation/blocs/scanner/bloc.dart';
 import 'package:document_scanner/scanner/presentation/screens/base.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/template_page.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/top_nav.dart';
-import 'package:document_scanner/scanner/presentation/screens/whats_new/page.dart';
+import 'package:document_scanner/scanner/presentation/screens/whats_new/app.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pdfx/pdfx.dart';
+import 'package:reactive_date_time_picker/reactive_date_time_picker.dart';
+import 'package:reactive_forms/reactive_forms.dart';
 
 class ScannerScreen extends BaseScreen {
   const ScannerScreen({super.key});
@@ -48,6 +46,28 @@ class ScannerScreen extends BaseScreen {
 }
 
 class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, ScannerBloc> {
+  _ScannerScreenState()
+      : super(
+          onSubmitting: (context, state) => LoadingDialog.show(context),
+          onSuccess: (context, state) {
+            LoadingDialog.hide(context);
+            showSnackBarSuccess(context, "scanner", "${state.successResponse}");
+            // context.go(ScannerScreen.path);
+          },
+          onUpdateState: (context, state) {
+            // trace(state.parameter.scannedImages, "sci3");
+            // LoadingDialog.hide(context);
+            // update();
+          },
+          onFailure: (context, state) {
+            LoadingDialog.hide(context);
+            final message =
+                AppLang.i18n.message_failure_genericError(state.failureResponse?.exception.toString() ?? "");
+            showSnackBarFailure(context, "scanner", message, state.failureResponse!.exception,
+                stackTrace: state.failureResponse!.stackTrace);
+          },
+        );
+
   @override
   ScannerBloc createBloc(BuildContext context) => ScannerBloc();
 
@@ -56,24 +76,19 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
 
   @override
   PreferredSizeWidget? buildAppBar(BuildContext context) {
-    final formBloc = BlocProvider.of<ScannerBloc>(context);
-
-    if (formBloc.displayCropper.value) {
-      return cropTopNavBar(formBloc);
+    if (bloc.state.parameter.showCropper) {
+      return cropTopNavBar();
     }
 
     return super.buildAppBar(context);
   }
 
-  PreferredSizeWidget cropTopNavBar(ScannerBloc formBloc) => CustomButtonTopNavBar(
+  PreferredSizeWidget cropTopNavBar() => CustomButtonTopNavBar(
         title: title(context),
         button: Row(
           children: [
             InkWell(
-              onTap: () {
-                formBloc.displayCropper.changeValue(false);
-                update();
-              },
+              onTap: bloc.hideCropper,
               child: Center(
                 child: Icon(
                   ThemeIcons.close,
@@ -88,9 +103,7 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
 
   @override
   Widget? buildEndDrawer(BuildContext context) {
-    final formBloc = BlocProvider.of<ScannerBloc>(context);
-
-    if (formBloc.displayCropper.value) {
+    if (bloc.state.parameter.showCropper) {
       return null;
     }
 
@@ -98,207 +111,114 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
   }
 
   @override
-  Widget buildScreen(BuildContext context) => buildScannerForm(context);
-  //buildScannerForm(context);
+  Widget buildScreen(BuildContext context) {
+    if (bloc.state.parameter.scannedImages.isNotEmpty) {
+      return buildImageEnhancementViewer(context);
+    }
+
+    if (bloc.state.parameter.showCropper) {
+      return cropper(context);
+    }
+
+    return buildScannerForm(context);
+  }
 
   Widget buildScannerForm(BuildContext context) {
-    final formBloc = BlocProvider.of<ScannerBloc>(context);
-
-    if (formBloc.shouldShowWhatsNew()) {
+    if (bloc.shouldShowWhatsNew()) {
       SchedulerBinding.instance.addPostFrameCallback(
         (_) => showDialog(
           context: context,
           builder: (context) => const WhatsNew(),
-        ).then((value) => formBloc.closedWhatsNew()),
+        ).then((value) => bloc.closedWhatsNew()),
       );
     }
 
     return ResponsiveWidthPadding(
-      FormBlocListener<ScannerBloc, String, ErrorValue>(
-        onSubmitting: (context, state) => LoadingDialog.show(context),
-        onSuccess: (context, state) {
-          LoadingDialog.hide(context);
-          showSnackBarSuccess(context, "attach", "${state.successResponse}");
-          // context.go(ScannerScreen.path);
-        },
-        onLoadFailed: (context, state) {
-          final message = AppLang.i18n.message_failure_genericError(state.failureResponse?.exception.toString() ?? "");
-          showSnackBarFailure(context, "attach (load)", message, state.failureResponse!.exception,
-              stackTrace: state.failureResponse!.stackTrace);
-        },
-        onFailure: (context, state) {
-          LoadingDialog.hide(context);
-          final message = AppLang.i18n.message_failure_genericError(state.failureResponse?.exception.toString() ?? "");
-          showSnackBarFailure(context, "attach", message, state.failureResponse!.exception,
-              stackTrace: state.failureResponse!.stackTrace);
-        },
-        child: Builder(builder: (context) {
-          if (formBloc.scannedImages.value.isNotEmpty) {
-            return buildImageEnhancementViewer(context, formBloc);
-          }
-
-          if (formBloc.displayCropper.value) {
-            return cropper(context);
-          }
-
-          return buildInputForm(context, formBloc);
-        }),
+      ReactiveForm(
+        formGroup: bloc.group,
+        child: SingleChildScrollView(
+          primary: true,
+          child: Padding(
+            padding: const EdgeInsets.all(18.0),
+            child: Column(
+              children: [
+                ReactiveDropdownField<I18nLabel>(
+                  items: bloc.state.parameter.areaItems
+                      .map((e) => DropdownMenuItem<I18nLabel>(value: e, child: Text(e.label)))
+                      .toList(),
+                  formControl: bloc.area,
+                  decoration: InputDecoration(
+                    labelText: AppLang.i18n.scanner_areaSelect_label,
+                    hintText: AppLang.i18n.scanner_areaSelect_hint,
+                  ),
+                ),
+                ReactiveAutocomplete<String>(
+                  formControl: bloc.senderName,
+                  textInputAction: TextInputAction.next,
+                  decoration: InputDecoration(
+                    labelText: AppLang.i18n.scanner_senderField_label,
+                    hintText: AppLang.i18n.scanner_senderField_hint,
+                  ),
+                  enableSuggestions: false,
+                  optionsBuilder: (value) => bloc.state.parameter.filterSenderItems(value.text),
+                ),
+                ReactiveDropdownField<I18nLabel>(
+                  items: bloc.state.parameter.receiverItems
+                      .map((e) => DropdownMenuItem<I18nLabel>(value: e, child: Text(e.label)))
+                      .toList(),
+                  formControl: bloc.receiverName,
+                  decoration: InputDecoration(
+                    labelText: AppLang.i18n.scanner_receiverField_label,
+                    hintText: AppLang.i18n.scanner_receiverField_hint,
+                  ),
+                ),
+                ReactiveDropdownField<I18nLabel>(
+                  items: bloc.state.parameter.docTypeItems
+                      .map((e) => DropdownMenuItem<I18nLabel>(value: e, child: Text(e.label)))
+                      .toList(),
+                  formControl: bloc.documentType,
+                  decoration: InputDecoration(
+                    labelText: AppLang.i18n.scanner_docTypeSelect_label,
+                    hintText: AppLang.i18n.scanner_docTypeSelect_hint,
+                  ),
+                ),
+                ReactiveDateTimePicker(
+                  formControl: bloc.documentDate,
+                  firstDate: DateTime(1900),
+                  lastDate: DateTime(2100),
+                  decoration: InputDecoration(
+                    labelText: AppLang.i18n.scanner_docDateField_label,
+                    hintText: AppLang.i18n.scanner_docDateField_label,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                ReactiveFormArray(
+                  formArray: bloc.attachments,
+                  builder: (BuildContext context, FormArray<dynamic> formArray, Widget? child) {
+                    return ListView.builder(
+                      key: ValueKey(formArray.controls),
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: bloc.attachments.controls.length,
+                      itemBuilder: attachmentItemBuilder(),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
 
-  Widget cropper(BuildContext context) {
-    final formBloc = BlocProvider.of<ScannerBloc>(context);
-    final image = formBloc.cropperImage;
-
-    return Cropper(
-      image: image!,
-      onCropped: (image) {
-        LoadingDialog.show(context);
-        final formBloc = BlocProvider.of<ScannerBloc>(context);
-        formBloc.displayCropper.changeValue(false);
-        formBloc.uploadAttachment(formBloc.cropperFilename!, image);
-        update();
-        LoadingDialog.hide(context);
-      },
-    );
-  }
-
-  Widget buildImageEnhancementViewer(BuildContext context, ScannerBloc formBloc) {
-    return Column(
-      children: [
-        I18nDropDownBlocBuilder(
-          bloc: formBloc.converter,
-          hint: AppLang.i18n.scanner_converterSelect_hint,
-          requestFocus: true,
-          onChanged: (_) => formBloc.clearImageCache(),
-        ),
-        Visibility(
-          visible: formBloc.converter.value?.technical == monochrome,
-          child: BlocBuilder(
-              bloc: formBloc.amount,
-              builder: (context, state) {
-                return Slider(
-                    value: formBloc.amount.value,
-                    divisions: 20,
-                    onChanged: (value) {
-                      formBloc.amountChanged(value);
-                      update();
-                    });
-              }),
-        ),
-        Visibility(
-          visible: formBloc.converter.value?.technical == luminance,
-          child: BlocBuilder(
-              bloc: formBloc.threshold,
-              builder: (context, state) {
-                return Slider(
-                    value: formBloc.threshold.value,
-                    divisions: 20,
-                    onChanged: (value) {
-                      formBloc.thresholdChanged(value);
-                      update();
-                    });
-              }),
-        ),
-        Expanded(
-          // height: 400,
-          //width: 400,
-          child: PhotoViewGallery.builder(
-            scrollPhysics: const BouncingScrollPhysics(),
-            builder: (BuildContext context, int index) {
-              return PhotoViewGalleryPageOptions.customChild(
-                child: FutureBuilder<Uint8List>(
-                  future: formBloc.convertedImage(index),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    return Image.memory(snapshot.data!);
-                  },
-                ),
-                //initialScale: PhotoViewComputedScale.contained * 0.8,
-                heroAttributes: PhotoViewHeroAttributes(tag: index),
-              );
-            },
-            onPageChanged: (index) => formBloc.currentImage = index,
-            itemCount: formBloc.scannedImages.value.length,
-            loadingBuilder: (context, event) => Center(
-              child: SizedBox(
-                width: 20.0,
-                height: 20.0,
-                child: CircularProgressIndicator(
-                  value: event == null
-                      ? 0
-                      : event.cumulativeBytesLoaded / (event.expectedTotalBytes ?? event.cumulativeBytesLoaded),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget buildInputForm(BuildContext context, ScannerBloc formBloc) => SingleChildScrollView(
-        physics: const ClampingScrollPhysics(),
-        primary: true,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 15),
-          child: Column(
-            children: [
-              I18nDropDownBlocBuilder(
-                bloc: formBloc.main.area,
-                label: AppLang.i18n.scanner_areaSelect_label,
-                hint: AppLang.i18n.scanner_areaSelect_hint,
-              ),
-              TextBlocBuilder(
-                bloc: formBloc.main.senderName,
-                label: AppLang.i18n.scanner_senderField_label,
-                hint: AppLang.i18n.scanner_senderField_hint,
-              ),
-              DropDownBlocBuilder(
-                bloc: formBloc.main.receiverName,
-                label: AppLang.i18n.scanner_receiverField_label,
-                hint: AppLang.i18n.scanner_receiverField_hint,
-              ),
-              I18nDropDownBlocBuilder(
-                bloc: formBloc.main.documentType,
-                label: AppLang.i18n.scanner_docTypeSelect_label,
-                hint: AppLang.i18n.scanner_docTypeSelect_hint,
-              ),
-              DateTimeBlocBuilder(
-                bloc: formBloc.main.documentDate,
-                label: AppLang.i18n.scanner_docDateField_label,
-                hint: AppLang.i18n.scanner_docDateField_hint,
-                firstDateTime: DateTime(1900),
-                lastDateDuration: const Duration(days: 3653 * 20),
-              ),
-              const SizedBox(height: 20),
-              BlocBuilder(
-                  bloc: formBloc.main.attachments,
-                  builder: (context, state) {
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: formBloc.attachmentCount(),
-                      itemBuilder: attachmentItemBuilder(formBloc),
-                    );
-                  }),
-            ],
-          ),
-        ),
-      );
-
   @override
   List<Widget>? buildPersistentFooterButtons(BuildContext context) {
-    final formBloc = BlocProvider.of<ScannerBloc>(context);
-
-    if (formBloc.displayCropper.value) {
+    if (bloc.state.parameter.showCropper) {
       return null;
     }
 
-    if (formBloc.scannedImages.value.isNotEmpty) {
+    if (bloc.state.parameter.scannedImages.isNotEmpty) {
       return [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -308,28 +228,22 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
               children: [
                 FloatingActionButton(
                   heroTag: "scanner_counterClockwise_pdf",
+                  onPressed: bloc.counterClockwise,
                   child: Icon(ThemeIcons.counterClockwise),
-                  onPressed: () {
-                    formBloc.counterClockwise();
-                    update();
-                  },
                 ),
                 const SizedBox(
                   width: 20,
                 ),
                 FloatingActionButton(
                   heroTag: "scanner_clockwise_pdf",
+                  onPressed: bloc.clockwise,
                   child: Icon(ThemeIcons.clockwise),
-                  onPressed: () {
-                    formBloc.clockwise();
-                    update();
-                  },
                 ),
               ],
             ),
             FloatingActionButton(
               heroTag: "scanner_btn_pdf",
-              onPressed: () => formBloc.createPDF().then((value) => update()),
+              onPressed: () => bloc.createPDF(), // .then((value) => update()),
               child: Icon(ThemeIcons.filePDF),
             ),
           ],
@@ -337,6 +251,10 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
       ];
     }
 
+    return buildPersistentDefaultFooterButtons(context);
+  }
+
+  List<Widget>? buildPersistentDefaultFooterButtons(BuildContext context) {
     return [
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
@@ -348,14 +266,14 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                scannerButton(formBloc),
+                scannerButton(),
                 const SizedBox(width: 8),
-                filePickerButton(formBloc),
+                filePickerButton(),
                 const SizedBox(width: 8),
-                cameraButton(formBloc),
+                cameraButton(),
               ],
             ),
-            sendButton(context, formBloc),
+            sendButton(context, bloc),
           ],
         ),
       ),
@@ -363,40 +281,35 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
   }
 
   void dirty(BuildContext context) {
-    final formBloc = BlocProvider.of<ScannerBloc>(context);
-
-    if (formBloc.attachments.isEmpty) {
+    if (bloc.attachments.controls.isEmpty) {
       showSnackBarSignal(context, "create (dirty)", AppLang.i18n.scanner_noAttachment_hint);
       // } else {
       // showSnackBarFailure(context, "create pre send (dirty)", "missing required values");
     }
 
-    formBloc.validate();
+    bloc.validate();
   }
 
-  void submit(BuildContext context) => context.read<ScannerBloc>().submit();
+  void submit(BuildContext context) => bloc.submit();
 
   Widget sendButton(BuildContext context, ScannerBloc bloc) {
-    final empty = bloc.main.attachments.value.isEmpty;
-    final valid = bloc.state.isValid();
-
+    final valid = bloc.group.valid;
     return FloatingActionButton(
       heroTag: "scanner_btn_send",
-      backgroundColor:
-          valid && !empty ? nord12AuroraOrange : Theme.of(context).floatingActionButtonTheme.backgroundColor,
-      onPressed: () => valid && !empty ? submit(context) : dirty(context),
+      backgroundColor: valid ? nord12AuroraOrange : Theme.of(context).floatingActionButtonTheme.backgroundColor,
+      onPressed: () => valid ? submit(context) : dirty(context),
       child: Icon(ThemeIcons.send),
     );
   }
 
-  Widget scannerButton(ScannerBloc formBloc) {
+  Widget scannerButton() {
     return FloatingActionButton(
       heroTag: "scanner_btn_scanner",
       onPressed: () async {
         LoadingDialog.show(context);
         CunningDocumentScanner.getPictures().then((value) {
           if (value != null) {
-            formBloc.storeScanResult(value, ready: () => update());
+            bloc.storeScanResult(value);
           }
         }).whenComplete(() => LoadingDialog.hide(context));
       },
@@ -404,11 +317,34 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
     );
   }
 
-  Widget cameraButton(ScannerBloc formBloc) {
+  Widget filePickerButton() {
+    return FloatingActionButton(
+      heroTag: "scanner_btn_filePicker",
+      onPressed: () async {
+        LoadingDialog.show(context);
+
+        FilePicker.platform
+            .pickFiles(
+              allowMultiple: false,
+              dialogTitle: "Choose a file",
+            ) //
+            .then((result) => result?.files.single.path)
+            .then(
+          (path) {
+            if (path != null) {
+              bloc.uploadAttachment(path, File(path).readAsBytesSync());
+            }
+          },
+        ).whenComplete(() => LoadingDialog.hide(context));
+      },
+      child: Icon(ThemeIcons.file),
+    );
+  }
+
+  Widget cameraButton() {
     return FloatingActionButton(
       heroTag: "scanner_btn_camera",
       onPressed: () => camera(
-        formBloc,
         source: ImageSource.camera,
         maxHeight: 2048,
         maxWidth: 2048,
@@ -418,8 +354,7 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
     );
   }
 
-  void camera(
-    ScannerBloc formBloc, {
+  void camera({
     ImageSource source = ImageSource.gallery,
     double? maxWidth,
     double? maxHeight,
@@ -433,32 +368,84 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
           imageQuality: imageQuality,
           requestFullMetadata: false,
         )
-        .then((file) => formBloc.loadCropperImage(file))
-        .then((_) => update()); //.whenComplete(() => LoadingDialog.hide(context));
+        .then((file) => bloc.loadCropperImage(file));
   }
 
-  Widget filePickerButton(ScannerBloc formBloc) {
-    return FloatingActionButton(
-      heroTag: "scanner_btn_filePicker",
-      onPressed: () async {
+  Widget cropper(BuildContext context) {
+    return Cropper(
+      image: bloc.state.parameter.cropperImage!,
+      onCropped: (image) {
         LoadingDialog.show(context);
-
-        FilePicker.platform
-            .pickFiles() //
-            .then((result) => result?.files.single.path)
-            .then(
-          (path) {
-            if (path != null) {
-              formBloc.uploadAttachment(path, File(path).readAsBytesSync());
-            }
-          },
-        ).whenComplete(() => LoadingDialog.hide(context));
+        bloc.hideCropper();
+        bloc.uploadAttachment(bloc.state.parameter.cropperFilename!, image);
+        LoadingDialog.hide(context);
       },
-      child: Icon(ThemeIcons.file),
     );
   }
 
-  IndexedWidgetBuilder attachmentItemBuilder(ScannerBloc formBloc) => (context, index) {
+  Widget buildImageEnhancementViewer(BuildContext context) {
+    return ReactiveForm(
+      formGroup: bloc.group,
+      child: Column(
+        children: [
+          ReactiveDropdownField<I18nLabel>(
+            items:
+                bloc.converterItems().map((e) => DropdownMenuItem<I18nLabel>(value: e, child: Text(e.label))).toList(),
+            formControl: bloc.converter,
+            decoration: InputDecoration(
+              hintText: AppLang.i18n.scanner_converterSelect_hint,
+            ),
+            onChanged: bloc.updateConverter,
+          ),
+          Visibility(
+              visible: bloc.converter.value?.technical == monochrome,
+              child: Slider(value: bloc.state.parameter.amount, divisions: 20, onChanged: bloc.amountChanged)),
+          Visibility(
+              visible: bloc.converter.value?.technical == luminance,
+              child: Slider(value: bloc.state.parameter.threshold, divisions: 20, onChanged: bloc.thresholdChanged)),
+          Expanded(
+            // height: 400,
+            //width: 400,
+            child: PhotoViewGallery.builder(
+              scrollPhysics: const BouncingScrollPhysics(),
+              builder: (BuildContext context, int index) {
+                return PhotoViewGalleryPageOptions.customChild(
+                  child: StreamBuilder<Uint8List?>(
+                    stream: bloc.currentScannedImageStream,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      return Image.memory(snapshot.data!);
+                    },
+                  ),
+                  //initialScale: PhotoViewComputedScale.contained * 0.8,
+                  heroAttributes: PhotoViewHeroAttributes(tag: index),
+                );
+              },
+              onPageChanged: (index) => bloc.updateCurrentScannedImage(index),
+              itemCount: bloc.state.parameter.scannedImages.length,
+              loadingBuilder: (context, event) => Center(
+                child: SizedBox(
+                  width: 20.0,
+                  height: 20.0,
+                  child: CircularProgressIndicator(
+                    value: event == null
+                        ? 0
+                        : event.cumulativeBytesLoaded / (event.expectedTotalBytes ?? event.cumulativeBytesLoaded),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  IndexedWidgetBuilder attachmentItemBuilder() => (context, index) {
+        final attachment = bloc.attachments.value![index]!;
+
         return Card(
           color: Theme.of(context).colorScheme.primary,
           elevation: 0,
@@ -474,12 +461,12 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        formBloc.attachments[index].value.name,
+                        attachment.name,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(color: nord6SnowStorm),
                       ),
                       Text(
-                        displaySize(formBloc.attachments[index].value.size.toDouble()),
+                        displaySize(attachment.size.toDouble()),
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(color: nord6SnowStorm),
                       ),
@@ -501,9 +488,9 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
                           ),
                         ).then((value) {
                           if (value ?? false) {
-                            formBloc.removeAttachment(index);
+                            bloc.removeAttachment(index);
                           }
-                        }).then((value) => update());
+                        });
                       },
                       icon: Icon(
                         ThemeIcons.deletePosition,

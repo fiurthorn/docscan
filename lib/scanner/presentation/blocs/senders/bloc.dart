@@ -10,7 +10,7 @@ import 'package:reactive_forms/reactive_forms.dart';
 part 'state.dart';
 
 class ItemBloc extends ReactiveBloc<StateParameter> {
-  final areas = FormArray<String>([]);
+  final senders = FormArray<String>([]);
 
   ItemBloc() : super(parameter: const StateParameter());
 
@@ -18,25 +18,25 @@ class ItemBloc extends ReactiveBloc<StateParameter> {
 
   @override
   Map<String, AbstractControl> get form => _form ??= {
-        "areas": areas,
+        "senders": senders,
       };
 
   @override
   Future<void> loading() async {
-    final items = getItems(KeyValueNames.areas);
+    final items = getItems(KeyValueNames.senderNames);
     for (var item in items) {
-      areas.add(FormControl<String>(value: item, validators: [Validators.required]));
+      senders.add(FormControl<String>(value: item, validators: [Validators.required]));
     }
   }
 
   void removeItem(int index) {
-    areas.removeAt(index);
-    areas.markAsDirty();
+    senders.removeAt(index);
+    senders.markAsDirty();
   }
 
   void addItem() {
-    areas.add(FormControl<String>(validators: [Validators.required]));
-    areas.markAsDirty();
+    senders.add(FormControl<String>(validators: [Validators.required]));
+    senders.markAsDirty();
     emit(UpdateReactiveState(parameter: state.parameter));
   }
 
@@ -48,7 +48,7 @@ class ItemBloc extends ReactiveBloc<StateParameter> {
     try {
       emitSubmitting();
       usecase<StoreListItemsResult, StoreListItemsParam>(
-        StoreListItemsParam(KeyValueNames.areas, areas.value!.map((e) => e!).toList()),
+        StoreListItemsParam(KeyValueNames.senderNames, senders.value!.map((e) => e!).toList()),
       ).then((value) => emitSuccess(successResponse: "Saved"));
     } on Exception catch (err, stack) {
       emitFailure(failureResponse: ErrorValue(err, stack));

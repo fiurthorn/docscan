@@ -22,6 +22,8 @@ class BaseMenu extends StatelessWidget {
   });
 
   void push(BuildContext context, String path) {
+    Scaffold.of(context).closeEndDrawer();
+
     if (context.canPop()) {
       context.pushReplacement(path);
     } else {
@@ -77,7 +79,7 @@ class BaseMenu extends StatelessWidget {
                       applicationName: 'docscan',
                       applicationVersion: buildVersion,
                       applicationLegalese: copyright,
-                      children: [const RuntimeWidget()]);
+                      children: [const SystemPanel()]);
 
                   Scaffold.of(context).closeEndDrawer();
                 },

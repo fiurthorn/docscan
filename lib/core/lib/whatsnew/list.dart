@@ -17,15 +17,17 @@ class WhatsNewList extends StatelessWidget {
       itemCount: items.length,
       itemBuilder: (context, index) {
         final item = items[index];
-        return ListTile(
-          title: item.buildTitle(context),
-          subtitle: item.buildSubtitle(context),
-          trailing: const SizedBox(height: 0),
-          contentPadding: const EdgeInsets.all(0),
-          horizontalTitleGap: 0,
-          minLeadingWidth: 0,
-          minVerticalPadding: 0,
-          //dense: true,
+
+        double padding = 0;
+        if (index > 0) {
+          padding = 25;
+        } else if (item is MessageItem) {
+          padding = 8;
+        }
+
+        return Padding(
+          padding: EdgeInsets.only(top: padding),
+          child: item.build(context),
         );
       },
     );

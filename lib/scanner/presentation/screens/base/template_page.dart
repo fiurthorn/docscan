@@ -1,12 +1,20 @@
-import 'package:document_scanner/core/lib/optional.dart';
+import 'package:document_scanner/core/reactive/bloc.dart';
 import 'package:document_scanner/scanner/presentation/screens/base.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/right_menu.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/top_nav.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 
-abstract class TemplateBaseScreenState<T extends StatefulWidget, F extends FormBloc<String, ErrorValue>>
-    extends FormBlocBaseScreenState<T, F> {
+abstract class TemplateBaseScreenState<T extends StatefulWidget, F extends ReactiveBloc>
+    extends ReactiveBlocBaseScreenState<T, F> {
+  TemplateBaseScreenState({
+    super.onSubmitting,
+    super.onFailure,
+    super.onSuccess,
+    super.onUpdateState,
+    bool extendBodyBehindAppBar = false,
+    FloatingActionButtonLocation floatingActionButtonLocation = FloatingActionButtonLocation.centerDocked,
+  });
+
   @override
   PreferredSizeWidget? buildAppBar(BuildContext context) => FullTopNavBar(title: title(context), refresh: update);
 

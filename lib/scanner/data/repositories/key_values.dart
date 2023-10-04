@@ -42,17 +42,20 @@ class KeyValuesImpl implements KeyValues {
       return;
     }
 
-    getItems(KeyValueNames.senderNames)
-        .then((value) => value.contains(senderName) ? null : value)
-        .then((value) => value
-          ?..add(senderName)
-          ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase())))
-        .then((value) => value == null ? null : _box.put(KeyValueNames.senderNames.name, value));
+    final items = getItems(KeyValueNames.senderNames);
+    if (!items.contains(senderName)) {
+      items
+        ..add(senderName)
+        ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+      _box.put(KeyValueNames.senderNames.name, items);
+    }
+
+    return;
   }
 
   @override
-  Future<List<String>> getItems(KeyValueNames key) async =>
-      (await _box.get(key.name, defaultValue: const []) as List).map((e) => '$e').toList();
+  List<String> getItems(KeyValueNames key) =>
+      (_box.get(key.name, defaultValue: const []) as List).map((e) => '$e').toList();
 
   @override
   Future<void> setItems(KeyValueNames key, List<String> list) {

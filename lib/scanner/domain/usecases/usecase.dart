@@ -6,6 +6,10 @@ abstract class UseCase<Result, Param> {
   Future<Optional<Result>> call(Param param);
 }
 
+abstract class UseCaseSync<Result, Param> {
+  Optional<Result> call(Param param);
+}
+
 abstract class UseCaseStream<Result, Param> {
   Stream<Result> call(Param param);
 }

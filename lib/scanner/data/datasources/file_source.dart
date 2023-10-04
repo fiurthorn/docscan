@@ -10,6 +10,10 @@ class FileSource {
     return File(path).readAsBytesSync();
   }
 
+  String readFileAsString(String path) {
+    return File(path).readAsStringSync();
+  }
+
   void deleteFile(String path) {
     return File(path).deleteSync();
   }

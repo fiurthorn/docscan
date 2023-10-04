@@ -1,34 +1,12 @@
-part of "bloc.dart";
+part of 'bloc.dart';
 
-typedef ItemStateBloc = TextFieldBloc<dynamic>;
+class StateParameter extends Equatable {
+  const StateParameter();
 
-class ItemState extends GroupFieldBloc<FieldBloc, dynamic> {
-  ListFieldBloc<ItemStateBloc, dynamic> get documentTypes =>
-      state.fieldBlocs["documentTypes"] as ListFieldBloc<ItemStateBloc, dynamic>;
-
-  ItemState()
-      : super(name: "main", fieldBlocs: [
-          ListFieldBloc<ItemStateBloc, String>(name: "documentTypes"),
-        ]) {
-    usecase<LoadListItemsResult, LoadListItemsParam>(LoadListItemsParam(KeyValueNames.documentTypes)).then((value) {
-      for (var element in value) {
-        createItem(initialValue: element);
-      }
-    });
+  StateParameter copyWith() {
+    return const StateParameter();
   }
 
-  void createItem({String? initialValue}) {
-    documentTypes.addFieldBloc(
-      TextFieldBloc(
-        initialValue: initialValue ?? "",
-        validators: [
-          FieldBlocValidators.required,
-        ],
-      ),
-    );
-  }
-
-  void removeItem(int index) {
-    documentTypes.removeFieldBlocAt(index);
-  }
+  @override
+  List<Object?> get props => [];
 }

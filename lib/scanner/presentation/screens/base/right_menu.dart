@@ -7,17 +7,20 @@ import 'package:document_scanner/scanner/presentation/screens/areas/page.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/base_right_menu.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/menu_item.dart';
 import 'package:document_scanner/scanner/presentation/screens/documentsTypes/page.dart';
-import 'package:document_scanner/scanner/presentation/screens/receiver/page.dart';
-import 'package:document_scanner/scanner/presentation/screens/scanner/page.dart';
-import 'package:document_scanner/scanner/presentation/screens/sender/page.dart';
+import 'package:document_scanner/scanner/presentation/screens/receivers/page.dart';
+import 'package:document_scanner/scanner/presentation/screens/senders/page.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class RightMenu extends BaseMenu {
+  final List<Widget> additionalMenuItems;
+  final List<Widget> additionalAccountItems;
+
   const RightMenu({
     required super.refresh,
     super.logout = true,
     super.key,
+    this.additionalMenuItems = const [],
+    this.additionalAccountItems = const [],
   });
 
   @override
@@ -38,37 +41,17 @@ class RightMenu extends BaseMenu {
       ),
       const SizedBox(height: 10),
       const Divider(thickness: 1, height: 2),
-      const SizedBox(height: 10),
-      ListTile(
-        title: Text(AppLang.i18n.scanner_page_title),
-        leading: Icon(ThemeIcons.scanner, color: foregroundColor),
-        onTap: () {
-          Scaffold.of(context).closeEndDrawer();
-          context.go(ScannerScreen.path);
-        },
-      ),
-      const Divider(thickness: 1, height: 2),
       ListTile(
         title: Text(AppLang.i18n.areas_page_title),
         leading: Icon(ThemeIcons.area, color: foregroundColor),
         onTap: () {
-          Scaffold.of(context).closeEndDrawer();
           push(context, AreasScreen.path);
-        },
-      ),
-      ListTile(
-        title: Text(AppLang.i18n.docTypes_page_title),
-        leading: Icon(ThemeIcons.docType, color: foregroundColor),
-        onTap: () {
-          Scaffold.of(context).closeEndDrawer();
-          push(context, DocumentTypesScreen.path);
         },
       ),
       ListTile(
         title: Text(AppLang.i18n.senders_page_title),
         leading: Icon(ThemeIcons.envelope, color: foregroundColor),
         onTap: () {
-          Scaffold.of(context).closeEndDrawer();
           push(context, SendersScreen.path);
         },
       ),
@@ -76,10 +59,17 @@ class RightMenu extends BaseMenu {
         title: Text(AppLang.i18n.receivers_page_title),
         leading: Icon(ThemeIcons.envelopeOpen, color: foregroundColor),
         onTap: () {
-          Scaffold.of(context).closeEndDrawer();
           push(context, ReceiversScreen.path);
         },
       ),
+      ListTile(
+        title: Text(AppLang.i18n.docTypes_page_title),
+        leading: Icon(ThemeIcons.docType, color: foregroundColor),
+        onTap: () {
+          push(context, DocumentTypesScreen.path);
+        },
+      ),
+      for (final w in additionalMenuItems) w,
     ];
   }
 
@@ -103,20 +93,23 @@ class RightMenu extends BaseMenu {
           Scaffold.of(context).closeEndDrawer();
           // context.go(SendersScreen.path);
         },
-      )
+      ),
+      for (final w in additionalAccountItems) w,
     ];
   }
 
-  Widget menuItem(MenuItem item) => Builder(builder: (context) {
-        return ListTile(
-          title: Text(item.title),
-          leading: item.icon,
-          onTap: () {
-            item.action(context);
-            if (item.closeDrawer) {
-              Scaffold.of(context).closeEndDrawer();
-            }
-          },
-        );
-      });
+  Widget menuItem(MenuItem item) => Builder(
+        builder: (context) {
+          return ListTile(
+            title: Text(item.title),
+            leading: item.icon,
+            onTap: () {
+              item.action(context);
+              if (item.closeDrawer) {
+                Scaffold.of(context).closeEndDrawer();
+              }
+            },
+          );
+        },
+      );
 }

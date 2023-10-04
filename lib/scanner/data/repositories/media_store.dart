@@ -4,7 +4,7 @@ import 'package:document_scanner/core/lib/logger.dart';
 import 'package:document_scanner/core/service_locator/service_locator.dart';
 import 'package:document_scanner/scanner/data/datasources/native.dart';
 import 'package:document_scanner/scanner/domain/repositories/media_store.dart';
-import 'package:flutter_form_bloc/flutter_form_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 
 class MediaStoreImpl implements MediaStore {

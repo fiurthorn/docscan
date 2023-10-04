@@ -36,7 +36,7 @@ class ErrorValue {
   final StackTrace? _stackTrace;
 
   ErrorValue(this._exception, this._stackTrace);
-  ErrorValue.fromString(String exception, StackTrace? stackTrace) : this(Exception(exception), stackTrace);
+  ErrorValue.fromString(String exception, [StackTrace? stackTrace]) : this(Exception(exception), stackTrace);
 
   StackTrace? get stackTrace => _stackTrace;
   Exception get exception => _exception;

@@ -12,13 +12,13 @@ class LoadListItemsParam {
 }
 
 typedef LoadListItemsResult = List<String>;
-typedef LoadListItems = UseCase<LoadListItemsResult, LoadListItemsParam>;
+typedef LoadListItems = UseCaseSync<LoadListItemsResult, LoadListItemsParam>;
 
 class LoadListItemsUseCase implements LoadListItems {
   @override
-  Future<Optional<LoadListItemsResult>> call(LoadListItemsParam param) async {
+  Optional<LoadListItemsResult> call(LoadListItemsParam param) {
     try {
-      return Optional.newValue(await sl<KeyValues>().getItems(param.key));
+      return Optional.newValue(sl<KeyValues>().getItems(param.key));
     } on Exception catch (e, st) {
       return Optional.newError(e, st);
     }

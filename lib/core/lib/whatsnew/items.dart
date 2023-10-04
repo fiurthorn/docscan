@@ -2,48 +2,44 @@ import 'package:flutter/material.dart';
 
 /// The base class for the different types of items the list can contain.
 abstract class ListItem {
-  /// The title line to show in a list item.
-  Widget buildTitle(BuildContext context);
-
-  /// The subtitle line, if any, to show in a list item.
-  Widget buildSubtitle(BuildContext context);
+  Widget build(BuildContext context);
 }
 
-/// A ListItem that contains data to display a heading.
 class HeadingItem implements ListItem {
   final String heading;
 
   HeadingItem(this.heading);
 
   @override
-  Widget buildTitle(BuildContext context) {
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Text(
-          heading,
-          style: Theme.of(context).textTheme.headlineSmall,
+        Padding(
+          padding: const EdgeInsets.only(left: 20),
+          child: Text(
+            heading,
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
         ),
-        const Divider(color: Colors.black, endIndent: 16, indent: 16), // THIS
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          child: Divider(color: Colors.black),
+        )
       ],
     );
   }
-
-  @override
-  Widget buildSubtitle(BuildContext context) => const SizedBox.shrink();
 }
 
-/// A ListItem that contains data to display a message.
 class MessageItem implements ListItem {
-  final String sender;
   final String body;
 
-  MessageItem(this.sender, this.body);
+  MessageItem(this.body);
 
   @override
-  Widget buildTitle(BuildContext context) => Text(sender);
-
-  @override
-  Widget buildSubtitle(BuildContext context) => Text(body);
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 30),
+        child: Text(body),
+      );
 }

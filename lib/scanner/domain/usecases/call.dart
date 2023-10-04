@@ -8,6 +8,10 @@ Future<Result> usecase<Result, Param>(Param param) async {
   return (await sl<UseCase<Result, Param>>()(param)).eval();
 }
 
+Result syncUsecase<Result, Param>(Param param) {
+  return (sl<UseCaseSync<Result, Param>>()(param)).eval();
+}
+
 Stream<Result> ucStream<Usecase extends UseCaseStream<Result, Param>, Result, Param>(Param param) {
   return sl<Usecase>()(param);
 }

@@ -26,6 +26,11 @@ class FileReposImpl implements FileRepos {
   }
 
   @override
+  String readFileAsString(String path) {
+    return sl<FileSource>().readFileAsString(path);
+  }
+
+  @override
   Future<Tuple2<String, Uint8List>> readXFile(XFile file) {
     return sl<FileSource>().readXFile(file).then((value) => Tuple2(file.name, value));
   }

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class LoadingDialog extends StatelessWidget {
   static void show(BuildContext context, {Key? key}) => showDialog<void>(
         context: context,
-        useRootNavigator: false,
+        useRootNavigator: true,
         barrierDismissible: false,
         builder: (_) => LoadingDialog(key: key),
       ).then((_) => FocusScope.of(context).requestFocus(FocusNode()));
@@ -35,7 +35,7 @@ typedef CancelAction = void Function();
 class CancelableLoadingDialog extends StatelessWidget {
   static void show(CancelAction onCancel, BuildContext context, {Key? key}) => showDialog<void>(
         context: context,
-        useRootNavigator: false,
+        useRootNavigator: true,
         barrierDismissible: false,
         builder: (_) => CancelableLoadingDialog(onCancel, key: key),
       ).then((_) => FocusScope.of(context).requestFocus(FocusNode()));

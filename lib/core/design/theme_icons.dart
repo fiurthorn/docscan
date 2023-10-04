@@ -44,6 +44,8 @@ class ThemeIcons {
   static IconData get firebase => const IconDataRegular(0xf0e0);
   static IconData get file => FontAwesomeIcons.file;
   static IconData get fileAdd => FontAwesomeIcons.fileCirclePlus;
+  static IconData get fileImport => FontAwesomeIcons.fileImport;
+  static IconData get fileExport => FontAwesomeIcons.fileExport;
   static IconData get fileDownload => FontAwesomeIcons.fileArrowDown;
   static IconData get filePDF => FontAwesomeIcons.filePdf;
 
@@ -67,6 +69,7 @@ class ThemeIcons {
   static IconData get multiLinePlus => FontAwesomeIcons.circlePlus;
 
   static IconData get newPosition => FontAwesomeIcons.plus;
+  static IconData get newspaper => FontAwesomeIcons.newspaper;
   static IconData get noObscure => FontAwesomeIcons.eye;
   static IconData get notifications => FontAwesomeIcons.bell;
 

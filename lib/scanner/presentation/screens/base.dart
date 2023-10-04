@@ -1,9 +1,11 @@
-import 'package:document_scanner/core/lib/optional.dart';
 import 'package:document_scanner/core/lib/platform/platform.dart';
-import 'package:document_scanner/core/widgets/loading_widget/loading_widget.dart';
-import 'package:document_scanner/scanner/presentation/screens/error/error.dart';
+import 'package:document_scanner/core/reactive/bloc.dart';
+import 'package:document_scanner/core/toaster/error.dart';
+import 'package:document_scanner/core/widgets/loading_dialog/loading_dialog.dart';
+import 'package:document_scanner/core/widgets/reactive/listener.dart';
+import 'package:document_scanner/l10n/app_lang.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_form_bloc/flutter_form_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 abstract class BaseScreen extends StatefulWidget {
@@ -94,11 +96,7 @@ abstract class BaseScreenState<T extends StatefulWidget> extends State<T> {
   List<Widget>? buildPersistentFooterButtons(BuildContext context) => null;
   Widget? buildFloatingActionButton(BuildContext context) => null;
 
-  ThemeData? themeData(BuildContext context) => null;
-  FormTheme formTheme(BuildContext context) {
-    final theme = FormTheme.of(context).copyWith();
-    return theme;
-  }
+  ThemeData themeData(BuildContext context) => Theme.of(context);
 
   Widget _scaffold(BuildContext context) => _theme(
       context,
@@ -119,35 +117,25 @@ abstract class BaseScreenState<T extends StatefulWidget> extends State<T> {
       ));
 
   _theme(BuildContext context, Widget screen) {
-    screen = FormThemeProvider(
-      theme: formTheme(context),
-      child: screen,
-    );
-
-    final theme = themeData(context);
-
-    if (theme == null) {
-      return screen;
-    }
-
     return Theme(
-      data: theme,
+      data: themeData(context),
       child: screen,
     );
   }
 
-  Future<bool> _onWillPop(BuildContext context) async {
-    if (!isMobile || isWeb) return true;
-    if (Navigator.of(context).canPop()) return true;
+  Future<bool> _onCanPop() async {
+    final dialog = onCanPop();
+    if (dialog == null) return true;
 
-    return await showDialog(
-          context: context,
-          builder: (context) => _buildExitDialog(context),
-        ) ??
-        false;
+    return showDialog<bool>(
+      context: context,
+      builder: (context) => dialog,
+    ).then((value) => value ?? false);
   }
 
-  AlertDialog _buildExitDialog(BuildContext context) {
+  AlertDialog? onCanPop() => null;
+
+  AlertDialog onExit(BuildContext context) {
     return AlertDialog(
       title: const Text('Please confirm'),
       content: const Text('Do you want to exit the app?'),
@@ -163,84 +151,29 @@ abstract class BaseScreenState<T extends StatefulWidget> extends State<T> {
       ],
     );
   }
-}
 
-abstract class FormBlocBaseScreenState<T extends StatefulWidget, F extends FormBloc<String, ErrorValue>>
-    extends BaseScreenState<T> {
-  FormBlocBaseScreenState({
-    bool extendBodyBehindAppBar = false,
-    FloatingActionButtonLocation floatingActionButtonLocation = FloatingActionButtonLocation.centerDocked,
-  }) : super(
-          extendBodyBehindAppBar: extendBodyBehindAppBar,
-          floatingActionButtonLocation: floatingActionButtonLocation,
-        );
+  Future<bool> _onWillPop(BuildContext context) async {
+    if (Navigator.of(context).canPop()) return _onCanPop();
 
-  @override
-  Widget build(BuildContext context) {
-    return _theme(
-      context,
-      BlocProvider<F>(
-        create: (context) => createBloc(context),
-        child: FormBlocListener<F, String, ErrorValue>(
-          onSuccess: onSuccess,
-          onDeleteFailed: onDeleteFailed,
-          onDeleting: onDeleting,
-          onDeleteSuccessful: onDeleteSuccessful,
-          onFailure: onFailure,
-          onLoadFailed: onLoadFailed,
-          onLoaded: onLoaded,
-          onLoading: onLoading,
-          onSubmissionCancelled: onSubmissionCancelled,
-          onSubmissionFailed: onSubmissionFailed,
-          onSubmitting: onSubmitting,
-          child: BlocBuilder<F, FormBlocState<String, ErrorValue>>(
-            builder: (context, state) {
-              if (state is FormBlocLoading) {
-                return const LoadingWidget();
-              } else if (state is FormBlocLoadFailed) {
-                final formBloc = BlocProvider.of<F>(context);
-                return ErrorScaffold(
-                  reload: () => formBloc.reload(),
-                  title: title(context),
-                  error: ((state as FormBlocLoadFailed).failureResponse as ErrorValue).exception,
-                  stackTrace: ((state as FormBlocLoadFailed).failureResponse as ErrorValue).stackTrace,
-                );
-                //   } else if (state is FormBlocFailure) {
-                //     final formBloc = BlocProvider.of<F>(context);
-                //     return ErrorScaffold(
-                //       reload: () => formBloc.reload(),
-                //       title: title(context),
-                //       error: ((state as FormBlocFailure).failureResponse as ErrorValue).exception,
-                //       stackTrace: ((state as FormBlocFailure).failureResponse as ErrorValue).stackTrace,
-                //     );
-              } else {
-                return _scaffold(context);
-              }
-            },
-          ),
-        ),
-      ),
-    );
+    return showDialog<bool>(
+      context: context,
+      builder: (context) => onExit(context),
+    ).then((value) => value ?? false);
   }
-
-  F createBloc(BuildContext context);
-
-  void onSuccess(BuildContext context, FormBlocSuccess<String, ErrorValue> state) {}
-  void onDeleteFailed(BuildContext context, FormBlocDeleteFailed<String, ErrorValue> state) {}
-  void onDeleting(BuildContext context, FormBlocDeleting<String, ErrorValue> state) {}
-  void onDeleteSuccessful(BuildContext context, FormBlocDeleteSuccessful<String, ErrorValue> state) {}
-  void onFailure(BuildContext context, FormBlocFailure<String, ErrorValue> state) {}
-  void onLoadFailed(BuildContext context, FormBlocLoadFailed<String, ErrorValue> state) {}
-  void onLoaded(BuildContext context, FormBlocLoaded<String, ErrorValue> state) {}
-  void onLoading(BuildContext context, FormBlocLoading<String, ErrorValue> state) {}
-  void onSubmissionCancelled(BuildContext context, FormBlocSubmissionCancelled<String, ErrorValue> state) {}
-  void onSubmissionFailed(BuildContext context, FormBlocSubmissionFailed<String, ErrorValue> state) {}
-  void onSubmitting(BuildContext context, FormBlocSubmitting<String, ErrorValue> state) {}
 }
 
-abstract class BlocBaseScreenState<T extends StatefulWidget, State, BLoC extends BlocBase<State>>
+abstract class ReactiveBlocBaseScreenState<T extends StatefulWidget, BLoC extends ReactiveBloc>
     extends BaseScreenState<T> {
-  BlocBaseScreenState({
+  final ReactiveBlocListenerCallback<SubmittingReactiveState>? onSubmitting;
+  final ReactiveBlocListenerCallback<FailureReactiveState>? onFailure;
+  final ReactiveBlocListenerCallback<SuccessReactiveState>? onSuccess;
+  final ReactiveBlocListenerCallback<UpdateReactiveState>? onUpdateState;
+
+  ReactiveBlocBaseScreenState({
+    this.onSubmitting,
+    this.onFailure,
+    this.onSuccess,
+    this.onUpdateState,
     bool extendBodyBehindAppBar = false,
     FloatingActionButtonLocation floatingActionButtonLocation = FloatingActionButtonLocation.centerDocked,
   }) : super(
@@ -248,17 +181,27 @@ abstract class BlocBaseScreenState<T extends StatefulWidget, State, BLoC extends
           floatingActionButtonLocation: floatingActionButtonLocation,
         );
 
-  void listener(BuildContext context, State state) {}
+  late BLoC bloc;
 
   @override
   Widget build(BuildContext context) {
     return _theme(
       context,
       BlocProvider<BLoC>(
-        create: (context) => createBloc(context),
-        child: BlocListener<BLoC, State>(
-          listener: listener,
-          child: BlocBuilder<BLoC, State>(
+        create: (context) => bloc = createBloc(context)..init(),
+        child: ReactiveBlocListener<BLoC>(
+          onLoadFailure: (context, state) {
+            final message =
+                AppLang.i18n.message_failure_genericError(state.failureResponse?.exception.toString() ?? "");
+            showSnackBarFailure(context, "load ($runtimeType)", message, state.failureResponse!.exception,
+                stackTrace: state.failureResponse!.stackTrace);
+          },
+          onLoading: (context, state) => LoadingDialog.show(context),
+          onLoaded: (context, state) => LoadingDialog.hide(context),
+          onSubmitting: onSubmitting,
+          onFailure: onFailure,
+          onSuccess: onSuccess,
+          child: BlocBuilder<BLoC, ReactiveState>(
             builder: (context, state) => _scaffold(context),
           ),
         ),
