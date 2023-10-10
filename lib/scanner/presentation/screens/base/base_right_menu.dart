@@ -8,14 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class BaseMenu extends StatelessWidget {
-  final Function refresh;
   final bool logout, about;
 
   List<Widget> menuItems(BuildContext context) => const [];
   List<Widget> accountItems(BuildContext context) => const [];
 
   const BaseMenu({
-    required this.refresh,
     this.about = true,
     this.logout = false,
     super.key,
@@ -51,14 +49,16 @@ class BaseMenu extends StatelessWidget {
                       .map(
                         (e) => DropdownMenuItem(
                           value: e.code,
-                          child: Text(e.name, style: Theme.of(context).textTheme.bodyLarge),
+                          child: Text(
+                            e.name,
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
                         ),
                       )
                       .toList(),
                   onChanged: (newValue) {
                     AppLang.lang = newValue!;
                     Scaffold.of(context).closeEndDrawer();
-                    refresh();
                   },
                 ),
               ),

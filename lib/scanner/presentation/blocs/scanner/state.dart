@@ -10,6 +10,7 @@ class StateParameter extends Equatable {
   final List<I18nLabel> docTypeItems;
 
   final String? cropperFilename;
+  final bool cropperImageLocked;
   final Uint8List? cropperImage;
   final List<Tuple2<String, Uint8List>> scannedImages;
   final List<Uint8List?> cachedImages;
@@ -26,6 +27,7 @@ class StateParameter extends Equatable {
     this.receiverItems = const [],
     this.docTypeItems = const [],
     this.cropperFilename,
+    this.cropperImageLocked = false,
     this.cropperImage,
     this.scannedImages = const [],
     this.cachedImages = const [],
@@ -42,6 +44,7 @@ class StateParameter extends Equatable {
     List<I18nLabel>? receiverItems,
     List<I18nLabel>? docTypeItems,
     String? cropperFilename,
+    bool? cropperImageLocked,
     Uint8List? cropperImage,
     List<Tuple2<String, Uint8List>>? scannedImages,
     List<Uint8List?>? cachedImages,
@@ -57,11 +60,10 @@ class StateParameter extends Equatable {
       receiverItems: receiverItems ?? this.receiverItems,
       docTypeItems: docTypeItems ?? this.docTypeItems,
       cropperFilename: cropperFilename ?? this.cropperFilename,
+      cropperImageLocked: cropperImageLocked ?? this.cropperImageLocked,
       cropperImage: cropperImage ?? this.cropperImage,
       scannedImages: scannedImages ?? this.scannedImages,
       cachedImages: cachedImages ?? this.cachedImages,
-      //   amount: amount ?? this.amount,
-      //   threshold: threshold ?? this.threshold,
       currentScannedImage: currentScannedImage ?? this.currentScannedImage,
     );
   }
@@ -75,11 +77,10 @@ class StateParameter extends Equatable {
         receiverItems,
         docTypeItems,
         cropperFilename,
+        cropperImageLocked,
         cropperImage,
         cachedImages,
         scannedImages,
-        // amount,
-        // threshold,
         currentScannedImage,
       ];
 

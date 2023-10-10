@@ -29,8 +29,11 @@ class InitReactiveState<StateParam extends Equatable> extends ReactiveState<Stat
 }
 
 class LoadingReactiveState<StateParam extends Equatable> extends ReactiveState<StateParam> {
+  final FormControl<int>? progress;
+
   const LoadingReactiveState({
     required super.parameter,
+    this.progress,
   }) : super(
           successResponse: null,
           failureResponse: null,
@@ -38,8 +41,10 @@ class LoadingReactiveState<StateParam extends Equatable> extends ReactiveState<S
 
   LoadingReactiveState.newWith({
     required ReactiveState<StateParam> other,
+    FormControl<int>? progress,
   }) : this(
           parameter: other.parameter,
+          progress: progress,
         );
 }
 
@@ -67,6 +72,65 @@ class LoadFailureReactiveState<StateParam extends Equatable> extends ReactiveSta
         );
 
   LoadFailureReactiveState.newWith({
+    required ErrorValue? failureResponse,
+    required ReactiveState<StateParam> other,
+  }) : this(
+          failureResponse: failureResponse,
+          parameter: other.parameter,
+        );
+}
+
+class ProgressReactiveState<StateParam extends Equatable> extends ReactiveState<StateParam> {
+  final FormControl<int>? progress;
+  final int max;
+
+  const ProgressReactiveState({
+    required super.parameter,
+    this.progress,
+    this.max = 0,
+  })  : assert(progress == null || max > 0, "progress and max have to set both calculate the progress"),
+        super(
+          successResponse: null,
+          failureResponse: null,
+        );
+
+  ProgressReactiveState.newWith({
+    required ReactiveState<StateParam> other,
+    FormControl<int>? progress,
+    int max = -1,
+  }) : this(
+          parameter: other.parameter,
+          progress: progress,
+          max: max,
+        );
+}
+
+class ProgressCloseReactiveState<StateParam extends Equatable> extends ReactiveState<StateParam> {
+  const ProgressCloseReactiveState({
+    required super.parameter,
+    required super.successResponse,
+  }) : super(
+          failureResponse: null,
+        );
+
+  ProgressCloseReactiveState.newWith({
+    required ReactiveState<StateParam> other,
+    required String? successResponse,
+  }) : this(
+          successResponse: successResponse,
+          parameter: other.parameter,
+        );
+}
+
+class ProgressFailureReactiveState<StateParam extends Equatable> extends ReactiveState<StateParam> {
+  const ProgressFailureReactiveState({
+    required super.failureResponse,
+    required super.parameter,
+  }) : super(
+          successResponse: null,
+        );
+
+  ProgressFailureReactiveState.newWith({
     required ErrorValue? failureResponse,
     required ReactiveState<StateParam> other,
   }) : this(

@@ -77,6 +77,30 @@
       }
     }
   },
+  "field_confirmPassword_label": "Confirm Password",
+  "@field_confirmPassword_label": {
+    "description": "Password hint on signin page"
+  },
+  "field_currentPassword_label": "Current Password",
+  "@field_currentPassword_label": {
+    "description": "Current Password on change password page"
+  },
+  "field_password_hint": "***",
+  "@field_password_hint": {
+    "description": ""
+  },
+  "field_password_label": "Password",
+  "@field_password_label": {
+    "description": ""
+  },
+  "field_username_hint": "username or email@example.com",
+  "@field_username_hint": {
+    "description": ""
+  },
+  "field_username_label": "Username or E-mail",
+  "@field_username_label": {
+    "description": "username hint an signin page"
+  },
   "i18n_field_hint": "tech;en:Name;de:Translation",
   "@i18n_field_hint": {
     "description": ""

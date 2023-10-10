@@ -1,12 +1,15 @@
 import 'package:document_scanner/core/lib/platform/platform.dart';
 import 'package:document_scanner/core/reactive/bloc.dart';
 import 'package:document_scanner/core/toaster/error.dart';
+import 'package:document_scanner/core/toaster/success.dart';
 import 'package:document_scanner/core/widgets/loading_dialog/loading_dialog.dart';
 import 'package:document_scanner/core/widgets/reactive/listener.dart';
 import 'package:document_scanner/l10n/app_lang.dart';
+import 'package:document_scanner/scanner/presentation/screens/error/error.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:reactive_forms/reactive_forms.dart';
 
 abstract class BaseScreen extends StatefulWidget {
   // static const String path = "/";.map((e) => null) baseLocation
@@ -164,15 +167,9 @@ abstract class BaseScreenState<T extends StatefulWidget> extends State<T> {
 
 abstract class ReactiveBlocBaseScreenState<T extends StatefulWidget, BLoC extends ReactiveBloc>
     extends BaseScreenState<T> {
-  final ReactiveBlocListenerCallback<SubmittingReactiveState>? onSubmitting;
-  final ReactiveBlocListenerCallback<FailureReactiveState>? onFailure;
-  final ReactiveBlocListenerCallback<SuccessReactiveState>? onSuccess;
   final ReactiveBlocListenerCallback<UpdateReactiveState>? onUpdateState;
 
   ReactiveBlocBaseScreenState({
-    this.onSubmitting,
-    this.onFailure,
-    this.onSuccess,
     this.onUpdateState,
     bool extendBodyBehindAppBar = false,
     FloatingActionButtonLocation floatingActionButtonLocation = FloatingActionButtonLocation.centerDocked,
@@ -198,11 +195,41 @@ abstract class ReactiveBlocBaseScreenState<T extends StatefulWidget, BLoC extend
           },
           onLoading: (context, state) => LoadingDialog.show(context),
           onLoaded: (context, state) => LoadingDialog.hide(context),
-          onSubmitting: onSubmitting,
-          onFailure: onFailure,
-          onSuccess: onSuccess,
+          //
+          onProgress: (context, state) => ProgressLoadingDialog.show(context, state.progress, state.max),
+          onProgressSuccess: (context, state) {
+            ProgressLoadingDialog.hide(context);
+            if (state.successResponse != null) {
+              showSnackBarSuccess(context, "scanner", "${state.successResponse}");
+            }
+          },
+          onProgressFailure: (context, state) {
+            final message =
+                AppLang.i18n.message_failure_genericError(state.failureResponse?.exception.toString() ?? "");
+            showSnackBarFailure(context, "load ($runtimeType)", message, state.failureResponse!.exception,
+                stackTrace: state.failureResponse!.stackTrace);
+          },
           child: BlocBuilder<BLoC, ReactiveState>(
-            builder: (context, state) => _scaffold(context),
+            builder: (context, state) => FutureBuilder(
+                future: bloc.loaded,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return ErrorScaffold(
+                      reload: () => bloc.init(),
+                      title: title(context),
+                      error: snapshot.error,
+                    );
+                  }
+
+                  if (!snapshot.hasData || snapshot.data == false) {
+                    return Container();
+                  }
+
+                  return ReactiveForm(
+                    formGroup: bloc.group,
+                    child: _scaffold(context),
+                  );
+                }),
           ),
         ),
       ),

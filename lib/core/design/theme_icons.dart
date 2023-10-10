@@ -70,10 +70,10 @@ class ThemeIcons {
 
   static IconData get newPosition => FontAwesomeIcons.plus;
   static IconData get newspaper => FontAwesomeIcons.newspaper;
-  static IconData get noObscure => FontAwesomeIcons.eye;
+  static IconData get noObscure => FontAwesomeIcons.eyeSlash;
   static IconData get notifications => FontAwesomeIcons.bell;
 
-  static IconData get obscure => FontAwesomeIcons.eyeSlash;
+  static IconData get obscure => FontAwesomeIcons.eye;
   static IconData get on => FontAwesomeIcons.toggleOn;
   static IconData get off => FontAwesomeIcons.toggleOff;
 
