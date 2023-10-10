@@ -32,6 +32,5 @@ class _NotFoundScreenState extends BaseScreenState<NotFoundScreen> {
       );
 
   @override
-  PreferredSizeWidget? buildAppBar(BuildContext context) =>
-      LightSubTopNavBar(title: title(context), refresh: update, home: true);
+  PreferredSizeWidget? buildAppBar(BuildContext context) => LightSubTopNavBar(title: title(context), home: true);
 }

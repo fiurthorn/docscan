@@ -109,6 +109,7 @@ abstract class ApplicationState<T extends Application> extends State<T> {
   Set<String>? _routePaths;
   Set<String> get routePaths => _routePaths ??= routes.map((e) => e.path).toSet();
 
+  String get whatsNew;
   String get initialRoute;
 
   RouterConfiguration goRouter() {
@@ -129,6 +130,10 @@ abstract class ApplicationState<T extends Application> extends State<T> {
       initialLocation: initialRoute,
       restorationScopeId: 'docscan',
       redirect: (context, state) {
+        if (sl<KeyValues>().hasNewBuildNumber()) {
+          return whatsNew;
+        }
+
         return null;
       },
     );

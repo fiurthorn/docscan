@@ -40,4 +40,6 @@ abstract class KeyValues {
   Future<void> exportDatabase();
 
   Future<void> importDatabase(Map<dynamic, dynamic> map);
+
+  void clear();
 }

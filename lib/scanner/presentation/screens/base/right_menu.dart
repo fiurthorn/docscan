@@ -16,7 +16,6 @@ class RightMenu extends BaseMenu {
   final List<Widget> additionalAccountItems;
 
   const RightMenu({
-    required super.refresh,
     super.logout = true,
     super.key,
     this.additionalMenuItems = const [],

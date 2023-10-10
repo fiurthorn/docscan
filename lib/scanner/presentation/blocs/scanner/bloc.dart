@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:crop_your_image/crop_your_image.dart';
 import 'package:document_scanner/core/lib/compare/compare.dart';
 import 'package:document_scanner/core/lib/logger.dart';
 import 'package:document_scanner/core/lib/optional.dart';
@@ -37,9 +38,12 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
 
   final amount = FormControl<double>(value: 1.0);
   final threshold = FormControl<double>(value: 0.5);
-  final working = FormControl<bool>(value: false);
+  final converting = FormControl<bool>(value: false);
+  final progress = FormControl<int>();
 
   final attachments = FormArray<FileAttachment>([], validators: [Validators.minLength(1)]);
+
+  final cropController = CropController();
 
   final _currentScannedImageController = StreamController<Uint8List?>.broadcast();
   Stream<Uint8List?> get currentScannedImageStream => _currentScannedImageController.stream;
@@ -53,12 +57,12 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
         converter.markAsDisabled();
         amount.markAsDisabled();
         threshold.markAsDisabled();
-        working.updateValue(true);
+        converting.updateValue(true);
       } else {
         converter.markAsEnabled();
         amount.markAsEnabled();
         threshold.markAsEnabled();
-        working.updateValue(false);
+        converting.updateValue(false);
       }
     });
   }
@@ -201,8 +205,26 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
     attachments.markAsDirty();
   }
 
-  void uploadFile(String filename) {
-    usecase<ReadFileResult, ReadFileParam>(ReadFileParam(filename)).then((value) => uploadAttachment(value.a, value.b));
+  void uploadCropperImage(Uint8List image) {
+    try {
+      emitProgress();
+      hideCropper();
+      uploadAttachment(state.parameter.cropperFilename!, image);
+      emitProgressSuccess();
+    } on Exception catch (err, stack) {
+      emitProgressFailure(failureResponse: ErrorValue(err, stack));
+    }
+  }
+
+  void uploadFilePickerFile(String filename) {
+    try {
+      emitProgress();
+      usecase<ReadFileResult, ReadFileParam>(ReadFileParam(filename))
+          .then((value) => uploadAttachment(value.a, value.b));
+      emitProgressSuccess();
+    } on Exception catch (err, stack) {
+      emitProgressFailure(failureResponse: ErrorValue(err, stack));
+    }
   }
 
   void uploadAttachment(String filename, Uint8List bytes) {
@@ -217,9 +239,8 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
       return;
     }
 
-    emitLoading();
     final content = await sl<FileRepos>().readXFile(file);
-    emitLoaded(
+    emitUpdate(
       parameter: state.parameter.copyWith(
         cropperFilename: content.a,
         cropperImage: content.b,
@@ -250,38 +271,46 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
   }
 
   Future<void> createPDF() async {
-    emitLoading();
+    progress.updateValue(0);
+    emitProgress(progress: progress, max: state.parameter.scannedImages.length);
 
     final futures = List.generate(state.parameter.scannedImages.length, (index) => index);
     await Future.forEach(
       futures,
       (index) => convertedImage(index).then(
-        (value) => Log.norm("pdf converted #${value + 1}"),
+        (value) {
+          progress.updateValue(value);
+          return Log.norm("pdf converted #${value + 1}");
+        },
       ),
-    );
-
-    final pdfImageData = <Tuple2<String, Uint8List>>[];
-    for (var i = 0, len = state.parameter.scannedImages.length; i < len; i++) {
-      pdfImageData.add(Tuple2(
-        state.parameter.scannedImages[i].a,
-        state.parameter.cachedImages[i]!,
-      ));
-    }
-
-    final pdfData = await usecase<CreatePdfFileResult, CreatePdfFileParam>(
-      CreatePdfFileParam(
-        pdfImageData.map((e) => AttachmentParam.fromTuple(e)).toList(),
-      ),
-    );
-    uploadAttachment("scan.pdf", pdfData);
-
-    emitLoaded(
-      parameter: state.parameter.copyWith(
-        currentScannedImage: 0,
-        scannedImages: [],
-        cachedImages: [],
-      ),
-    );
+    )
+        .then((value) => <Tuple2<String, Uint8List>>[])
+        .then((pdfImageData) {
+          for (var i = 0, len = state.parameter.scannedImages.length; i < len; i++) {
+            pdfImageData.add(Tuple2(
+              state.parameter.scannedImages[i].a,
+              state.parameter.cachedImages[i]!,
+            ));
+          }
+          return pdfImageData;
+        })
+        .then((pdfImageData) => usecase<CreatePdfFileResult, CreatePdfFileParam>(
+              CreatePdfFileParam(
+                pdfImageData.map((e) => AttachmentParam.fromTuple(e)).toList(),
+              ),
+            ))
+        .then(
+          (pdfData) => uploadAttachment("scan.pdf", pdfData),
+        )
+        .then((value) => progress.updateValue(state.parameter.scannedImages.length))
+        .whenComplete(() => emitProgressSuccess(
+              parameter: state.parameter.copyWith(
+                currentScannedImage: 0,
+                scannedImages: [],
+                cachedImages: [],
+              ),
+            ))
+        .catchError((err, stackTrace) => emitProgressFailure(failureResponse: ErrorValue(err, stackTrace)));
   }
 
   clearImageCache() {
@@ -333,10 +362,6 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
     updateConvertedImage();
   }
 
-  bool shouldShowWhatsNew() => sl<KeyValues>().hasNewBuildNumber();
-
-  closedWhatsNew() => sl<KeyValues>().resetBuildNumber();
-
   void amountChanged() {
 //     emitUpdate(parameter: state.parameter.copyWith(amount: value));
     clearImageCache();
@@ -352,6 +377,10 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
   updateConverter(FormControl<I18nLabel> value) {
     clearImageCache();
     updateConvertedImage();
+  }
+
+  void toggleCropperImageLock() {
+    emitUpdate(parameter: state.parameter.copyWith(cropperImageLocked: !state.parameter.cropperImageLocked));
   }
 }
 

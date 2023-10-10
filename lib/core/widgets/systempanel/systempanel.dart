@@ -49,7 +49,9 @@ class SystemPanel extends StatelessWidget {
                 "What's new",
                 () => showDialog(
                   context: context,
-                  builder: (context) => const WhatsNewDialog(),
+                  builder: (context) => WhatsNewDialog(
+                    onClose: () => Navigator.pop(context),
+                  ),
                 ),
               ),
               _reloadButton(

@@ -1,15 +1,12 @@
+import 'package:crop_your_image/crop_your_image.dart';
 import 'package:cunning_document_scanner/cunning_document_scanner.dart';
 import 'package:document_scanner/core/design/theme_colors.dart';
 import 'package:document_scanner/core/design/theme_icons.dart';
 import 'package:document_scanner/core/lib/size.dart';
 import 'package:document_scanner/core/reactive/i18n_label.dart';
-import 'package:document_scanner/core/toaster/error.dart';
 import 'package:document_scanner/core/toaster/signal.dart';
-import 'package:document_scanner/core/toaster/success.dart';
 import 'package:document_scanner/core/widgets/confirm/confirm.dart';
-import 'package:document_scanner/core/widgets/cropper/widget.dart';
 import 'package:document_scanner/core/widgets/goroute/route.dart';
-import 'package:document_scanner/core/widgets/loading_dialog/loading_dialog.dart';
 import 'package:document_scanner/core/widgets/reactive/autocomplete.dart';
 import 'package:document_scanner/core/widgets/responsive.dart';
 import 'package:document_scanner/l10n/app_lang.dart';
@@ -18,11 +15,9 @@ import 'package:document_scanner/scanner/presentation/blocs/scanner/bloc.dart';
 import 'package:document_scanner/scanner/presentation/screens/base.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/template_page.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/top_nav.dart';
-import 'package:document_scanner/scanner/presentation/screens/whats_new/app.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pdfx/pdfx.dart';
 import 'package:reactive_date_time_picker/reactive_date_time_picker.dart';
@@ -44,22 +39,6 @@ class ScannerScreen extends BaseScreen {
 }
 
 class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, ScannerBloc> {
-  _ScannerScreenState()
-      : super(
-          onSubmitting: (context, state) => LoadingDialog.show(context),
-          onSuccess: (context, state) {
-            LoadingDialog.hide(context);
-            showSnackBarSuccess(context, "scanner", "${state.successResponse}");
-          },
-          onFailure: (context, state) {
-            LoadingDialog.hide(context);
-            final message =
-                AppLang.i18n.message_failure_genericError(state.failureResponse?.exception.toString() ?? "");
-            showSnackBarFailure(context, "scanner", message, state.failureResponse!.exception,
-                stackTrace: state.failureResponse!.stackTrace);
-          },
-        );
-
   @override
   ScannerBloc createBloc(BuildContext context) => ScannerBloc();
 
@@ -89,7 +68,6 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
             ),
           ],
         ),
-        refresh: update,
       );
 
   @override
@@ -115,88 +93,75 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
   }
 
   Widget buildScannerForm(BuildContext context) {
-    if (bloc.shouldShowWhatsNew()) {
-      SchedulerBinding.instance.addPostFrameCallback(
-        (_) => showDialog(
-          context: context,
-          builder: (context) => const WhatsNew(),
-        ).then((value) => bloc.closedWhatsNew()),
-      );
-    }
-
     return ResponsiveWidthPadding(
-      ReactiveForm(
-        formGroup: bloc.group,
-        child: SingleChildScrollView(
-          primary: true,
-          child: Padding(
-            padding: const EdgeInsets.all(18.0),
-            child: Column(
-              children: [
-                ReactiveDropdownField<I18nLabel>(
-                  items: bloc.state.parameter.areaItems
-                      .map((e) => DropdownMenuItem<I18nLabel>(value: e, child: Text(e.label)))
-                      .toList(),
-                  formControl: bloc.area,
-                  decoration: InputDecoration(
-                    labelText: AppLang.i18n.scanner_areaSelect_label,
-                    hintText: AppLang.i18n.scanner_areaSelect_hint,
-                  ),
+      SingleChildScrollView(
+        primary: true,
+        child: Padding(
+          padding: const EdgeInsets.all(18.0),
+          child: Column(
+            children: [
+              ReactiveDropdownField<I18nLabel>(
+                items: bloc.state.parameter.areaItems
+                    .map((e) => DropdownMenuItem<I18nLabel>(value: e, child: Text(e.label)))
+                    .toList(),
+                formControl: bloc.area,
+                decoration: InputDecoration(
+                  labelText: AppLang.i18n.scanner_areaSelect_label,
+                  hintText: AppLang.i18n.scanner_areaSelect_hint,
                 ),
-                ReactiveAutocomplete<String>(
-                  formControl: bloc.senderName,
-                  textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(
-                    labelText: AppLang.i18n.scanner_senderField_label,
-                    hintText: AppLang.i18n.scanner_senderField_hint,
-                  ),
-                  enableSuggestions: false,
-                  optionsBuilder: (value) => bloc.state.parameter.filterSenderItems(value.text),
+              ),
+              ReactiveAutocomplete<String>(
+                formControl: bloc.senderName,
+                textInputAction: TextInputAction.next,
+                decoration: InputDecoration(
+                  labelText: AppLang.i18n.scanner_senderField_label,
+                  hintText: AppLang.i18n.scanner_senderField_hint,
                 ),
-                ReactiveDropdownField<I18nLabel>(
-                  items: bloc.state.parameter.receiverItems
-                      .map((e) => DropdownMenuItem<I18nLabel>(value: e, child: Text(e.label)))
-                      .toList(),
-                  formControl: bloc.receiverName,
-                  decoration: InputDecoration(
-                    labelText: AppLang.i18n.scanner_receiverField_label,
-                    hintText: AppLang.i18n.scanner_receiverField_hint,
-                  ),
+                optionsBuilder: (value) => bloc.state.parameter.filterSenderItems(value.text),
+              ),
+              ReactiveDropdownField<I18nLabel>(
+                items: bloc.state.parameter.receiverItems
+                    .map((e) => DropdownMenuItem<I18nLabel>(value: e, child: Text(e.label)))
+                    .toList(),
+                formControl: bloc.receiverName,
+                decoration: InputDecoration(
+                  labelText: AppLang.i18n.scanner_receiverField_label,
+                  hintText: AppLang.i18n.scanner_receiverField_hint,
                 ),
-                ReactiveDropdownField<I18nLabel>(
-                  items: bloc.state.parameter.docTypeItems
-                      .map((e) => DropdownMenuItem<I18nLabel>(value: e, child: Text(e.label)))
-                      .toList(),
-                  formControl: bloc.documentType,
-                  decoration: InputDecoration(
-                    labelText: AppLang.i18n.scanner_docTypeSelect_label,
-                    hintText: AppLang.i18n.scanner_docTypeSelect_hint,
-                  ),
+              ),
+              ReactiveDropdownField<I18nLabel>(
+                items: bloc.state.parameter.docTypeItems
+                    .map((e) => DropdownMenuItem<I18nLabel>(value: e, child: Text(e.label)))
+                    .toList(),
+                formControl: bloc.documentType,
+                decoration: InputDecoration(
+                  labelText: AppLang.i18n.scanner_docTypeSelect_label,
+                  hintText: AppLang.i18n.scanner_docTypeSelect_hint,
                 ),
-                ReactiveDateTimePicker(
-                  formControl: bloc.documentDate,
-                  firstDate: DateTime(1900),
-                  lastDate: DateTime(2100),
-                  decoration: InputDecoration(
-                    labelText: AppLang.i18n.scanner_docDateField_label,
-                    hintText: AppLang.i18n.scanner_docDateField_label,
-                  ),
+              ),
+              ReactiveDateTimePicker(
+                formControl: bloc.documentDate,
+                firstDate: DateTime.now().subtract(const Duration(days: 36530)),
+                lastDate: DateTime.now().add(const Duration(days: 36530)),
+                decoration: InputDecoration(
+                  labelText: AppLang.i18n.scanner_docDateField_label,
+                  hintText: AppLang.i18n.scanner_docDateField_label,
                 ),
-                const SizedBox(height: 20),
-                ReactiveFormArray(
-                  formArray: bloc.attachments,
-                  builder: (BuildContext context, FormArray<dynamic> formArray, Widget? child) {
-                    return ListView.builder(
-                      key: ValueKey(formArray.controls),
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: bloc.attachments.controls.length,
-                      itemBuilder: attachmentItemBuilder(),
-                    );
-                  },
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 20),
+              ReactiveFormArray(
+                formArray: bloc.attachments,
+                builder: (BuildContext context, FormArray<dynamic> formArray, Widget? child) {
+                  return ListView.builder(
+                    key: ValueKey(formArray.controls),
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: bloc.attachments.controls.length,
+                    itemBuilder: attachmentItemBuilder(),
+                  );
+                },
+              ),
+            ],
           ),
         ),
       ),
@@ -206,46 +171,82 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
   @override
   List<Widget>? buildPersistentFooterButtons(BuildContext context) {
     if (bloc.state.parameter.showCropper) {
-      return null;
+      return buildPersistentCropperFooterButtons(context);
     }
 
     if (bloc.state.parameter.scannedImages.isNotEmpty) {
-      return [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                FloatingActionButton(
-                  heroTag: "scanner_counterClockwise_pdf",
-                  onPressed: bloc.working.value! ? null : bloc.counterClockwise,
-                  child: Icon(ThemeIcons.counterClockwise),
-                ),
-                const SizedBox(
-                  width: 20,
-                ),
-                FloatingActionButton(
-                  heroTag: "scanner_clockwise_pdf",
-                  onPressed: bloc.working.value! ? null : bloc.clockwise,
-                  child: Icon(ThemeIcons.clockwise),
-                ),
-              ],
-            ),
-            FloatingActionButton(
-              heroTag: "scanner_btn_pdf",
-              onPressed: () => bloc.working.value! ? null : bloc.createPDF(),
-              child: Icon(ThemeIcons.filePDF),
-            ),
-          ],
-        )
-      ];
+      return buildPersistentConverterFooterButtons(context);
     }
 
-    return buildPersistentDefaultFooterButtons(context);
+    return buildPersistentScannerFooterButtons(context);
   }
 
-  List<Widget>? buildPersistentDefaultFooterButtons(BuildContext context) {
+  List<Widget>? buildPersistentCropperFooterButtons(BuildContext context) {
+    return [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          FloatingActionButton(
+            heroTag: "scanner_crop_lock",
+            onPressed: bloc.toggleCropperImageLock,
+            child: Icon(!bloc.state.parameter.cropperImageLocked ? ThemeIcons.lock : ThemeIcons.lockOpen),
+          ),
+          FloatingActionButton(
+            heroTag: "scanner_crop",
+            onPressed: bloc.state.parameter.cropperImageLocked ? bloc.cropController.crop : null,
+            backgroundColor: bloc.state.parameter.cropperImageLocked
+                ? nord12AuroraOrange
+                : Theme.of(context).floatingActionButtonTheme.backgroundColor,
+            child: Icon(ThemeIcons.check),
+          ),
+        ],
+      )
+    ];
+  }
+
+  List<Widget>? buildPersistentConverterFooterButtons(BuildContext context) {
+    return [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              ReactiveFormField(
+                formControl: bloc.converting,
+                builder: (context) => FloatingActionButton(
+                  heroTag: "scanner_counterClockwise_pdf",
+                  onPressed: bloc.converting.value! ? null : bloc.counterClockwise,
+                  child: Icon(ThemeIcons.counterClockwise),
+                ),
+              ),
+              const SizedBox(
+                width: 20,
+              ),
+              ReactiveFormField(
+                formControl: bloc.converting,
+                builder: (context) => FloatingActionButton(
+                  heroTag: "scanner_clockwise_pdf",
+                  onPressed: bloc.converting.value! ? null : bloc.clockwise,
+                  child: Icon(ThemeIcons.clockwise),
+                ),
+              ),
+            ],
+          ),
+          ReactiveFormField(
+            formControl: bloc.converting,
+            builder: (context) => FloatingActionButton(
+              heroTag: "scanner_btn_pdf",
+              onPressed: () => bloc.converting.value! ? null : bloc.createPDF(),
+              child: Icon(ThemeIcons.filePDF),
+            ),
+          ),
+        ],
+      )
+    ];
+  }
+
+  List<Widget>? buildPersistentScannerFooterButtons(BuildContext context) {
     return [
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
@@ -295,12 +296,11 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
     return FloatingActionButton(
       heroTag: "scanner_btn_scanner",
       onPressed: () async {
-        LoadingDialog.show(context);
         CunningDocumentScanner.getPictures().then((value) {
           if (value != null) {
             bloc.storeScanResult(value);
           }
-        }).whenComplete(() => LoadingDialog.hide(context));
+        });
       },
       child: Icon(ThemeIcons.scanner),
     );
@@ -310,8 +310,6 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
     return FloatingActionButton(
       heroTag: "scanner_btn_filePicker",
       onPressed: () async {
-        LoadingDialog.show(context);
-
         FilePicker.platform
             .pickFiles(
               allowMultiple: false,
@@ -321,10 +319,10 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
             .then(
           (path) {
             if (path != null) {
-              bloc.uploadFile(path);
+              bloc.uploadFilePickerFile(path);
             }
           },
-        ).whenComplete(() => LoadingDialog.hide(context));
+        );
       },
       child: Icon(ThemeIcons.file),
     );
@@ -361,14 +359,20 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
   }
 
   Widget cropper(BuildContext context) {
-    return Cropper(
+    final maskColor = Theme.of(context).scaffoldBackgroundColor;
+
+    return Crop(
       image: bloc.state.parameter.cropperImage!,
-      onCropped: (image) {
-        LoadingDialog.show(context);
-        bloc.hideCropper();
-        bloc.uploadAttachment(bloc.state.parameter.cropperFilename!, image);
-        LoadingDialog.hide(context);
-      },
+      controller: bloc.cropController,
+      maskColor: bloc.state.parameter.cropperImageLocked ? maskColor : null,
+      fixArea: bloc.state.parameter.cropperImageLocked,
+      cornerDotBuilder: (size, edgeAlignment) => bloc.state.parameter.cropperImageLocked //
+          ? const SizedBox.shrink()
+          : const DotControl(),
+      baseColor: maskColor,
+      initialSize: 0.5,
+      radius: 0,
+      onCropped: bloc.uploadCropperImage,
     );
   }
 

@@ -16,7 +16,7 @@ String showSnackBarSuccess(BuildContext context, String hint, String message, [L
   }
 
   WidgetsBinding.instance.addPostFrameCallback((_) {
-    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: ResponsiveWidthPadding(content),
       backgroundColor: Theme.of(context).colorScheme.secondary,

@@ -77,6 +77,11 @@ class KeyValuesImpl implements KeyValues {
   }
 
   @override
+  void clear() {
+    set(KeyValueNames.lastBuildNumber, "0");
+  }
+
+  @override
   Future<void> importDatabase(Map<dynamic, dynamic> map) {
     return Future.wait(
       map.entries.map(

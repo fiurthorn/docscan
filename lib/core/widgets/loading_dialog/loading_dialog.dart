@@ -4,10 +4,11 @@ import 'package:reactive_forms/reactive_forms.dart';
 class LoadingDialog extends StatelessWidget {
   const LoadingDialog({super.key});
 
-  static void show(BuildContext context, {Key? key}) => showDialog<void>(
+  static void show(BuildContext context, {Color? color, Key? key}) => showDialog<void>(
         context: context,
         useRootNavigator: true,
         barrierDismissible: false,
+        barrierColor: color ?? Colors.black.withOpacity(0.5),
         builder: (_) => LoadingDialog(key: key),
       ).then((_) => FocusScope.of(context).requestFocus(FocusNode()));
 
@@ -18,13 +19,11 @@ class LoadingDialog extends StatelessWidget {
     return WillPopScope(
       onWillPop: () async => false,
       child: Center(
-        child: Card(
-          child: Container(
-            width: 80,
-            height: 80,
-            padding: const EdgeInsets.all(12.0),
-            child: const CircularProgressIndicator(),
-          ),
+        child: Container(
+          width: 80,
+          height: 80,
+          padding: const EdgeInsets.all(12.0),
+          child: const CircularProgressIndicator(),
         ),
       ),
     );
@@ -34,10 +33,11 @@ class LoadingDialog extends StatelessWidget {
 typedef CancelAction = void Function();
 
 class CancelableLoadingDialog extends StatelessWidget {
-  static void show(CancelAction onCancel, BuildContext context, {Key? key}) => showDialog<void>(
+  static void show(CancelAction onCancel, BuildContext context, {Color? color, Key? key}) => showDialog<void>(
         context: context,
         useRootNavigator: true,
         barrierDismissible: false,
+        barrierColor: color ?? Colors.black.withOpacity(0.5),
         builder: (_) => CancelableLoadingDialog(onCancel, key: key),
       ).then((_) => FocusScope.of(context).requestFocus(FocusNode()));
 
@@ -52,21 +52,18 @@ class CancelableLoadingDialog extends StatelessWidget {
     return WillPopScope(
       onWillPop: () async => false,
       child: Center(
-        child: Card(
-          child: Container(
-            // width: 80,
-            // height: 80,
-            padding: const EdgeInsets.all(12.0),
-            child: FloatingActionButton.extended(
-              label: const Text("Aktion abbrechen"),
-              icon: const Icon(
-                Icons.close,
-              ),
-              onPressed: () {
-                onCancel();
-                hide(context);
-              },
-            ),
+        child: Container(
+          // width: 80,
+          // height: 80,
+          padding: const EdgeInsets.all(12.0),
+          child: FloatingActionButton.extended(
+            elevation: 0,
+            label: const Text("Aktion abbrechen"),
+            icon: const Icon(Icons.close),
+            onPressed: () {
+              onCancel();
+              hide(context);
+            },
           ),
         ),
       ),
@@ -75,24 +72,30 @@ class CancelableLoadingDialog extends StatelessWidget {
 }
 
 class ProgressLoadingDialog extends StatefulWidget {
-  final FormControl<int> control;
+  final FormControl<int>? progress;
   final int max;
 
   const ProgressLoadingDialog({
-    required this.control,
-    this.max = 100,
+    required this.progress,
+    this.max = 0,
     super.key,
   });
 
-  static void show(BuildContext context, FormControl<int> control, {Key? key}) => showDialog<void>(
-        context: context,
-        useRootNavigator: true,
-        barrierDismissible: false,
-        builder: (_) => ProgressLoadingDialog(
-          control: control,
-          key: key,
-        ),
-      ).then((_) => FocusScope.of(context).requestFocus(FocusNode()));
+  static void show(BuildContext context, FormControl<int>? progress, int max, {Color? color, Key? key}) {
+    assert(progress == null || max > 0, "progress and max have to set both calculate the progress");
+
+    showDialog<void>(
+      context: context,
+      useRootNavigator: true,
+      barrierDismissible: false,
+      barrierColor: color ?? Colors.black.withOpacity(0.5),
+      builder: (_) => ProgressLoadingDialog(
+        progress: progress,
+        max: max,
+        key: key,
+      ),
+    ).then((_) => FocusScope.of(context).requestFocus(FocusNode()));
+  }
 
   static void hide(BuildContext context) => Navigator.pop(context);
 
@@ -101,22 +104,26 @@ class ProgressLoadingDialog extends StatefulWidget {
 }
 
 class _ProgressLoadingDialogState extends State<ProgressLoadingDialog> {
+  FormControl<int> get control => widget.progress!;
+
   @override
   Widget build(BuildContext context) {
+    if (widget.progress == null) {
+      return const LoadingDialog();
+    }
+
     return ReactiveFormField(
-        formControl: widget.control,
+        formControl: widget.progress,
         builder: (context) {
           return WillPopScope(
             onWillPop: () async => false,
             child: Center(
-              child: Card(
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  padding: const EdgeInsets.all(12.0),
-                  child: CircularProgressIndicator(
-                    value: ((widget.control.value ?? 0) > 0) ? (widget.control.value! / widget.max) : 0,
-                  ),
+              child: Container(
+                width: 80,
+                height: 80,
+                padding: const EdgeInsets.all(12.0),
+                child: CircularProgressIndicator(
+                  value: widget.max <= 0 ? null : (control.value! / widget.max),
                 ),
               ),
             ),

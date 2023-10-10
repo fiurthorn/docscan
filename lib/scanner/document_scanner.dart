@@ -5,6 +5,7 @@ import 'package:document_scanner/scanner/presentation/screens/documentsTypes/pag
 import 'package:document_scanner/scanner/presentation/screens/receivers/page.dart';
 import 'package:document_scanner/scanner/presentation/screens/scanner/page.dart';
 import 'package:document_scanner/scanner/presentation/screens/senders/page.dart';
+import 'package:document_scanner/scanner/presentation/screens/whats_new/page.dart';
 import 'package:flutter/material.dart';
 
 class DocumentScanner extends Application {
@@ -22,7 +23,11 @@ class _DocumentScannerState extends ApplicationState<DocumentScanner> {
     DocumentTypesScreen.route,
     SendersScreen.route,
     ReceiversScreen.route,
+    WhatsNewDialog.route
   };
+
+  @override
+  String get whatsNew => WhatsNewDialog.path;
 
   @override
   String get initialRoute => ScannerScreen.path;

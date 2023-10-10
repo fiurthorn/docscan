@@ -6,30 +6,23 @@ import 'package:go_router/go_router.dart';
 
 class NavbarTitle extends StatelessWidget {
   final String title;
-  final Function refresh;
 
   const NavbarTitle(
-    this.title,
-    this.refresh, {
+    this.title, {
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    final back = context.canPop();
-
     return Row(children: [
       Visibility(
-        visible: back,
+        visible: context.canPop(),
         child: IconButton(
           icon: Icon(
             ThemeIcons.back,
             color: Theme.of(context).appBarTheme.foregroundColor,
           ),
-          onPressed: () {
-            context.pop();
-            refresh();
-          },
+          onPressed: context.pop,
         ),
       ),
       CustomText(
@@ -59,12 +52,10 @@ class Leading extends StatelessWidget {
 class CustomButtonTopNavBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final Widget button;
-  final void Function() refresh;
 
   const CustomButtonTopNavBar({
     required this.title,
     required this.button,
-    required this.refresh,
     super.key,
   });
 
@@ -74,7 +65,7 @@ class CustomButtonTopNavBar extends StatelessWidget implements PreferredSizeWidg
         automaticallyImplyLeading: false,
         title: ResponsiveWidthPadding(Row(
           children: [
-            NavbarTitle(title, refresh),
+            NavbarTitle(title),
             const Expanded(child: SizedBox()),
             button,
           ],
@@ -88,11 +79,9 @@ class CustomButtonTopNavBar extends StatelessWidget implements PreferredSizeWidg
 class LightSubTopNavBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool home;
-  final void Function() refresh;
 
   const LightSubTopNavBar({
     required this.title,
-    required this.refresh,
     this.home = false,
     super.key,
   });
@@ -102,7 +91,7 @@ class LightSubTopNavBar extends StatelessWidget implements PreferredSizeWidget {
         actions: const [SizedBox()],
         leading: home ? const Leading() : null,
         automaticallyImplyLeading: false,
-        title: ResponsiveWidthPadding(NavbarTitle(title, refresh)),
+        title: ResponsiveWidthPadding(NavbarTitle(title)),
       );
 
   @override
@@ -111,14 +100,12 @@ class LightSubTopNavBar extends StatelessWidget implements PreferredSizeWidget {
 
 class FullTopNavBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
-  final Function() refresh;
   final List<Widget> navigation;
   final List<Widget> children;
   final bool home;
 
   const FullTopNavBar({
     required this.title,
-    required this.refresh,
     this.navigation = const [],
     this.children = const [],
     this.home = false,
@@ -133,7 +120,7 @@ class FullTopNavBar extends StatelessWidget implements PreferredSizeWidget {
         title: ResponsiveWidthPadding(
           Row(
             children: [
-              NavbarTitle(title, refresh),
+              NavbarTitle(title),
               ...navigation,
               const Expanded(child: SizedBox()),
               ...children,
