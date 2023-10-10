@@ -1,3 +1,7 @@
+## v0.2.0
+
+- Code cleanup
+
 ## v0.1.6
 
 - disable controls when convert images.
