@@ -1,7 +1,7 @@
-import 'package:document_scanner/core/lib/tuple.dart';
 import 'package:document_scanner/core/service_locator/service_locator.dart';
 import 'package:document_scanner/scanner/data/datasources/file_source.dart';
 import 'package:document_scanner/scanner/domain/repositories/file_repos.dart';
+import 'package:document_scanner/scanner/domain/repositories/models/read_file.dart';
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -15,14 +15,14 @@ class FileReposImpl implements FileRepos {
   }
 
   @override
-  List<Tuple2<String, Uint8List>> readFiles(List<String> paths) {
+  List<ReadFileModel> readFiles(List<String> paths) {
     final content = paths.map((e) => sl<FileSource>().readFile(e)).toList();
-    return zip([paths, content]).map((e) => Tuple2(e[0] as String, e[1] as Uint8List)).toList();
+    return zip([paths, content]).map((e) => ReadFileModel(e[0] as String, e[1] as Uint8List)).toList();
   }
 
   @override
-  Tuple2<String, Uint8List> readFile(String path) {
-    return Tuple2(path, sl<FileSource>().readFile(path));
+  ReadFileModel readFile(String path) {
+    return ReadFileModel(path, sl<FileSource>().readFile(path));
   }
 
   @override
@@ -31,7 +31,7 @@ class FileReposImpl implements FileRepos {
   }
 
   @override
-  Future<Tuple2<String, Uint8List>> readXFile(XFile file) {
-    return sl<FileSource>().readXFile(file).then((value) => Tuple2(file.name, value));
+  Future<ReadFileModel> readXFile(XFile file) {
+    return sl<FileSource>().readXFile(file).then((value) => ReadFileModel(file.name, value));
   }
 }

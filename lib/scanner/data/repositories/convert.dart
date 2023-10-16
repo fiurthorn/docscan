@@ -1,4 +1,3 @@
-import 'package:document_scanner/core/lib/tuple.dart';
 import 'package:document_scanner/core/service_locator/service_locator.dart';
 import 'package:document_scanner/scanner/data/datasources/file_source.dart';
 import 'package:document_scanner/scanner/domain/repositories/convert.dart';
@@ -9,12 +8,13 @@ class ImageConverterImpl implements ImageConverter {
   @override
   Future<Uint8List> convertImage(
     String converter,
-    Tuple2<String, Uint8List> item, {
+    String itemName,
+    Uint8List itemData, {
     double amount = 1,
     double threshold = 0.5,
   }) {
-    final path = item.a;
-    final image = item.b;
+    final path = itemName;
+    final image = itemData;
 
     Future<Uint8List> cachedImage;
     switch (converter) {

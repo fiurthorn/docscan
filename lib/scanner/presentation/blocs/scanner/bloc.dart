@@ -4,7 +4,6 @@ import 'package:crop_your_image/crop_your_image.dart';
 import 'package:document_scanner/core/lib/compare/compare.dart';
 import 'package:document_scanner/core/lib/logger.dart';
 import 'package:document_scanner/core/lib/optional.dart';
-import 'package:document_scanner/core/lib/tuple.dart';
 import 'package:document_scanner/core/reactive/bloc.dart';
 import 'package:document_scanner/core/reactive/i18n_label.dart';
 import 'package:document_scanner/core/reactive/validators/required.dart';
@@ -20,14 +19,43 @@ import 'package:document_scanner/scanner/domain/usecases/load_list_items.dart';
 import 'package:document_scanner/scanner/domain/usecases/read_file.dart';
 import 'package:document_scanner/scanner/domain/usecases/read_files.dart';
 import 'package:document_scanner/scanner/domain/usecases/rotate_image.dart';
-import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
-part 'state.dart';
+part 'bloc.freezed.dart';
+
+@freezed
+class StateParameter with _$StateParameter {
+  const factory StateParameter({
+    String? cropperFilename,
+    Uint8List? cropperImage,
+    @Default(0) int currentScannedImage,
+    @Default(false) bool showCropper,
+    @Default(false) bool showScanner,
+    @Default(false) bool cropperImageLocked,
+    @Default([]) List<I18nLabel> areaItems,
+    @Default([]) List<String> senderItems,
+    @Default([]) List<I18nLabel> receiverItems,
+    @Default([]) List<I18nLabel> docTypeItems,
+    @Default([]) List<FileAttachment> scannedImages,
+    @Default([]) List<Uint8List?> cachedImages,
+  }) = _StateParameter;
+}
+
+@freezed
+class FileAttachment with _$FileAttachment {
+  factory FileAttachment(
+    String name,
+    Uint8List data,
+    int size,
+  ) = $FileAttachment;
+}
 
 class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
+  static const String scan = "scan";
+
   final area = FormControl<I18nLabel>(validators: [const CustomRequiredValidator()]);
   final senderName = FormControl<String>(validators: [Validators.required]);
   final receiverName = FormControl<I18nLabel>(validators: [const CustomRequiredValidator()]);
@@ -92,7 +120,7 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
       docTypeItems: _i18nItems(KeyValueNames.documentTypes),
     ));
 
-    converter.updateValue(converterItems()[1]);
+    converter.updateValue(converterItems().firstWhere((item) => item.technical == grayscale));
   }
 
   List<String> _plainItems(KeyValueNames key) {
@@ -154,11 +182,20 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
     ];
   }
 
-  void showCropper() => emit(UpdateReactiveState(parameter: state.parameter.copyWith(showCropper: true)));
-  void hideCropper() => emit(UpdateReactiveState(parameter: state.parameter.copyWith(showCropper: false)));
+  void showCropper() => emitUpdate(
+          parameter: state.parameter.copyWith(
+        showCropper: true,
+        cropperImageLocked: false,
+      ));
+
+  void hideCropper() => emitUpdate(
+          parameter: state.parameter.copyWith(
+        showCropper: false,
+        cropperImageLocked: false,
+      ));
 
   submit() {
-    emitSubmitting();
+    emitProgress();
 
     try {
       usecase<ExportAttachmentResult, ExportAttachmentsParam>(ExportAttachmentsParam(
@@ -173,7 +210,8 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
             (_) => attachments.clear(),
           )
           .whenComplete(
-            () => emitSuccess(
+            () => emitProgressSuccess(
+              progressIndicator: scan,
               successResponse: "files created",
               parameter: state.parameter.copyWith(
                 scannedImages: [],
@@ -182,7 +220,7 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
             ),
           );
     } on Exception catch (err, stack) {
-      emitFailure(failureResponse: ErrorValue(err, stack));
+      emitProgressFailureError(failureResponse: ErrorValue(err, stack));
     }
   }
 
@@ -192,7 +230,7 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
         emitUpdate(
           parameter: state.parameter.copyWith(
             currentScannedImage: 0,
-            scannedImages: value,
+            scannedImages: value.map((e) => FileAttachment(e.name, e.data, e.data.length)).toList(),
             cachedImages: List.filled(value.length, null),
           ),
         );
@@ -212,7 +250,7 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
       uploadAttachment(state.parameter.cropperFilename!, image);
       emitProgressSuccess();
     } on Exception catch (err, stack) {
-      emitProgressFailure(failureResponse: ErrorValue(err, stack));
+      emitProgressFailureError(failureResponse: ErrorValue(err, stack));
     }
   }
 
@@ -220,10 +258,10 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
     try {
       emitProgress();
       usecase<ReadFileResult, ReadFileParam>(ReadFileParam(filename))
-          .then((value) => uploadAttachment(value.a, value.b));
+          .then((value) => uploadAttachment(value.name, value.data));
       emitProgressSuccess();
     } on Exception catch (err, stack) {
-      emitProgressFailure(failureResponse: ErrorValue(err, stack));
+      emitProgressFailureError(failureResponse: ErrorValue(err, stack));
     }
   }
 
@@ -231,7 +269,7 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
     final value = FileAttachment(filename, bytes, bytes.length);
     attachments.add(FormControl<FileAttachment>(value: value));
     attachments.markAsDirty();
-    emit(UpdateReactiveState(parameter: state.parameter));
+    emitUpdate(parameter: state.parameter);
   }
 
   loadCropperImage(XFile? file) async {
@@ -242,8 +280,8 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
     final content = await sl<FileRepos>().readXFile(file);
     emitUpdate(
       parameter: state.parameter.copyWith(
-        cropperFilename: content.a,
-        cropperImage: content.b,
+        cropperFilename: content.name,
+        cropperImage: content.data,
         showCropper: true,
       ),
     );
@@ -254,17 +292,24 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
 
   void _rotate(bool counterClockwise) {
     currentScannedImageSink.add(null);
+
     final index = state.parameter.currentScannedImage;
-    final currentScanned = state.parameter.scannedImages[index];
-    usecase<Uint8List, RotateImageParam>(RotateImageParam(currentScanned.b, counterClockwise))
-        .then((value) => state.parameter.scannedImages[index] = Tuple2(currentScanned.a, value))
-        .then((_) => state.parameter.cachedImages[index] = null)
+    final scannedImages = List.of(state.parameter.scannedImages);
+    final cachedImages = List.of(state.parameter.cachedImages);
+
+    usecase<Uint8List, RotateImageParam>(RotateImageParam(scannedImages[index].data, counterClockwise))
+        .then((value) => scannedImages[index] = FileAttachment(
+              scannedImages[index].name,
+              value,
+              value.length,
+            ))
+        .then((_) => cachedImages[index] = null)
         .then((_) => updateConvertedImage())
         .then(
           (_) => emitUpdate(
             parameter: state.parameter.copyWith(
-              scannedImages: state.parameter.scannedImages,
-              cachedImages: state.parameter.cachedImages,
+              scannedImages: scannedImages,
+              cachedImages: cachedImages,
             ),
           ),
         );
@@ -284,19 +329,20 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
         },
       ),
     )
-        .then((value) => <Tuple2<String, Uint8List>>[])
+        .then((value) => <FileAttachment>[])
         .then((pdfImageData) {
           for (var i = 0, len = state.parameter.scannedImages.length; i < len; i++) {
-            pdfImageData.add(Tuple2(
-              state.parameter.scannedImages[i].a,
+            pdfImageData.add(FileAttachment(
+              state.parameter.scannedImages[i].name,
               state.parameter.cachedImages[i]!,
+              state.parameter.cachedImages[i]!.length,
             ));
           }
           return pdfImageData;
         })
         .then((pdfImageData) => usecase<CreatePdfFileResult, CreatePdfFileParam>(
               CreatePdfFileParam(
-                pdfImageData.map((e) => AttachmentParam.fromTuple(e)).toList(),
+                pdfImageData.map((e) => AttachmentParam(e.name, e.data)).toList(),
               ),
             ))
         .then(
@@ -310,7 +356,7 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
                 cachedImages: [],
               ),
             ))
-        .catchError((err, stackTrace) => emitProgressFailure(failureResponse: ErrorValue(err, stackTrace)));
+        .catchError((err, stackTrace) => emitProgressFailureError(failureResponse: ErrorValue(err, stackTrace)));
   }
 
   clearImageCache() {
@@ -325,9 +371,11 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
   Future<int> convertedImage(int index) {
     if (state.parameter.cachedImages[index] != null) return Future.value(index);
 
+    final item = state.parameter.scannedImages[index];
     return usecase<ConvertImageResult, ConvertImageParam>(ConvertImageParam(
       converter: converter.value!.technical,
-      item: state.parameter.scannedImages[index],
+      itemName: item.name,
+      itemData: item.data,
       amount: amount.value!,
       threshold: threshold.value!,
     )).then((value) => state.parameter.cachedImages[index] = value).then((value) => index);
@@ -341,9 +389,11 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
       _currentScannedImageController.sink.add(state.parameter.cachedImages[index]!);
     }
 
+    final item = state.parameter.scannedImages[index];
     usecase<ConvertImageResult, ConvertImageParam>(ConvertImageParam(
       converter: converter.value!.technical,
-      item: state.parameter.scannedImages[index],
+      itemName: item.name,
+      itemData: item.data,
       amount: amount.value!,
       threshold: threshold.value!,
     )) //
@@ -363,13 +413,11 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
   }
 
   void amountChanged() {
-//     emitUpdate(parameter: state.parameter.copyWith(amount: value));
     clearImageCache();
     updateConvertedImage();
   }
 
   void thresholdChanged() {
-//     emitUpdate(parameter: state.parameter.copyWith(threshold: value));
     clearImageCache();
     updateConvertedImage();
   }
@@ -381,6 +429,16 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
 
   void toggleCropperImageLock() {
     emitUpdate(parameter: state.parameter.copyWith(cropperImageLocked: !state.parameter.cropperImageLocked));
+  }
+
+  List<String> filterSenderItems(String text) {
+    if (text.isEmpty) {
+      return state.parameter.senderItems;
+    } else {
+      return state.parameter.senderItems
+          .where((element) => element.toLowerCase().contains(text.toLowerCase()))
+          .toList();
+    }
   }
 }
 

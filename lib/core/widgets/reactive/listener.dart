@@ -10,13 +10,9 @@ class ReactiveBlocListener<BLoC extends ReactiveBloc> extends BlocListener<BLoC,
   final ReactiveBlocListenerCallback<LoadedReactiveState>? onLoaded;
 
   final ReactiveBlocListenerCallback<ProgressReactiveState>? onProgress;
-  final ReactiveBlocListenerCallback<ProgressCloseReactiveState>? onProgressSuccess;
+  final ReactiveBlocListenerCallback<ProgressSuccessReactiveState>? onProgressSuccess;
   final ReactiveBlocListenerCallback<ProgressFailureReactiveState>? onProgressFailure;
 
-  final ReactiveBlocListenerCallback<SubmittingReactiveState>? onSubmitting;
-  final ReactiveBlocListenerCallback<SuccessReactiveState>? onSuccess;
-
-  final ReactiveBlocListenerCallback<FailureReactiveState>? onFailure;
   final ReactiveBlocListenerCallback<UpdateReactiveState>? onUpdateState;
 
   ReactiveBlocListener({
@@ -26,14 +22,12 @@ class ReactiveBlocListener<BLoC extends ReactiveBloc> extends BlocListener<BLoC,
     this.onProgress,
     this.onProgressSuccess,
     this.onProgressFailure,
-    this.onSubmitting,
-    this.onSuccess,
-    this.onFailure,
     this.onUpdateState,
     super.child,
     super.key,
   }) : super(
           listener: (context, state) {
+            //
             if (state is LoadFailureReactiveState && onLoadFailure != null) {
               onLoadFailure(context, state);
             } else if (state is LoadingReactiveState && onLoading != null) {
@@ -42,16 +36,10 @@ class ReactiveBlocListener<BLoC extends ReactiveBloc> extends BlocListener<BLoC,
               onLoaded(context, state);
             } else if (state is ProgressReactiveState && onProgress != null) {
               onProgress(context, state);
-            } else if (state is ProgressCloseReactiveState && onProgressSuccess != null) {
+            } else if (state is ProgressSuccessReactiveState && onProgressSuccess != null) {
               onProgressSuccess(context, state);
             } else if (state is ProgressFailureReactiveState && onProgressFailure != null) {
               onProgressFailure(context, state);
-            } else if (state is SubmittingReactiveState && onSubmitting != null) {
-              onSubmitting(context, state);
-            } else if (state is SuccessReactiveState && onSuccess != null) {
-              onSuccess(context, state);
-            } else if (state is FailureReactiveState && onFailure != null) {
-              onFailure(context, state);
             } else if (state is UpdateReactiveState && onUpdateState != null) {
               onUpdateState(context, state);
             }

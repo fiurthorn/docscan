@@ -1,13 +1,11 @@
-import 'package:document_scanner/core/lib/tuple.dart';
 import 'package:flutter/foundation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-class ImageAttachment extends Tuple2<String, Uint8List> {
-  String get path => a;
-  Uint8List get image => b;
+part 'pdf.freezed.dart';
 
-  const ImageAttachment(String path, Uint8List image) : super(path, image);
-
-  ImageAttachment.fromTuple(Tuple2<String, Uint8List> t) : this(t.a, t.b);
+@freezed
+class ImageAttachment with _$ImageAttachment {
+  factory ImageAttachment(String path, Uint8List image) = _ImageAttachment;
 }
 
 abstract class PdfCreator {

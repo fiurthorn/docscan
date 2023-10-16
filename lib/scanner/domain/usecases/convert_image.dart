@@ -1,5 +1,4 @@
 import 'package:document_scanner/core/lib/optional.dart';
-import 'package:document_scanner/core/lib/tuple.dart';
 import 'package:document_scanner/core/service_locator/service_locator.dart';
 import 'package:document_scanner/scanner/domain/repositories/convert.dart';
 import 'package:document_scanner/scanner/domain/usecases/usecase.dart';
@@ -9,13 +8,15 @@ export 'call.dart';
 
 class ConvertImageParam {
   final Converter converter;
-  final Tuple2<String, Uint8List> item;
+  final String itemName;
+  final Uint8List itemData;
   final double amount;
   final double threshold;
 
   ConvertImageParam({
     required this.converter,
-    required this.item,
+    required this.itemName,
+    required this.itemData,
     this.amount = 1,
     this.threshold = 0.5,
   });
@@ -31,7 +32,8 @@ class ConvertImageUseCase implements ConvertImage {
       return sl<ImageConverter>()
           .convertImage(
             param.converter,
-            param.item,
+            param.itemName,
+            param.itemData,
             amount: param.amount,
             threshold: param.threshold,
           )

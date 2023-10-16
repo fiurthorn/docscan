@@ -2,14 +2,49 @@ import 'dart:async';
 
 import 'package:document_scanner/core/lib/optional.dart';
 import 'package:document_scanner/core/reactive/form.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
-part 'state.dart';
+part 'bloc.freezed.dart';
 
-abstract class ReactiveBloc<Param extends Equatable> extends Cubit<ReactiveState<Param>> implements ReactiveBlocForm {
+@freezed
+sealed class ReactiveState<StateParam> with _$ReactiveState<StateParam> {
+  const factory ReactiveState.init({required StateParam parameter}) = InitReactiveState;
+  //
+  const factory ReactiveState.loading({required StateParam parameter}) = LoadingReactiveState;
+  const factory ReactiveState.loaded({required StateParam parameter}) = LoadedReactiveState;
+  const factory ReactiveState.loadFailure({
+    required StateParam parameter,
+    required ErrorValue failureResponse,
+  }) = LoadFailureReactiveState;
+  //
+
+  @Assert("(progress==null && max<=0) || (progress!=null && max>0)",
+      "progress and max have to set both to calculate the progress")
+  const factory ReactiveState.progress({
+    required StateParam parameter,
+    String? progressIndicator,
+    FormControl<int>? progress,
+    @Default(0) int max,
+  }) = ProgressReactiveState;
+
+  const factory ReactiveState.progressSuccess({
+    required StateParam parameter,
+    String? successResponse,
+    String? progressIndicator,
+  }) = ProgressSuccessReactiveState;
+
+  const factory ReactiveState.progressFailure({
+    required StateParam parameter,
+    required ErrorValue failureResponse,
+    String? progressIndicator,
+  }) = ProgressFailureReactiveState;
+  //
+  const factory ReactiveState.update({required StateParam parameter}) = UpdateReactiveState;
+}
+
+abstract class ReactiveBloc<StateParam> extends Cubit<ReactiveState<StateParam>> implements ReactiveBlocForm {
   FormGroup group = FormGroup({});
 
   final _completer = Completer<bool>();
@@ -17,7 +52,7 @@ abstract class ReactiveBloc<Param extends Equatable> extends Cubit<ReactiveState
 
   Future<void> loading() async {}
 
-  ReactiveBloc({required Param parameter}) : super(InitReactiveState(parameter: parameter)) {
+  ReactiveBloc({required StateParam parameter}) : super(ReactiveState.init(parameter: parameter)) {
     group.addAll(form);
   }
 
@@ -25,47 +60,79 @@ abstract class ReactiveBloc<Param extends Equatable> extends Cubit<ReactiveState
   void init() async {
     await Future<void>.delayed(const Duration());
     try {
-      emit(LoadingReactiveState.newWith(other: state));
+      _emitLoading();
       loading()
-          .then((value) => emit(LoadedReactiveState.newWith(other: state)))
-          .then((value) => _completer.complete(true));
+          .then((value) => _emitLoaded())
+          .whenComplete(() => _completer.complete(true))
+          .onError<Exception>((err, stack) => _emitLoadFailureException(err, stack))
+          .catchError((err, stack) => _emitLoadFailureError(err, stack));
     } on Exception catch (e, s) {
-      emit(LoadFailureReactiveState.newWith(other: state, failureResponse: ErrorValue(e, s)));
+      _emitLoadFailureException(e, s);
+    } catch (e, s) {
+      _emitLoadFailureError(e, s);
     }
   }
 
-  emitSubmitting() {
-    emit(SubmittingReactiveState.newWith(other: state));
+  _emitLoading() => emit(ReactiveState.loading(parameter: state.parameter));
+  _emitLoaded() => emit(ReactiveState.loaded(parameter: state.parameter));
+  _emitLoadFailureException(Exception err, StackTrace stack) =>
+      emit(ReactiveState.loadFailure(parameter: state.parameter, failureResponse: ErrorValue(err, stack)));
+  _emitLoadFailureError(dynamic err, StackTrace stack) => emit(
+      ReactiveState.loadFailure(parameter: state.parameter, failureResponse: ErrorValue.fromString("$err", stack)));
+
+  emitProgress({FormControl<int>? progress, int max = 0, String? progressIndicator}) {
+    emit(ReactiveState.progress(
+      progressIndicator: progressIndicator,
+      parameter: state.parameter,
+      progress: progress,
+      max: max,
+    ));
   }
 
-  emitProgress({
-    FormControl<int>? progress,
-    int max = 0,
-  }) {
-    emit(ProgressReactiveState.newWith(other: state, progress: progress, max: max));
+  emitProgressSuccess({String? successResponse, StateParam? parameter, String? progressIndicator}) {
+    emit(ReactiveState.progressSuccess(
+      parameter: parameter ?? state.parameter,
+      successResponse: successResponse,
+      progressIndicator: progressIndicator,
+    ));
   }
 
-  emitProgressSuccess({String? successResponse, Param? parameter}) {
-    emit(ProgressCloseReactiveState(parameter: parameter ?? state.parameter, successResponse: successResponse));
-  }
-
-  emitProgressFailure({required ErrorValue failureResponse, Param? parameter}) {
-    emit(ProgressFailureReactiveState(
+  emitProgressFailure({required ErrorValue failureResponse, StateParam? parameter, String? progressIndicator}) {
+    emit(ReactiveState.progressFailure(
+      progressIndicator: progressIndicator,
       parameter: parameter ?? state.parameter,
       failureResponse: failureResponse,
     ));
   }
 
-  emitSuccess({required String successResponse, Param? parameter}) {
-    emit(SuccessReactiveState(parameter: parameter ?? state.parameter, successResponse: successResponse));
+  emitProgressFailureException({
+    required Exception failureResponse,
+    StackTrace? stackTrace,
+    StateParam? parameter,
+    String? progressIndicator,
+  }) {
+    emit(ReactiveState.progressFailure(
+      progressIndicator: progressIndicator,
+      parameter: parameter ?? state.parameter,
+      failureResponse: ErrorValue(failureResponse, stackTrace),
+    ));
   }
 
-  emitFailure({required ErrorValue failureResponse, Param? parameter}) {
-    emit(FailureReactiveState(parameter: parameter ?? state.parameter, failureResponse: failureResponse));
+  emitProgressFailureError({
+    required dynamic failureResponse,
+    StackTrace? stackTrace,
+    StateParam? parameter,
+    String? progressIndicator,
+  }) {
+    emit(ReactiveState.progressFailure(
+      progressIndicator: progressIndicator,
+      parameter: parameter ?? state.parameter,
+      failureResponse: ErrorValue.fromString(failureResponse, stackTrace),
+    ));
   }
 
-  emitUpdate({required Param parameter}) {
-    emit(UpdateReactiveState(parameter: parameter));
+  emitUpdate({required StateParam parameter}) {
+    emit(ReactiveState.update(parameter: parameter));
   }
 
   validate() {

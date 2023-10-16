@@ -4,15 +4,20 @@ import 'package:document_scanner/core/reactive/bloc.dart';
 import 'package:document_scanner/scanner/domain/repositories/key_values.dart';
 import 'package:document_scanner/scanner/domain/usecases/load_list_items.dart';
 import 'package:document_scanner/scanner/domain/usecases/store_list_items.dart';
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
-part 'state.dart';
+part 'bloc.freezed.dart';
+
+@freezed
+class StateParameter with _$StateParameter {
+  factory StateParameter() = _StateParameter;
+}
 
 class ItemBloc extends ReactiveBloc<StateParameter> {
   final senders = FormArray<String>([]);
 
-  ItemBloc() : super(parameter: const StateParameter());
+  ItemBloc() : super(parameter: StateParameter());
 
   Map<String, AbstractControl>? _form;
 
@@ -37,7 +42,7 @@ class ItemBloc extends ReactiveBloc<StateParameter> {
   void addItem() {
     senders.add(FormControl<String>(validators: [Validators.required]));
     senders.markAsDirty();
-    emit(UpdateReactiveState(parameter: state.parameter));
+    emitUpdate(parameter: state.parameter);
   }
 
   List<String> getItems(KeyValueNames key) {
@@ -46,12 +51,12 @@ class ItemBloc extends ReactiveBloc<StateParameter> {
 
   submit() {
     try {
-      emitSubmitting();
+      emitProgress();
       usecase<StoreListItemsResult, StoreListItemsParam>(
         StoreListItemsParam(KeyValueNames.senderNames, senders.value!.map((e) => e!).toList()),
-      ).then((value) => emitSuccess(successResponse: "Saved"));
+      ).then((value) => emitProgressSuccess(successResponse: "Saved"));
     } on Exception catch (err, stack) {
-      emitFailure(failureResponse: ErrorValue(err, stack));
+      emitProgressFailureError(failureResponse: ErrorValue(err, stack));
     }
   }
 }

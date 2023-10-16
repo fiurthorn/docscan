@@ -1,6 +1,9 @@
 import 'package:document_scanner/core/lib/transition_page_fade.dart';
 import 'package:flutter/material.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:go_router/go_router.dart';
+
+part 'route.freezed.dart';
 
 CustomTransitionPage<void> _defaultTransitionPage({
   required LocalKey key,
@@ -98,4 +101,9 @@ class GoRouterObserver extends NavigatorObserver {
   String? _name(RouteSettings? page) {
     return page?.name;
   }
+}
+
+@freezed
+class RouterConfiguration with _$RouterConfiguration {
+  factory RouterConfiguration(GoRouter goRouter, GlobalKey<NavigatorState> navigatorKey) = _RouterConfiguration;
 }

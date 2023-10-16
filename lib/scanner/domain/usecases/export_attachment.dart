@@ -1,20 +1,18 @@
 import 'package:document_scanner/core/lib/optional.dart';
-import 'package:document_scanner/core/lib/tuple.dart';
 import 'package:document_scanner/core/service_locator/service_locator.dart';
 import 'package:document_scanner/scanner/domain/repositories/key_values.dart';
 import 'package:document_scanner/scanner/domain/repositories/media_store.dart';
 import 'package:document_scanner/scanner/domain/usecases/usecase.dart';
 import 'package:flutter/foundation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 export 'call.dart';
 
-class ExportAttachmentParam extends Tuple2<String, Uint8List> {
-  String get name => a;
-  Uint8List get image => b;
+part 'export_attachment.freezed.dart';
 
-  const ExportAttachmentParam(String name, Uint8List image) : super(name, image);
-
-  ExportAttachmentParam.fromTuple(Tuple2<String, Uint8List> t) : this(t.a, t.b);
+@freezed
+class ExportAttachmentParam with _$ExportAttachmentParam {
+  factory ExportAttachmentParam(String name, Uint8List image) = _ExportAttachmentParam;
 }
 
 class ExportAttachmentsParam {
@@ -49,7 +47,7 @@ class ExportAttachmentUseCase implements ExportAttachment {
           param.receiver,
           param.docType,
           param.dateTime,
-          param.attachments.map((e) => ExportAttachmentModel.fromTuple(e)).toList(),
+          param.attachments.map((e) => ExportAttachmentModel(e.name, e.image)).toList(),
         )..then((_) => sl<KeyValues>().addSenderName(param.sender)),
       );
     } on Exception catch (e, st) {

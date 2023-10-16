@@ -1,13 +1,11 @@
-import 'package:document_scanner/core/lib/tuple.dart';
 import 'package:flutter/foundation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-class ExportAttachmentModel extends Tuple2<String, Uint8List> {
-  String get name => a;
-  Uint8List get image => b;
+part 'media_store.freezed.dart';
 
-  const ExportAttachmentModel(String name, Uint8List image) : super(name, image);
-
-  ExportAttachmentModel.fromTuple(Tuple2<String, Uint8List> t) : this(t.a, t.b);
+@freezed
+class ExportAttachmentModel with _$ExportAttachmentModel {
+  factory ExportAttachmentModel(String name, Uint8List image) = _ExportAttachmentModel;
 }
 
 abstract class MediaStore {

@@ -1,28 +1,25 @@
-import 'package:document_scanner/core/lib/tuple.dart';
 import 'package:document_scanner/l10n/translations/translations.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'language_name.freezed.dart';
 
 const languageName = {
   "en": "English",
   "de": "Deutsch",
 };
 
-class LanguageTuple extends Tuple2<String, String> {
-  String get name => b;
-  String get code => a;
-
-  const LanguageTuple(
+@freezed
+class LanguageTuple with _$LanguageTuple {
+  factory LanguageTuple(
     String code,
     String name,
-  ) : super(
-          code,
-          name,
-        );
+  ) = _LanguageTuple;
 }
 
 final sortedLanguageNames = S.supportedLocales
     .map((e) => LanguageTuple(e.languageCode, languageName[e.languageCode] ?? e.languageCode))
     .toList()
-  ..sort((a, b) => b.b.compareTo(a.b));
+  ..sort((a, b) => b.name.compareTo(a.name));
 
 final sortedLocales = S.supportedLocales.map((e) => e.languageCode).toList()..sort((a, b) => b.compareTo(a));
 

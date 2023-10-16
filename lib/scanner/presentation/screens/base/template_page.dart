@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 abstract class TemplateBaseScreenState<T extends StatefulWidget, F extends ReactiveBloc>
     extends ReactiveBlocBaseScreenState<T, F> {
   TemplateBaseScreenState({
-    super.onUpdateState,
+    super.onUpdate,
     super.onProgress,
     super.onProgressSuccess,
     super.onProgressFailure,

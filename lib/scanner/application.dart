@@ -5,7 +5,6 @@ import 'dart:math';
 import 'package:document_scanner/core/design/theme_data.dart';
 import 'package:document_scanner/core/lib/platform/platform.dart';
 import 'package:document_scanner/core/lib/simple_bloc_observer.dart';
-import 'package:document_scanner/core/lib/tuple.dart';
 import 'package:document_scanner/core/service_locator/service_locator.dart';
 import 'package:document_scanner/core/widgets/goroute/route.dart';
 import 'package:document_scanner/l10n/app_lang.dart';
@@ -14,8 +13,6 @@ import 'package:document_scanner/scanner/domain/repositories/key_values.dart';
 import 'package:document_scanner/scanner/presentation/screens/error/error.dart' as err;
 import 'package:document_scanner/scanner/presentation/screens/notfound/notfound.dart';
 import 'package:document_scanner/scanner/presentation/screens/splash/page.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -23,7 +20,6 @@ import 'package:go_router/go_router.dart';
 abstract class Application extends StatefulWidget {
   Application({super.key}) {
     Bloc.observer = SimpleBlocObserver();
-    EquatableConfig.stringify = kDebugMode;
   }
 
   static final random = Random();
@@ -146,11 +142,4 @@ abstract class ApplicationState<T extends Application> extends State<T> {
         stackTrace: details.stack,
         reload: restartApp,
       );
-}
-
-class RouterConfiguration extends Tuple2<GoRouter, GlobalKey<NavigatorState>> {
-  GoRouter get goRouter => a;
-  GlobalKey<NavigatorState> get navigatorKey => b;
-
-  const RouterConfiguration(GoRouter router, GlobalKey<NavigatorState> navigatorKey) : super(router, navigatorKey);
 }

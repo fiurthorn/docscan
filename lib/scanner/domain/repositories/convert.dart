@@ -1,4 +1,3 @@
-import 'package:document_scanner/core/lib/tuple.dart';
 import 'package:flutter/foundation.dart';
 
 typedef Converter = String;
@@ -11,7 +10,8 @@ const Converter luminance = "Luminance";
 abstract class ImageConverter {
   Future<Uint8List> convertImage(
     Converter converter,
-    Tuple2<String, Uint8List> item, {
+    String itemName,
+    Uint8List itemData, {
     double amount = 1,
     double threshold = 0.5,
   });

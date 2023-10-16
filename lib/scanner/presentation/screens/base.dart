@@ -167,10 +167,16 @@ abstract class BaseScreenState<T extends StatefulWidget> extends State<T> {
 
 abstract class ReactiveBlocBaseScreenState<T extends StatefulWidget, BLoC extends ReactiveBloc>
     extends BaseScreenState<T> {
-  final ReactiveBlocListenerCallback<UpdateReactiveState>? onUpdateState;
+  final ReactiveBlocListenerCallback<UpdateReactiveState>? onUpdate;
+  final ReactiveBlocListenerCallback<ProgressReactiveState>? onProgress;
+  final ReactiveBlocListenerCallback<ProgressSuccessReactiveState>? onProgressSuccess;
+  final ReactiveBlocListenerCallback<ProgressFailureReactiveState>? onProgressFailure;
 
   ReactiveBlocBaseScreenState({
-    this.onUpdateState,
+    this.onUpdate,
+    this.onProgress,
+    this.onProgressSuccess,
+    this.onProgressFailure,
     bool extendBodyBehindAppBar = false,
     FloatingActionButtonLocation floatingActionButtonLocation = FloatingActionButtonLocation.centerDocked,
   }) : super(

@@ -1,19 +1,17 @@
 import 'package:document_scanner/core/lib/optional.dart';
-import 'package:document_scanner/core/lib/tuple.dart';
 import 'package:document_scanner/core/service_locator/service_locator.dart';
 import 'package:document_scanner/scanner/domain/repositories/pdf.dart';
 import 'package:document_scanner/scanner/domain/usecases/usecase.dart';
 import 'package:flutter/foundation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 export 'call.dart';
 
-class AttachmentParam extends Tuple2<String, Uint8List> {
-  String get path => a;
-  Uint8List get image => b;
+part 'create_pdf_file.freezed.dart';
 
-  const AttachmentParam(String path, Uint8List image) : super(path, image);
-
-  AttachmentParam.fromTuple(Tuple2<String, Uint8List> t) : this(t.a, t.b);
+@freezed
+class AttachmentParam with _$AttachmentParam {
+  factory AttachmentParam(String path, Uint8List image) = _AttachmentParam;
 }
 
 class CreatePdfFileParam {
@@ -31,7 +29,7 @@ class CreatePdfFileUseCase implements CreatePdfFile {
     try {
       final value = await sl<PdfCreator>()
           .createPdfFromImages(
-            param.documentTypes.map((e) => ImageAttachment.fromTuple(e)).toList(),
+            param.documentTypes.map((e) => ImageAttachment(e.path, e.image)).toList(),
           )
           .then((value) => value!);
       return Optional.newValue(value);
