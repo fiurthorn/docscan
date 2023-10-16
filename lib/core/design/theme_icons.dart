@@ -37,8 +37,8 @@ class ThemeIcons {
   static IconData get docType => FontAwesomeIcons.fileInvoice;
 
   static IconData get email => FontAwesomeIcons.share;
-  static IconData get envelopeOpen => FontAwesomeIcons.envelopeOpen;
-  static IconData get envelope => FontAwesomeIcons.envelope;
+  static IconData get envelopeSender => FontAwesomeIcons.envelopesBulk;
+  static IconData get envelopeReceiver => FontAwesomeIcons.envelopeOpenText;
   static IconData get exit => FontAwesomeIcons.rightFromBracket;
 
   static IconData get firebase => const IconDataRegular(0xf0e0);

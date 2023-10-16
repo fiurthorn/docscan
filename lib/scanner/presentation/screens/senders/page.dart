@@ -11,6 +11,7 @@ import 'package:document_scanner/scanner/presentation/screens/base.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/template_page.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/top_nav.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 class SendersScreen extends BaseScreen {
@@ -29,6 +30,11 @@ class SendersScreen extends BaseScreen {
 }
 
 class _SendersScreenState extends TemplateBaseScreenState<SendersScreen, ItemBloc> {
+  _SendersScreenState()
+      : super(
+          onProgressSuccess: (context, state) => context.pop(),
+        );
+
   @override
   ItemBloc createBloc(BuildContext context) => ItemBloc();
 

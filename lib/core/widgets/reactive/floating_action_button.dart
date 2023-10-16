@@ -23,6 +23,7 @@ class ReactiveFloatingActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ReactiveFormConsumer(
+        child: child,
         builder: (context, formGroup, child) => FloatingActionButton(
           heroTag: heroTag,
           backgroundColor: formGroup.valid //

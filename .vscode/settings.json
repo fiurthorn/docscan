@@ -41,13 +41,16 @@
     "qrcode"
   ],
   "cSpell.words": [
+    "Diagnosticable",
     "docscanner",
     "firefox",
     "goroute",
     "grayscale",
     "Grayscale",
     "Memoizer",
+    "nodoc",
     "nord",
+    "nullable",
     "pdfx"
   ],
   "commentTranslate.targetLanguage": "de",

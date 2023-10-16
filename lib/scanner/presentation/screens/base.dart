@@ -188,26 +188,33 @@ abstract class ReactiveBlocBaseScreenState<T extends StatefulWidget, BLoC extend
         create: (context) => bloc = createBloc(context)..init(),
         child: ReactiveBlocListener<BLoC>(
           onLoadFailure: (context, state) {
-            final message =
-                AppLang.i18n.message_failure_genericError(state.failureResponse?.exception.toString() ?? "");
-            showSnackBarFailure(context, "load ($runtimeType)", message, state.failureResponse!.exception,
-                stackTrace: state.failureResponse!.stackTrace);
+            LoadingDialog.hide(context);
+            final message = AppLang.i18n.message_failure_genericError(state.failureResponse.exception.toString() ?? "");
+            showBannerFailure(context, "load ($runtimeType)", message, state.failureResponse.exception,
+                stackTrace: state.failureResponse.stackTrace);
           },
-          onLoading: (context, state) => LoadingDialog.show(context),
+          onLoading: (context, state) => LoadingDialog.show(
+            context,
+            color: Colors.transparent,
+          ),
           onLoaded: (context, state) => LoadingDialog.hide(context),
           //
-          onProgress: (context, state) => ProgressLoadingDialog.show(context, state.progress, state.max),
+          onProgress: (context, state) {
+            ProgressLoadingDialog.show(context, state.progress, state.max);
+            onProgress?.call(context, state);
+          },
           onProgressSuccess: (context, state) {
             ProgressLoadingDialog.hide(context);
             if (state.successResponse != null) {
               showSnackBarSuccess(context, "scanner", "${state.successResponse}");
             }
+            onProgressSuccess?.call(context, state);
           },
           onProgressFailure: (context, state) {
-            final message =
-                AppLang.i18n.message_failure_genericError(state.failureResponse?.exception.toString() ?? "");
-            showSnackBarFailure(context, "load ($runtimeType)", message, state.failureResponse!.exception,
-                stackTrace: state.failureResponse!.stackTrace);
+            final message = AppLang.i18n.message_failure_genericError(state.failureResponse.exception.toString() ?? "");
+            showBannerFailure(context, "load ($runtimeType)", message, state.failureResponse.exception,
+                stackTrace: state.failureResponse.stackTrace);
+            onProgressFailure?.call(context, state);
           },
           child: BlocBuilder<BLoC, ReactiveState>(
             builder: (context, state) => FutureBuilder(

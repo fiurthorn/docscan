@@ -11,6 +11,7 @@ import 'package:document_scanner/scanner/presentation/screens/base.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/template_page.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/top_nav.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 class AreasScreen extends BaseScreen {
@@ -29,6 +30,10 @@ class AreasScreen extends BaseScreen {
 }
 
 class _AreasScreenState extends TemplateBaseScreenState<AreasScreen, ItemBloc> {
+  _AreasScreenState()
+      : super(
+          onProgressSuccess: (context, state) => context.pop(),
+        );
   @override
   ItemBloc createBloc(BuildContext context) => ItemBloc();
 

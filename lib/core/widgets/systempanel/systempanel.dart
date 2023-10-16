@@ -25,7 +25,7 @@ class SystemPanel extends StatelessWidget {
               _importDatabaseButton(
                 ThemeIcons.fileImport,
                 ThemeIcons.fileImport,
-                "What's new",
+                "Import Database",
                 () {
                   LoadingDialog.show(context);
                   FilePicker.platform

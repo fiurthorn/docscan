@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 class LoadingDialog extends StatelessWidget {
-  const LoadingDialog({super.key});
+  final Color? color;
+
+  const LoadingDialog({this.color, super.key});
 
   static void show(BuildContext context, {Color? color, Key? key}) => showDialog<void>(
         context: context,
@@ -33,6 +35,8 @@ class LoadingDialog extends StatelessWidget {
 typedef CancelAction = void Function();
 
 class CancelableLoadingDialog extends StatelessWidget {
+  final Color? color;
+
   static void show(CancelAction onCancel, BuildContext context, {Color? color, Key? key}) => showDialog<void>(
         context: context,
         useRootNavigator: true,
@@ -45,7 +49,7 @@ class CancelableLoadingDialog extends StatelessWidget {
 
   final CancelAction onCancel;
 
-  const CancelableLoadingDialog(this.onCancel, {super.key});
+  const CancelableLoadingDialog(this.onCancel, {this.color, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -72,12 +76,15 @@ class CancelableLoadingDialog extends StatelessWidget {
 }
 
 class ProgressLoadingDialog extends StatefulWidget {
+  final Color? color;
+
   final FormControl<int>? progress;
   final int max;
 
   const ProgressLoadingDialog({
     required this.progress,
     this.max = 0,
+    this.color,
     super.key,
   });
 

@@ -70,6 +70,11 @@ func BuildRunner() error {
 	return mage.NewTask("dart", "run", "build_runner", "build", "--delete-conflicting-outputs").Run()
 }
 
+// call the dart build runner watcher
+func BuildRunnerWatch() error {
+	return mage.NewTask("dart", "run", "build_runner", "watch", "--delete-conflicting-outputs").Run()
+}
+
 func DartAnalyse() error {
 	return mage.NewTask("dart", "analyze", "--fatal-infos").Run()
 }
@@ -231,6 +236,26 @@ func DevelopDeps() {
 		Icons,
 		BuildRunner,
 	)
+}
+
+// run pub get to pre-compile executables
+func GoModTidy() error {
+	return mage.NewTask("go", "mod", "tidy", "-e").Run()
+}
+
+// run pub get to upgrade dependencies
+func GoGetUpgrade() error {
+	return mage.NewTask("go", "get", "-u", "./...").Run()
+}
+
+// run pub get to upgrade dependencies
+func GoModDownload() error {
+	return mage.NewTask("go", "mod", "download").Run()
+}
+
+// run pub get to pre-compile executables
+func GoGet(module string) error {
+	return mage.NewTask("go", "get", module).Run()
 }
 
 // start tests

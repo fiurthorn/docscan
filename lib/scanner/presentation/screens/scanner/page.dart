@@ -8,6 +8,7 @@ import 'package:document_scanner/core/toaster/signal.dart';
 import 'package:document_scanner/core/widgets/confirm/confirm.dart';
 import 'package:document_scanner/core/widgets/goroute/route.dart';
 import 'package:document_scanner/core/widgets/reactive/autocomplete.dart';
+import 'package:document_scanner/core/widgets/reactive/floating_action_button.dart';
 import 'package:document_scanner/core/widgets/responsive.dart';
 import 'package:document_scanner/l10n/app_lang.dart';
 import 'package:document_scanner/scanner/domain/repositories/convert.dart';
@@ -117,7 +118,7 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
                   labelText: AppLang.i18n.scanner_senderField_label,
                   hintText: AppLang.i18n.scanner_senderField_hint,
                 ),
-                optionsBuilder: (value) => bloc.state.parameter.filterSenderItems(value.text),
+                optionsBuilder: (value) => bloc.filterSenderItems(value.text),
               ),
               ReactiveDropdownField<I18nLabel>(
                 items: bloc.state.parameter.receiverItems
@@ -142,7 +143,7 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
               ReactiveDateTimePicker(
                 formControl: bloc.documentDate,
                 firstDate: DateTime.now().subtract(const Duration(days: 36530)),
-                lastDate: DateTime.now().add(const Duration(days: 36530)),
+                lastDate: DateTime.now().add(const Duration(days: 3653)),
                 decoration: InputDecoration(
                   labelText: AppLang.i18n.scanner_docDateField_label,
                   hintText: AppLang.i18n.scanner_docDateField_label,
@@ -189,14 +190,13 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
           FloatingActionButton(
             heroTag: "scanner_crop_lock",
             onPressed: bloc.toggleCropperImageLock,
+            backgroundColor: bloc.state.parameter.cropperImageLocked ? null : nord12AuroraOrange,
             child: Icon(!bloc.state.parameter.cropperImageLocked ? ThemeIcons.lock : ThemeIcons.lockOpen),
           ),
           FloatingActionButton(
             heroTag: "scanner_crop",
             onPressed: bloc.state.parameter.cropperImageLocked ? bloc.cropController.crop : null,
-            backgroundColor: bloc.state.parameter.cropperImageLocked
-                ? nord12AuroraOrange
-                : Theme.of(context).floatingActionButtonTheme.backgroundColor,
+            backgroundColor: bloc.state.parameter.cropperImageLocked ? nord12AuroraOrange : nord3PolarNight,
             child: Icon(ThemeIcons.check),
           ),
         ],
@@ -283,11 +283,11 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
   void submit(BuildContext context) => bloc.submit();
 
   Widget sendButton(BuildContext context, ScannerBloc bloc) {
-    final valid = bloc.group.valid;
-    return FloatingActionButton(
+    return ReactiveFloatingActionButton(
       heroTag: "scanner_btn_send",
-      backgroundColor: valid ? nord12AuroraOrange : Theme.of(context).floatingActionButtonTheme.backgroundColor,
-      onPressed: () => valid ? submit(context) : dirty(context),
+      validBackgroundColor: nord12AuroraOrange,
+      backgroundColor: Theme.of(context).floatingActionButtonTheme.backgroundColor,
+      onPressed: (group) => group.valid ? submit(context) : dirty(context),
       child: Icon(ThemeIcons.send),
     );
   }

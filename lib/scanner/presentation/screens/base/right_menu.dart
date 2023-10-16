@@ -49,14 +49,14 @@ class RightMenu extends BaseMenu {
       ),
       ListTile(
         title: Text(AppLang.i18n.senders_page_title),
-        leading: Icon(ThemeIcons.envelope, color: foregroundColor),
+        leading: Icon(ThemeIcons.envelopeSender, color: foregroundColor),
         onTap: () {
           push(context, SendersScreen.path);
         },
       ),
       ListTile(
         title: Text(AppLang.i18n.receivers_page_title),
-        leading: Icon(ThemeIcons.envelopeOpen, color: foregroundColor),
+        leading: Icon(ThemeIcons.envelopeReceiver, color: foregroundColor),
         onTap: () {
           push(context, ReceiversScreen.path);
         },
@@ -86,7 +86,7 @@ class RightMenu extends BaseMenu {
                 (value) => showSnackBarSuccess(context, "export", "Database exported successfully."),
               )
               .onError(
-                (error, stackTrace) => showSnackBarFailure(context, "export", "Error while exporting database.", error,
+                (error, stackTrace) => showBannerFailure(context, "export", "Error while exporting database.", error,
                     stackTrace: stackTrace),
               );
           Scaffold.of(context).closeEndDrawer();

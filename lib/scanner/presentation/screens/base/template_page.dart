@@ -8,6 +8,9 @@ abstract class TemplateBaseScreenState<T extends StatefulWidget, F extends React
     extends ReactiveBlocBaseScreenState<T, F> {
   TemplateBaseScreenState({
     super.onUpdateState,
+    super.onProgress,
+    super.onProgressSuccess,
+    super.onProgressFailure,
     bool extendBodyBehindAppBar = false,
     FloatingActionButtonLocation floatingActionButtonLocation = FloatingActionButtonLocation.centerDocked,
   });
