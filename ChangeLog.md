@@ -1,3 +1,9 @@
+## v0.3.0
+
+- code cleanup
+- State from Equatable to Freezed
+- cleanup GUI
+
 ## v0.2.1
 
 - Code cleanup
