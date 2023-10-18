@@ -1,21 +1,21 @@
 import 'package:document_scanner/core/design/theme_icons.dart';
-import 'package:document_scanner/core/toaster/error.dart';
+import 'package:document_scanner/core/toaster/failure_banner.dart';
 import 'package:document_scanner/core/toaster/success.dart';
 import 'package:document_scanner/l10n/app_lang.dart';
 import 'package:document_scanner/scanner/domain/usecases/export_database.dart';
 import 'package:document_scanner/scanner/presentation/screens/areas/page.dart';
-import 'package:document_scanner/scanner/presentation/screens/base/base_right_menu.dart';
+import 'package:document_scanner/scanner/presentation/screens/base/default_right_menu.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/menu_item.dart';
 import 'package:document_scanner/scanner/presentation/screens/documentsTypes/page.dart';
 import 'package:document_scanner/scanner/presentation/screens/receivers/page.dart';
 import 'package:document_scanner/scanner/presentation/screens/senders/page.dart';
 import 'package:flutter/material.dart';
 
-class RightMenu extends BaseMenu {
+class ScannerRightMenu extends DefaultRightMenu {
   final List<Widget> additionalMenuItems;
   final List<Widget> additionalAccountItems;
 
-  const RightMenu({
+  const ScannerRightMenu({
     super.logout = true,
     super.key,
     this.additionalMenuItems = const [],
@@ -83,11 +83,11 @@ class RightMenu extends BaseMenu {
         onTap: () {
           usecase<ExportDatabaseResult, ExportDatabaseParam>(ExportDatabaseParam())
               .then(
-                (value) => showSnackBarSuccess(context, "export", "Database exported successfully."),
+                (value) => showSnackBarSuccess(context, "Database exported successfully."),
               )
               .onError(
-                (error, stackTrace) => showBannerFailure(context, "export", "Error while exporting database.", error,
-                    stackTrace: stackTrace),
+                (err, stackTrace) => showBannerFailure(context, "export",
+                    message: "Error while exporting database.", failure: err, stackTrace: stackTrace),
               );
           Scaffold.of(context).closeEndDrawer();
           // context.go(SendersScreen.path);

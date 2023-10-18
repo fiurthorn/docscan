@@ -1,4 +1,4 @@
-import 'package:document_scanner/core/lib/optional.dart';
+import 'package:document_scanner/core/lib/either.dart';
 import 'package:document_scanner/core/service_locator/service_locator.dart';
 import 'package:document_scanner/scanner/domain/repositories/file_repos.dart';
 import 'package:document_scanner/scanner/domain/usecases/usecase.dart';
@@ -24,12 +24,12 @@ typedef ReadFile = UseCase<ReadFileResult, ReadFileParam>;
 
 class ReadFileUseCase implements ReadFile {
   @override
-  Future<Optional<ReadFileResult>> call(ReadFileParam param) async {
+  Future<Either<ReadFileResult>> call(ReadFileParam param) async {
     try {
       final result = sl<FileRepos>().readFile(param.path);
-      return Optional.newValue(ReadFileEntity(result.name, result.data));
+      return Either.value(ReadFileEntity(result.name, result.data));
     } on Exception catch (e, st) {
-      return Optional.newError(e, st);
+      return Either.failure(e, st);
     }
   }
 }

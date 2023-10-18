@@ -8,7 +8,7 @@ class SplashPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: nord3PolarNight,
+      color: nord6SnowStorm,
       child: Column(
         children: [
           const SizedBox(height: 140.0),

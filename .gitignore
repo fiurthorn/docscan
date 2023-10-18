@@ -1,6 +1,7 @@
 /mage
 
 *.g.dart
+*.freezed.dart
 *.graphql.dart
 lib/l10n/missing.json
 lib/l10n/unused.txt

@@ -1,4 +1,4 @@
-import 'package:document_scanner/core/lib/optional.dart';
+import 'package:document_scanner/core/lib/either.dart';
 import 'package:document_scanner/core/service_locator/service_locator.dart';
 import 'package:document_scanner/scanner/domain/repositories/key_values.dart';
 import 'package:document_scanner/scanner/domain/usecases/usecase.dart';
@@ -17,11 +17,11 @@ typedef StoreListItems = UseCase<StoreListItemsResult, StoreListItemsParam>;
 
 class StoreListItemsUseCase implements StoreListItems {
   @override
-  Future<Optional<StoreListItemsResult>> call(StoreListItemsParam param) async {
+  Future<Either<StoreListItemsResult>> call(StoreListItemsParam param) async {
     try {
-      return sl<KeyValues>().setItems(param.key, param.items).then((_) => Optional.newValue(true));
+      return sl<KeyValues>().setItems(param.key, param.items).then((_) => const Either.value(true));
     } on Exception catch (e, st) {
-      return Optional.newError(e, st);
+      return Either.failure(e, st);
     }
   }
 }

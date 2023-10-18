@@ -1,4 +1,4 @@
-import 'package:document_scanner/core/lib/optional.dart';
+import 'package:document_scanner/core/lib/either.dart';
 import 'package:document_scanner/core/service_locator/service_locator.dart';
 import 'package:document_scanner/scanner/domain/repositories/pdf.dart';
 import 'package:document_scanner/scanner/domain/usecases/usecase.dart';
@@ -25,16 +25,16 @@ typedef CreatePdfFile = UseCase<CreatePdfFileResult, CreatePdfFileParam>;
 
 class CreatePdfFileUseCase implements CreatePdfFile {
   @override
-  Future<Optional<CreatePdfFileResult>> call(CreatePdfFileParam param) async {
+  Future<Either<CreatePdfFileResult>> call(CreatePdfFileParam param) async {
     try {
       final value = await sl<PdfCreator>()
           .createPdfFromImages(
             param.documentTypes.map((e) => ImageAttachment(e.path, e.image)).toList(),
           )
           .then((value) => value!);
-      return Optional.newValue(value);
+      return Either.value(value);
     } on Exception catch (e, st) {
-      return Optional.newError(e, st);
+      return Either.failure(e, st);
     }
   }
 }

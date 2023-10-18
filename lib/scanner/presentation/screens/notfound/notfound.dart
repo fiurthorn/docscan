@@ -1,9 +1,9 @@
 import 'package:document_scanner/core/design/theme_icons.dart';
-import 'package:document_scanner/scanner/presentation/screens/base.dart';
-import 'package:document_scanner/scanner/presentation/screens/base/top_nav.dart';
+import 'package:document_scanner/scanner/presentation/screens/base/app_bar.dart';
+import 'package:document_scanner/scanner/presentation/screens/base/screen.dart';
 import 'package:flutter/material.dart';
 
-class NotFoundScreen extends BaseScreen {
+class NotFoundScreen extends Screen {
   const NotFoundScreen({super.key});
 
   @override
@@ -12,7 +12,7 @@ class NotFoundScreen extends BaseScreen {
   static const String route = '/404';
 }
 
-class _NotFoundScreenState extends BaseScreenState<NotFoundScreen> {
+class _NotFoundScreenState extends ScreenState<NotFoundScreen> {
   @override
   String title(BuildContext context) => "Not Found";
 
@@ -32,5 +32,5 @@ class _NotFoundScreenState extends BaseScreenState<NotFoundScreen> {
       );
 
   @override
-  PreferredSizeWidget? buildAppBar(BuildContext context) => LightSubTopNavBar(title: title(context), home: true);
+  PreferredSizeWidget? buildAppBar(BuildContext context) => MinimalAppBar(title: title(context), home: true);
 }

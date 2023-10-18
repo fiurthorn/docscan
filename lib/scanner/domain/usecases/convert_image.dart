@@ -1,4 +1,4 @@
-import 'package:document_scanner/core/lib/optional.dart';
+import 'package:document_scanner/core/lib/either.dart';
 import 'package:document_scanner/core/service_locator/service_locator.dart';
 import 'package:document_scanner/scanner/domain/repositories/convert.dart';
 import 'package:document_scanner/scanner/domain/usecases/usecase.dart';
@@ -27,7 +27,7 @@ typedef ConvertImage = UseCase<ConvertImageResult, ConvertImageParam>;
 
 class ConvertImageUseCase implements ConvertImage {
   @override
-  Future<Optional<ConvertImageResult>> call(ConvertImageParam param) async {
+  Future<Either<ConvertImageResult>> call(ConvertImageParam param) async {
     try {
       return sl<ImageConverter>()
           .convertImage(
@@ -37,9 +37,9 @@ class ConvertImageUseCase implements ConvertImage {
             amount: param.amount,
             threshold: param.threshold,
           )
-          .then((value) => Optional.newValue(value));
+          .then((value) => Either.value(value));
     } on Exception catch (e, st) {
-      return Optional.newError(e, st);
+      return Either.failure(e, st);
     }
   }
 }

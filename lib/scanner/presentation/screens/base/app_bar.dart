@@ -4,10 +4,10 @@ import 'package:document_scanner/core/widgets/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class NavbarTitle extends StatelessWidget {
+class AppbarTitle extends StatelessWidget {
   final String title;
 
-  const NavbarTitle(
+  const AppbarTitle(
     this.title, {
     super.key,
   });
@@ -35,8 +35,8 @@ class NavbarTitle extends StatelessWidget {
   }
 }
 
-class Leading extends StatelessWidget {
-  const Leading({
+class AppbarLeading extends StatelessWidget {
+  const AppbarLeading({
     super.key,
   });
 
@@ -49,11 +49,11 @@ class Leading extends StatelessWidget {
   }
 }
 
-class CustomButtonTopNavBar extends StatelessWidget implements PreferredSizeWidget {
+class CustomButtonAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final Widget button;
 
-  const CustomButtonTopNavBar({
+  const CustomButtonAppBar({
     required this.title,
     required this.button,
     super.key,
@@ -65,7 +65,7 @@ class CustomButtonTopNavBar extends StatelessWidget implements PreferredSizeWidg
         automaticallyImplyLeading: false,
         title: ResponsiveWidthPadding(Row(
           children: [
-            NavbarTitle(title),
+            AppbarTitle(title),
             const Expanded(child: SizedBox()),
             button,
           ],
@@ -76,11 +76,11 @@ class CustomButtonTopNavBar extends StatelessWidget implements PreferredSizeWidg
   Size get preferredSize => const Size.fromHeight(56.0);
 }
 
-class LightSubTopNavBar extends StatelessWidget implements PreferredSizeWidget {
+class MinimalAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool home;
 
-  const LightSubTopNavBar({
+  const MinimalAppBar({
     required this.title,
     this.home = false,
     super.key,
@@ -89,22 +89,22 @@ class LightSubTopNavBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) => AppBar(
         actions: const [SizedBox()],
-        leading: home ? const Leading() : null,
+        leading: home ? const AppbarLeading() : null,
         automaticallyImplyLeading: false,
-        title: ResponsiveWidthPadding(NavbarTitle(title)),
+        title: ResponsiveWidthPadding(AppbarTitle(title)),
       );
 
   @override
   Size get preferredSize => const Size.fromHeight(56.0);
 }
 
-class FullTopNavBar extends StatelessWidget implements PreferredSizeWidget {
+class FullAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final List<Widget> navigation;
   final List<Widget> children;
   final bool home;
 
-  const FullTopNavBar({
+  const FullAppBar({
     required this.title,
     this.navigation = const [],
     this.children = const [],
@@ -115,12 +115,12 @@ class FullTopNavBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) => AppBar(
         actions: const [SizedBox()],
-        leading: home ? const Leading() : null,
+        leading: home ? const AppbarLeading() : null,
         automaticallyImplyLeading: false,
         title: ResponsiveWidthPadding(
           Row(
             children: [
-              NavbarTitle(title),
+              AppbarTitle(title),
               ...navigation,
               const Expanded(child: SizedBox()),
               ...children,

@@ -1,5 +1,5 @@
 import 'package:document_scanner/core/lib/compare/compare.dart';
-import 'package:document_scanner/core/lib/optional.dart';
+import 'package:document_scanner/core/lib/either.dart';
 import 'package:document_scanner/core/reactive/bloc.dart';
 import 'package:document_scanner/scanner/domain/repositories/key_values.dart';
 import 'package:document_scanner/scanner/domain/usecases/load_list_items.dart';
@@ -56,7 +56,7 @@ class ItemBloc extends ReactiveBloc<StateParameter> {
         StoreListItemsParam(KeyValueNames.senderNames, senders.value!.map((e) => e!).toList()),
       ).then((value) => emitProgressSuccess(successResponse: "Saved"));
     } on Exception catch (err, stack) {
-      emitProgressFailureError(failureResponse: ErrorValue(err, stack));
+      emitProgressFailureError(failureResponse: Failure(err, stack));
     }
   }
 }

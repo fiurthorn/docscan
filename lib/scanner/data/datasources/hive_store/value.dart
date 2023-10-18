@@ -1,5 +1,4 @@
 import 'package:hive/hive.dart';
-import 'package:sprintf/sprintf.dart';
 
 part 'value.g.dart';
 
@@ -15,6 +14,6 @@ class Value extends HiveObject {
 
   @override
   String toString() {
-    return sprintf("[Value:{%s}]", [timestamp.toIso8601String(), data]);
+    return "[Value:{${timestamp.toIso8601String()}: $data}]";
   }
 }

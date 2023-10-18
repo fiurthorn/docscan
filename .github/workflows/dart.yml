@@ -27,20 +27,23 @@ jobs:
       - name: compile mage
         run: go mod download && go run magefiles/cmd/mage.go -compile ../mage
 
-      - name: display telemetry
+      - name: disable telemetry
         run: flutter --disable-telemetry
 
-      - name: Install dependencies
+      - name: Install dependencies and code generation
         run: ./mage PubGlobalUpgrade PubGet CreateI18nSynthetic BuildRunner CreateVersion CreateI18n
 
-      - name: Install dependencies
-        run: lic_ck check-licenses -c lic_ck.yaml -i
-
-      - name: Format generated files
-        run: dart format --line-length=120 lib/scanner/data/datasources/hive_store/value.g.dart lib/l10n/translations/translations*.dart lib/core/version.g.dart
+      - name: Format code generation
+        run: |
+          find -name "*.g.dart" -exec dart format --line-length=120 "{}" "+"
+          find -name "*.freezed.dart" -exec dart format --line-length=120 "{}" "+"
+          find -name "translations*.dart" -exec dart format --line-length=120 "{}" "+"
 
       - name: Verify formatting
         run: dart format --line-length=120 --output=none --set-exit-if-changed .
+
+      - name: Check licenses
+        run: lic_ck check-licenses -c lic_ck.yaml -i
 
       - name: Analyze project source
         run: dart analyze --fatal-infos

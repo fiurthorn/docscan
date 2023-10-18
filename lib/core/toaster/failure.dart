@@ -1,9 +1,8 @@
 import 'package:document_scanner/core/design/theme_colors.dart';
 import 'package:document_scanner/core/widgets/responsive.dart';
 import 'package:flutter/material.dart';
-import 'package:sprintf/sprintf.dart';
 
-String showSnackBarSignal(BuildContext context, String hint, String message, [List<dynamic> args = const []]) {
+String showSnackBarFailure(BuildContext context, String message) {
   final content = Text(
     message,
     style: TextStyle(
@@ -11,10 +10,6 @@ String showSnackBarSignal(BuildContext context, String hint, String message, [Li
       backgroundColor: nord12AuroraOrange,
     ),
   );
-
-  if (args.isNotEmpty) {
-    message = sprintf(message, args);
-  }
 
   WidgetsBinding.instance.addPostFrameCallback((_) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();

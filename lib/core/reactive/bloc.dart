@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:document_scanner/core/lib/optional.dart';
+import 'package:document_scanner/core/lib/either.dart';
 import 'package:document_scanner/core/reactive/form.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -16,7 +16,7 @@ sealed class ReactiveState<StateParam> with _$ReactiveState<StateParam> {
   const factory ReactiveState.loaded({required StateParam parameter}) = LoadedReactiveState;
   const factory ReactiveState.loadFailure({
     required StateParam parameter,
-    required ErrorValue failureResponse,
+    required Failure failureResponse,
   }) = LoadFailureReactiveState;
   //
 
@@ -37,7 +37,7 @@ sealed class ReactiveState<StateParam> with _$ReactiveState<StateParam> {
 
   const factory ReactiveState.progressFailure({
     required StateParam parameter,
-    required ErrorValue failureResponse,
+    required Failure failureResponse,
     String? progressIndicator,
   }) = ProgressFailureReactiveState;
   //
@@ -47,8 +47,8 @@ sealed class ReactiveState<StateParam> with _$ReactiveState<StateParam> {
 abstract class ReactiveBloc<StateParam> extends Cubit<ReactiveState<StateParam>> implements ReactiveBlocForm {
   FormGroup group = FormGroup({});
 
-  final _completer = Completer<bool>();
-  Future<bool> get loaded => _completer.future;
+  final _loaderCompleter = Completer<bool>();
+  Future<bool> get loadedFuture => _loaderCompleter.future;
 
   Future<void> loading() async {}
 
@@ -63,7 +63,7 @@ abstract class ReactiveBloc<StateParam> extends Cubit<ReactiveState<StateParam>>
       _emitLoading();
       loading()
           .then((value) => _emitLoaded())
-          .whenComplete(() => _completer.complete(true))
+          .whenComplete(() => _loaderCompleter.complete(true))
           .onError<Exception>((err, stack) => _emitLoadFailureException(err, stack))
           .catchError((err, stack) => _emitLoadFailureError(err, stack));
     } on Exception catch (e, s) {
@@ -76,9 +76,9 @@ abstract class ReactiveBloc<StateParam> extends Cubit<ReactiveState<StateParam>>
   _emitLoading() => emit(ReactiveState.loading(parameter: state.parameter));
   _emitLoaded() => emit(ReactiveState.loaded(parameter: state.parameter));
   _emitLoadFailureException(Exception err, StackTrace stack) =>
-      emit(ReactiveState.loadFailure(parameter: state.parameter, failureResponse: ErrorValue(err, stack)));
-  _emitLoadFailureError(dynamic err, StackTrace stack) => emit(
-      ReactiveState.loadFailure(parameter: state.parameter, failureResponse: ErrorValue.fromString("$err", stack)));
+      emit(ReactiveState.loadFailure(parameter: state.parameter, failureResponse: Failure(err, stack)));
+  _emitLoadFailureError(dynamic err, StackTrace stack) =>
+      emit(ReactiveState.loadFailure(parameter: state.parameter, failureResponse: Failure.dynamic(err, stack)));
 
   emitProgress({FormControl<int>? progress, int max = 0, String? progressIndicator}) {
     emit(ReactiveState.progress(
@@ -97,7 +97,7 @@ abstract class ReactiveBloc<StateParam> extends Cubit<ReactiveState<StateParam>>
     ));
   }
 
-  emitProgressFailure({required ErrorValue failureResponse, StateParam? parameter, String? progressIndicator}) {
+  emitProgressFailure({required Failure failureResponse, StateParam? parameter, String? progressIndicator}) {
     emit(ReactiveState.progressFailure(
       progressIndicator: progressIndicator,
       parameter: parameter ?? state.parameter,
@@ -111,11 +111,11 @@ abstract class ReactiveBloc<StateParam> extends Cubit<ReactiveState<StateParam>>
     StateParam? parameter,
     String? progressIndicator,
   }) {
-    emit(ReactiveState.progressFailure(
+    emitProgressFailure(
       progressIndicator: progressIndicator,
       parameter: parameter ?? state.parameter,
-      failureResponse: ErrorValue(failureResponse, stackTrace),
-    ));
+      failureResponse: Failure(failureResponse, stackTrace),
+    );
   }
 
   emitProgressFailureError({
@@ -124,11 +124,11 @@ abstract class ReactiveBloc<StateParam> extends Cubit<ReactiveState<StateParam>>
     StateParam? parameter,
     String? progressIndicator,
   }) {
-    emit(ReactiveState.progressFailure(
+    emitProgressFailure(
       progressIndicator: progressIndicator,
       parameter: parameter ?? state.parameter,
-      failureResponse: ErrorValue.fromString(failureResponse, stackTrace),
-    ));
+      failureResponse: Failure.dynamic(failureResponse, stackTrace),
+    );
   }
 
   emitUpdate({required StateParam parameter}) {

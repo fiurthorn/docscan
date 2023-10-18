@@ -49,7 +49,7 @@ class SystemPanel extends StatelessWidget {
                 "What's new",
                 () => showDialog(
                   context: context,
-                  builder: (context) => WhatsNewDialog(
+                  builder: (context) => WhatsNewScreen(
                     onClose: () => Navigator.pop(context),
                   ),
                 ),

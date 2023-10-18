@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:crop_your_image/crop_your_image.dart';
 import 'package:document_scanner/core/lib/compare/compare.dart';
+import 'package:document_scanner/core/lib/either.dart';
 import 'package:document_scanner/core/lib/logger.dart';
-import 'package:document_scanner/core/lib/optional.dart';
 import 'package:document_scanner/core/reactive/bloc.dart';
 import 'package:document_scanner/core/reactive/i18n_label.dart';
 import 'package:document_scanner/core/reactive/validators/required.dart';
@@ -220,7 +220,7 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
             ),
           );
     } on Exception catch (err, stack) {
-      emitProgressFailureError(failureResponse: ErrorValue(err, stack));
+      emitProgressFailureError(failureResponse: Failure(err, stack));
     }
   }
 
@@ -250,7 +250,7 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
       uploadAttachment(state.parameter.cropperFilename!, image);
       emitProgressSuccess();
     } on Exception catch (err, stack) {
-      emitProgressFailureError(failureResponse: ErrorValue(err, stack));
+      emitProgressFailureError(failureResponse: Failure(err, stack));
     }
   }
 
@@ -261,7 +261,7 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
           .then((value) => uploadAttachment(value.name, value.data));
       emitProgressSuccess();
     } on Exception catch (err, stack) {
-      emitProgressFailureError(failureResponse: ErrorValue(err, stack));
+      emitProgressFailureError(failureResponse: Failure(err, stack));
     }
   }
 
@@ -356,7 +356,7 @@ class ScannerBloc extends ReactiveBloc<StateParameter> implements GoRouteAware {
                 cachedImages: [],
               ),
             ))
-        .catchError((err, stackTrace) => emitProgressFailureError(failureResponse: ErrorValue(err, stackTrace)));
+        .catchError((err, stackTrace) => emitProgressFailureError(failureResponse: Failure(err, stackTrace)));
   }
 
   clearImageCache() {

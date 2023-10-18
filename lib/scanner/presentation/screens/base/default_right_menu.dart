@@ -7,13 +7,13 @@ import 'package:document_scanner/l10n/app_lang.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class BaseMenu extends StatelessWidget {
+class DefaultRightMenu extends StatelessWidget {
   final bool logout, about;
 
   List<Widget> menuItems(BuildContext context) => const [];
   List<Widget> accountItems(BuildContext context) => const [];
 
-  const BaseMenu({
+  const DefaultRightMenu({
     this.about = true,
     this.logout = false,
     super.key,

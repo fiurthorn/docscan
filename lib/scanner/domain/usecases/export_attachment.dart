@@ -1,4 +1,4 @@
-import 'package:document_scanner/core/lib/optional.dart';
+import 'package:document_scanner/core/lib/either.dart';
 import 'package:document_scanner/core/service_locator/service_locator.dart';
 import 'package:document_scanner/scanner/domain/repositories/key_values.dart';
 import 'package:document_scanner/scanner/domain/repositories/media_store.dart';
@@ -38,9 +38,9 @@ typedef ExportAttachment = UseCase<ExportAttachmentResult, ExportAttachmentsPara
 
 class ExportAttachmentUseCase implements ExportAttachment {
   @override
-  Future<Optional<ExportAttachmentResult>> call(ExportAttachmentsParam param) async {
+  Future<Either<ExportAttachmentResult>> call(ExportAttachmentsParam param) async {
     try {
-      return Optional.newValue(
+      return Either.value(
         sl<MediaStore>().upload(
           param.area,
           param.sender,
@@ -51,7 +51,7 @@ class ExportAttachmentUseCase implements ExportAttachment {
         )..then((_) => sl<KeyValues>().addSenderName(param.sender)),
       );
     } on Exception catch (e, st) {
-      return Optional.newError(e, st);
+      return Either.failure(e, st);
     }
   }
 }

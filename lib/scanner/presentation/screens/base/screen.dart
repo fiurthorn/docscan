@@ -1,6 +1,6 @@
 import 'package:document_scanner/core/lib/platform/platform.dart';
 import 'package:document_scanner/core/reactive/bloc.dart';
-import 'package:document_scanner/core/toaster/error.dart';
+import 'package:document_scanner/core/toaster/failure_banner.dart';
 import 'package:document_scanner/core/toaster/success.dart';
 import 'package:document_scanner/core/widgets/loading_dialog/loading_dialog.dart';
 import 'package:document_scanner/core/widgets/reactive/listener.dart';
@@ -11,10 +11,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
-abstract class BaseScreen extends StatefulWidget {
+abstract class Screen extends StatefulWidget {
   // static const String path = "/";.map((e) => null) baseLocation
 
-  const BaseScreen({super.key});
+  const Screen({super.key});
 
   static String buildGoRoute(
     String baseLocation, {
@@ -30,7 +30,7 @@ abstract class BaseScreen extends StatefulWidget {
       ).toString();
 }
 
-abstract class BaseScreenState<T extends StatefulWidget> extends State<T> {
+abstract class ScreenState<T extends StatefulWidget> extends State<T> {
   final GlobalKey<ScaffoldState> scaffold = GlobalKey();
 
   void go(String route) {
@@ -52,7 +52,7 @@ abstract class BaseScreenState<T extends StatefulWidget> extends State<T> {
   bool extendBodyBehindAppBar;
   FloatingActionButtonLocation floatingActionButtonLocation;
 
-  BaseScreenState({
+  ScreenState({
     this.extendBodyBehindAppBar = false,
     this.floatingActionButtonLocation = FloatingActionButtonLocation.centerDocked,
   });
@@ -165,14 +165,13 @@ abstract class BaseScreenState<T extends StatefulWidget> extends State<T> {
   }
 }
 
-abstract class ReactiveBlocBaseScreenState<T extends StatefulWidget, BLoC extends ReactiveBloc>
-    extends BaseScreenState<T> {
+abstract class ReactiveScreenState<T extends StatefulWidget, BLoC extends ReactiveBloc> extends ScreenState<T> {
   final ReactiveBlocListenerCallback<UpdateReactiveState>? onUpdate;
   final ReactiveBlocListenerCallback<ProgressReactiveState>? onProgress;
   final ReactiveBlocListenerCallback<ProgressSuccessReactiveState>? onProgressSuccess;
   final ReactiveBlocListenerCallback<ProgressFailureReactiveState>? onProgressFailure;
 
-  ReactiveBlocBaseScreenState({
+  ReactiveScreenState({
     this.onUpdate,
     this.onProgress,
     this.onProgressSuccess,
@@ -195,8 +194,10 @@ abstract class ReactiveBlocBaseScreenState<T extends StatefulWidget, BLoC extend
         child: ReactiveBlocListener<BLoC>(
           onLoadFailure: (context, state) {
             LoadingDialog.hide(context);
-            final message = AppLang.i18n.message_failure_genericError(state.failureResponse.exception.toString() ?? "");
-            showBannerFailure(context, "load ($runtimeType)", message, state.failureResponse.exception,
+            final message = AppLang.i18n.message_failure_genericError("${state.failureResponse.exception}");
+            showBannerFailure(context, "load ($runtimeType)",
+                message: message,
+                failure: state.failureResponse.exception,
                 stackTrace: state.failureResponse.stackTrace);
           },
           onLoading: (context, state) => LoadingDialog.show(
@@ -212,19 +213,21 @@ abstract class ReactiveBlocBaseScreenState<T extends StatefulWidget, BLoC extend
           onProgressSuccess: (context, state) {
             ProgressLoadingDialog.hide(context);
             if (state.successResponse != null) {
-              showSnackBarSuccess(context, "scanner", "${state.successResponse}");
+              showSnackBarSuccess(context, "${state.successResponse}");
             }
             onProgressSuccess?.call(context, state);
           },
           onProgressFailure: (context, state) {
-            final message = AppLang.i18n.message_failure_genericError(state.failureResponse.exception.toString() ?? "");
-            showBannerFailure(context, "load ($runtimeType)", message, state.failureResponse.exception,
+            final message = AppLang.i18n.message_failure_genericError("${state.failureResponse.exception}");
+            showBannerFailure(context, "load ($runtimeType)",
+                message: message,
+                failure: state.failureResponse.exception,
                 stackTrace: state.failureResponse.stackTrace);
             onProgressFailure?.call(context, state);
           },
           child: BlocBuilder<BLoC, ReactiveState>(
             builder: (context, state) => FutureBuilder(
-                future: bloc.loaded,
+                future: bloc.loadedFuture,
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return ErrorScaffold(

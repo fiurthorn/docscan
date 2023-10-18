@@ -4,7 +4,7 @@ import 'package:document_scanner/core/design/theme_colors.dart';
 import 'package:document_scanner/core/design/theme_icons.dart';
 import 'package:document_scanner/core/lib/size.dart';
 import 'package:document_scanner/core/reactive/i18n_label.dart';
-import 'package:document_scanner/core/toaster/signal.dart';
+import 'package:document_scanner/core/toaster/failure.dart';
 import 'package:document_scanner/core/widgets/confirm/confirm.dart';
 import 'package:document_scanner/core/widgets/goroute/route.dart';
 import 'package:document_scanner/core/widgets/reactive/autocomplete.dart';
@@ -13,9 +13,9 @@ import 'package:document_scanner/core/widgets/responsive.dart';
 import 'package:document_scanner/l10n/app_lang.dart';
 import 'package:document_scanner/scanner/domain/repositories/convert.dart';
 import 'package:document_scanner/scanner/presentation/blocs/scanner/bloc.dart';
-import 'package:document_scanner/scanner/presentation/screens/base.dart';
-import 'package:document_scanner/scanner/presentation/screens/base/template_page.dart';
-import 'package:document_scanner/scanner/presentation/screens/base/top_nav.dart';
+import 'package:document_scanner/scanner/presentation/screens/base/app_bar.dart';
+import 'package:document_scanner/scanner/presentation/screens/base/scanner_scareen_sate.dart';
+import 'package:document_scanner/scanner/presentation/screens/base/screen.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +24,7 @@ import 'package:pdfx/pdfx.dart';
 import 'package:reactive_date_time_picker/reactive_date_time_picker.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
-class ScannerScreen extends BaseScreen {
+class ScannerScreen extends Screen {
   const ScannerScreen({super.key});
 
   @override
@@ -39,7 +39,7 @@ class ScannerScreen extends BaseScreen {
       );
 }
 
-class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, ScannerBloc> {
+class _ScannerScreenState extends ScannerScreenState<ScannerScreen, ScannerBloc> {
   @override
   ScannerBloc createBloc(BuildContext context) => ScannerBloc();
 
@@ -55,7 +55,7 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
     return super.buildAppBar(context);
   }
 
-  PreferredSizeWidget cropTopNavBar() => CustomButtonTopNavBar(
+  PreferredSizeWidget cropTopNavBar() => CustomButtonAppBar(
         title: title(context),
         button: Row(
           children: [
@@ -265,7 +265,7 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
                 cameraButton(),
               ],
             ),
-            sendButton(context, bloc),
+            sendButton(context),
           ],
         ),
       ),
@@ -274,7 +274,7 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
 
   void dirty(BuildContext context) {
     if (bloc.attachments.controls.isEmpty) {
-      showSnackBarSignal(context, "create (dirty)", AppLang.i18n.scanner_noAttachment_hint);
+      showSnackBarFailure(context, AppLang.i18n.scanner_noAttachment_hint);
     }
 
     bloc.validate();
@@ -282,7 +282,7 @@ class _ScannerScreenState extends TemplateBaseScreenState<ScannerScreen, Scanner
 
   void submit(BuildContext context) => bloc.submit();
 
-  Widget sendButton(BuildContext context, ScannerBloc bloc) {
+  Widget sendButton(BuildContext context) {
     return ReactiveFloatingActionButton(
       heroTag: "scanner_btn_send",
       validBackgroundColor: nord12AuroraOrange,

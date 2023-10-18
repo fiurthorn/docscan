@@ -7,14 +7,14 @@ import 'package:document_scanner/core/widgets/reactive/list_view_builder.dart';
 import 'package:document_scanner/core/widgets/responsive.dart';
 import 'package:document_scanner/l10n/app_lang.dart';
 import 'package:document_scanner/scanner/presentation/blocs/areas/bloc.dart';
-import 'package:document_scanner/scanner/presentation/screens/base.dart';
-import 'package:document_scanner/scanner/presentation/screens/base/template_page.dart';
-import 'package:document_scanner/scanner/presentation/screens/base/top_nav.dart';
+import 'package:document_scanner/scanner/presentation/screens/base/app_bar.dart';
+import 'package:document_scanner/scanner/presentation/screens/base/scanner_scareen_sate.dart';
+import 'package:document_scanner/scanner/presentation/screens/base/screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
-class AreasScreen extends BaseScreen {
+class AreasScreen extends Screen {
   const AreasScreen({super.key});
 
   @override
@@ -29,7 +29,7 @@ class AreasScreen extends BaseScreen {
       );
 }
 
-class _AreasScreenState extends TemplateBaseScreenState<AreasScreen, ItemBloc> {
+class _AreasScreenState extends ScannerScreenState<AreasScreen, ItemBloc> {
   _AreasScreenState()
       : super(
           onProgressSuccess: (context, state) => context.pop(),
@@ -41,7 +41,7 @@ class _AreasScreenState extends TemplateBaseScreenState<AreasScreen, ItemBloc> {
   String title(BuildContext context) => AppLang.i18n.areas_page_title;
 
   @override
-  PreferredSizeWidget? buildAppBar(BuildContext context) => LightSubTopNavBar(title: title(context));
+  PreferredSizeWidget? buildAppBar(BuildContext context) => MinimalAppBar(title: title(context));
 
   @override
   AlertDialog? onCanPop() {

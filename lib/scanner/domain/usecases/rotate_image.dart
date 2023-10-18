@@ -1,4 +1,4 @@
-import 'package:document_scanner/core/lib/optional.dart';
+import 'package:document_scanner/core/lib/either.dart';
 import 'package:document_scanner/core/service_locator/service_locator.dart';
 import 'package:document_scanner/scanner/domain/repositories/convert.dart';
 import 'package:document_scanner/scanner/domain/usecases/usecase.dart';
@@ -18,11 +18,11 @@ typedef RotateImage = UseCase<RotateImageResult, RotateImageParam>;
 
 class RotateImageUseCase implements RotateImage {
   @override
-  Future<Optional<RotateImageResult>> call(RotateImageParam param) async {
+  Future<Either<RotateImageResult>> call(RotateImageParam param) async {
     try {
-      return sl<ImageConverter>().rotate(param.image, param.counterClockwise).then((value) => Optional.newValue(value));
+      return sl<ImageConverter>().rotate(param.image, param.counterClockwise).then((value) => Either.value(value));
     } on Exception catch (e, st) {
-      return Optional.newError(e, st);
+      return Either.failure(e, st);
     }
   }
 }

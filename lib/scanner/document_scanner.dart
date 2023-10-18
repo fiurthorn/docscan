@@ -23,11 +23,11 @@ class _DocumentScannerState extends ApplicationState<DocumentScanner> {
     DocumentTypesScreen.route,
     SendersScreen.route,
     ReceiversScreen.route,
-    WhatsNewDialog.route
+    WhatsNewScreen.route
   };
 
   @override
-  String get whatsNew => WhatsNewDialog.path;
+  String get whatsNew => WhatsNewScreen.path;
 
   @override
   String get initialRoute => ScannerScreen.path;

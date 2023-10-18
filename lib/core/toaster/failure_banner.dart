@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 
 String showBannerFailure(
   BuildContext context,
-  String hint,
+  String hint, {
   String? message,
-  Object? error, {
+  dynamic failure,
   StackTrace? stackTrace,
 }) {
-  final msg = message ?? error?.toString() ?? "Unknown error";
+  final msg = message ?? failure?.toString() ?? "Unknown error";
 
-  Log.high("snackBar Failure on hint:'$hint' ${message ?? ''}", error: error, stackTrace: stackTrace);
+  Log.high("snackBar Failure on '$hint' $message", error: failure, stackTrace: stackTrace);
 
   WidgetsBinding.instance.addPostFrameCallback((_) {
     ScaffoldMessenger.of(context).clearMaterialBanners();
