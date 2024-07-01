@@ -47,6 +47,8 @@ sealed class ReactiveState<StateParam> with _$ReactiveState<StateParam> {
 abstract class ReactiveBloc<StateParam> extends Cubit<ReactiveState<StateParam>> implements ReactiveBlocForm {
   FormGroup group = FormGroup({});
 
+  StateParam get parameter => state.parameter;
+
   final _loaderCompleter = Completer<bool>();
   Future<bool> get loadedFuture => _loaderCompleter.future;
 

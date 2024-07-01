@@ -17,7 +17,6 @@ import 'package:document_scanner/scanner/presentation/screens/base/app_bar.dart'
 import 'package:document_scanner/scanner/presentation/screens/base/scanner_scareen_sate.dart';
 import 'package:document_scanner/scanner/presentation/screens/base/screen.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pdfx/pdfx.dart';
@@ -83,7 +82,11 @@ class _ScannerScreenState extends ScannerScreenState<ScannerScreen, ScannerBloc>
   @override
   Widget buildScreen(BuildContext context) {
     if (bloc.state.parameter.scannedImages.isNotEmpty) {
-      return buildImageEnhancementViewer(context);
+      if (bloc.state.parameter.showPdfSorter) {
+        return buildImageEnhancementSortingViewer(context);
+      } else {
+        return buildImageEnhancementViewer(context);
+      }
     }
 
     if (bloc.state.parameter.showCropper) {
@@ -176,7 +179,11 @@ class _ScannerScreenState extends ScannerScreenState<ScannerScreen, ScannerBloc>
     }
 
     if (bloc.state.parameter.scannedImages.isNotEmpty) {
-      return buildPersistentConverterFooterButtons(context);
+      if (bloc.state.parameter.showPdfSorter) {
+        return buildPersistentSortingFooterButtons(context);
+      } else {
+        return buildPersistentConverterFooterButtons(context);
+      }
     }
 
     return buildPersistentScannerFooterButtons(context);
@@ -211,6 +218,7 @@ class _ScannerScreenState extends ScannerScreenState<ScannerScreen, ScannerBloc>
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               ReactiveFormField(
                 formControl: bloc.converting,
@@ -221,7 +229,7 @@ class _ScannerScreenState extends ScannerScreenState<ScannerScreen, ScannerBloc>
                 ),
               ),
               const SizedBox(
-                width: 20,
+                width: 10,
               ),
               ReactiveFormField(
                 formControl: bloc.converting,
@@ -239,6 +247,59 @@ class _ScannerScreenState extends ScannerScreenState<ScannerScreen, ScannerBloc>
               heroTag: "scanner_btn_pdf",
               onPressed: () => bloc.converting.value! ? null : bloc.createPDF(),
               child: Icon(ThemeIcons.filePDF),
+            ),
+          ),
+        ],
+      )
+    ];
+  }
+
+  List<Widget>? buildPersistentSortingFooterButtons(BuildContext context) {
+    return [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ReactiveFormField(
+                formControl: bloc.converting,
+                builder: (context) => FloatingActionButton(
+                  heroTag: "scanner_up_pdf",
+                  onPressed: bloc.converting.value! || bloc.parameter.currentScannedImage == 0 //
+                      ? null
+                      : bloc.up,
+                  child: Icon(ThemeIcons.up),
+                ),
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              ReactiveFormField(
+                formControl: bloc.converting,
+                builder: (context) => FloatingActionButton(
+                  heroTag: "scanner_down_pdf",
+                  onPressed: bloc.converting.value! ||
+                          bloc.parameter.currentScannedImage + 1 == bloc.parameter.scannedImages.length //
+                      ? null
+                      : bloc.down,
+                  disabledElevation: 5,
+                  child: Icon(ThemeIcons.down),
+                ),
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              scannerButton(true),
+            ],
+          ),
+          ReactiveFormField(
+            formControl: bloc.converting,
+            builder: (context) => FloatingActionButton(
+              heroTag: "scanner_btn_convert",
+              onPressed: () => bloc.converting.value! ? null : bloc.convertPDF(),
+              child: Icon(ThemeIcons.fileExport),
             ),
           ),
         ],
@@ -292,17 +353,17 @@ class _ScannerScreenState extends ScannerScreenState<ScannerScreen, ScannerBloc>
     );
   }
 
-  Widget scannerButton() {
+  Widget scannerButton([bool add = false]) {
     return FloatingActionButton(
       heroTag: "scanner_btn_scanner",
       onPressed: () async {
-        CunningDocumentScanner.getPictures().then((value) {
+        CunningDocumentScanner.getPictures(true).then((value) {
           if (value != null) {
-            bloc.storeScanResult(value);
+            bloc.storeScanResult(value, add: add);
           }
         });
       },
-      child: Icon(ThemeIcons.scanner),
+      child: Icon(add ? ThemeIcons.fileAdd : ThemeIcons.scanner),
     );
   }
 
@@ -381,14 +442,19 @@ class _ScannerScreenState extends ScannerScreenState<ScannerScreen, ScannerBloc>
       formGroup: bloc.group,
       child: Column(
         children: [
-          ReactiveDropdownField<I18nLabel>(
-            items:
-                bloc.converterItems().map((e) => DropdownMenuItem<I18nLabel>(value: e, child: Text(e.label))).toList(),
-            formControl: bloc.converter,
-            decoration: InputDecoration(
-              hintText: AppLang.i18n.scanner_converterSelect_hint,
+          Visibility(
+            visible: !bloc.parameter.showPdfSorter,
+            child: ReactiveDropdownField<I18nLabel>(
+              items: bloc
+                  .converterItems()
+                  .map((e) => DropdownMenuItem<I18nLabel>(value: e, child: Text(e.label)))
+                  .toList(),
+              formControl: bloc.converter,
+              decoration: InputDecoration(
+                hintText: AppLang.i18n.scanner_converterSelect_hint,
+              ),
+              onChanged: bloc.updateConverter,
             ),
-            onChanged: bloc.updateConverter,
           ),
           Visibility(
             visible: bloc.converter.value?.technical == monochrome,
@@ -414,30 +480,48 @@ class _ScannerScreenState extends ScannerScreenState<ScannerScreen, ScannerBloc>
             child: PhotoViewGallery.builder(
               scrollPhysics: const BouncingScrollPhysics(),
               builder: (BuildContext context, int index) {
-                return PhotoViewGalleryPageOptions.customChild(
-                  child: StreamBuilder<Uint8List?>(
-                    stream: bloc.currentScannedImageStream,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      return Image.memory(snapshot.data!);
-                    },
-                  ),
+                return PhotoViewGalleryPageOptions(
+                  imageProvider: MemoryImage(bloc.state.parameter.cachedImages[index]!),
                   heroAttributes: PhotoViewHeroAttributes(tag: index),
                 );
               },
-              onPageChanged: (index) => bloc.updateCurrentScannedImage(index),
-              itemCount: bloc.state.parameter.scannedImages.length,
-              loadingBuilder: (context, event) => Center(
+              //   onPageChanged: (index) => bloc.updateCurrentScannedImage(index),
+              itemCount: bloc.state.parameter.cachedImages.length,
+              loadingBuilder: (context, event) => const Center(
                 child: SizedBox(
                   width: 20.0,
                   height: 20.0,
-                  child: CircularProgressIndicator(
-                    value: event == null
-                        ? 0
-                        : event.cumulativeBytesLoaded / (event.expectedTotalBytes ?? event.cumulativeBytesLoaded),
-                  ),
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildImageEnhancementSortingViewer(BuildContext context) {
+    return ReactiveForm(
+      formGroup: bloc.group,
+      child: Column(
+        children: [
+          Expanded(
+            child: PhotoViewGallery.builder(
+              scrollPhysics: const BouncingScrollPhysics(),
+              builder: (BuildContext context, int index) {
+                return PhotoViewGalleryPageOptions(
+                  imageProvider: MemoryImage(bloc.state.parameter.scannedImages[index].data),
+                  heroAttributes: PhotoViewHeroAttributes(tag: index),
+                );
+              },
+              //   onPageChanged: (index) => bloc.updateCurrentScannedImage(index),
+              itemCount: bloc.state.parameter.scannedImages.length,
+              loadingBuilder: (context, event) => const Center(
+                child: SizedBox(
+                  width: 20.0,
+                  height: 20.0,
+                  child: CircularProgressIndicator(),
                 ),
               ),
             ),

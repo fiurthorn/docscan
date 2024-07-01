@@ -12,7 +12,7 @@ String showBannerFailure(
 }) {
   final msg = message ?? failure?.toString() ?? "Unknown error";
 
-  Log.high("snackBar Failure on '$hint' $message", error: failure, stackTrace: stackTrace);
+  Log.high("snackBar Failure on '$hint' $msg", error: failure, stackTrace: stackTrace ?? StackTrace.current);
 
   WidgetsBinding.instance.addPostFrameCallback((_) {
     ScaffoldMessenger.of(context).clearMaterialBanners();

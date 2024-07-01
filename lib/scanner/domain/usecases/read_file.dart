@@ -29,7 +29,7 @@ class ReadFileUseCase implements ReadFile {
       final result = sl<FileRepos>().readFile(param.path);
       return Either.value(ReadFileEntity(result.name, result.data));
     } on Exception catch (e, st) {
-      return Either.failure(e, st);
+      return Either.exception(e, st);
     }
   }
 }

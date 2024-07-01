@@ -18,7 +18,7 @@ class ExportDatabaseUseCase implements ExportDatabase {
     try {
       return sl<KeyValues>().exportDatabase().then((value) => const Either.value(true));
     } on Exception catch (e, st) {
-      return Either.failure(e, st);
+      return Either.exception(e, st);
     }
   }
 }

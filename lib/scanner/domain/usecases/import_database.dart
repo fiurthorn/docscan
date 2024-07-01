@@ -25,7 +25,7 @@ class ImportDatabaseUseCase implements ImportDatabase {
           .importDatabase(jsonDecode(content) as Map<dynamic, dynamic>)
           .then((value) => const Either.value(true));
     } on Exception catch (e, st) {
-      return Either.failure(e, st);
+      return Either.exception(e, st);
     }
   }
 }

@@ -22,7 +22,7 @@ class RotateImageUseCase implements RotateImage {
     try {
       return sl<ImageConverter>().rotate(param.image, param.counterClockwise).then((value) => Either.value(value));
     } on Exception catch (e, st) {
-      return Either.failure(e, st);
+      return Either.exception(e, st);
     }
   }
 }

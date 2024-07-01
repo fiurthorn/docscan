@@ -20,7 +20,7 @@ class LoadListItemsUseCase implements LoadListItems {
     try {
       return Either.value(sl<KeyValues>().getItems(param.key));
     } on Exception catch (e, st) {
-      return Either.failure(e, st);
+      return Either.exception(e, st);
     }
   }
 }

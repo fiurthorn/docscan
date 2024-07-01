@@ -41,7 +41,7 @@ class WhatsNewScreen extends StatelessWidget {
                 }
 
                 if (snapshot.data == null) {
-                  showBannerFailure(context, "error loading changelog (no data)");
+                  //   showBannerFailure(context, "error loading changelog (no data)");
                   return Container(color: nord6SnowStorm);
                 }
 

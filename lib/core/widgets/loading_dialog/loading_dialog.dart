@@ -12,7 +12,7 @@ class LoadingDialog extends StatelessWidget {
         barrierDismissible: false,
         barrierColor: color ?? Colors.black.withOpacity(0.5),
         builder: (_) => LoadingDialog(key: key),
-      ).then((_) => FocusScope.of(context).requestFocus(FocusNode()));
+      ).then((_) => FocusScope.of(context).unfocus());
 
   static void hide(BuildContext context) => Navigator.pop(context);
 
@@ -43,7 +43,7 @@ class CancelableLoadingDialog extends StatelessWidget {
         barrierDismissible: false,
         barrierColor: color ?? Colors.black.withOpacity(0.5),
         builder: (_) => CancelableLoadingDialog(onCancel, key: key),
-      ).then((_) => FocusScope.of(context).requestFocus(FocusNode()));
+      ).then((_) => FocusScope.of(context).unfocus());
 
   static void hide(BuildContext context) => Navigator.pop(context);
 
@@ -101,7 +101,7 @@ class ProgressLoadingDialog extends StatefulWidget {
         max: max,
         key: key,
       ),
-    ).then((_) => FocusScope.of(context).requestFocus(FocusNode()));
+    ).then((_) => FocusScope.of(context).unfocus());
   }
 
   static void hide(BuildContext context) => Navigator.pop(context);

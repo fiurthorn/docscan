@@ -51,7 +51,7 @@ class ExportAttachmentUseCase implements ExportAttachment {
         )..then((_) => sl<KeyValues>().addSenderName(param.sender)),
       );
     } on Exception catch (e, st) {
-      return Either.failure(e, st);
+      return Either.exception(e, st);
     }
   }
 }

@@ -34,7 +34,7 @@ class CreatePdfFileUseCase implements CreatePdfFile {
           .then((value) => value!);
       return Either.value(value);
     } on Exception catch (e, st) {
-      return Either.failure(e, st);
+      return Either.exception(e, st);
     }
   }
 }

@@ -21,7 +21,7 @@ class StoreListItemsUseCase implements StoreListItems {
     try {
       return sl<KeyValues>().setItems(param.key, param.items).then((_) => const Either.value(true));
     } on Exception catch (e, st) {
-      return Either.failure(e, st);
+      return Either.exception(e, st);
     }
   }
 }

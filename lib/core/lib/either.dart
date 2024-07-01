@@ -4,10 +4,9 @@ typedef Folder<Value, Result> = Result Function(Value value);
 
 sealed class Either<Type> {
   const factory Either.value(Type value) = Value<Type>;
-  const factory Either.failure(Exception exception, [StackTrace? stackTrace]) = Failure<Type>;
-
-  factory Either.failureDynamic(dynamic failure, [StackTrace? stackTrace]) =>
-      Either.failure(Exception("$failure"), StackTrace.current);
+  const factory Either.exception(Exception exception, [StackTrace? stackTrace]) = Failure<Type>;
+  factory Either.failure(dynamic failure, [StackTrace? stackTrace]) =>
+      Either.exception(Exception("$failure"), StackTrace.current);
 
   Either<R> map<R>(Folder<Type, R> converter);
   Type eval();

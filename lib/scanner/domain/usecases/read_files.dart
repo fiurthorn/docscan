@@ -28,7 +28,7 @@ class ReadFilesUseCase implements ReadFiles {
     try {
       return Either.value(sl<FileRepos>().readFiles(param.path).map((e) => ReadFileEntity(e.name, e.data)).toList());
     } on Exception catch (e, st) {
-      return Either.failure(e, st);
+      return Either.exception(e, st);
     }
   }
 }
